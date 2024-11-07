@@ -23,7 +23,7 @@ public class Article extends BaseEntity {
 
     private Long view;
 
-    private Boolean is_deleted;
+    private Boolean isDeleted;
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
