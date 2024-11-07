@@ -17,6 +17,8 @@ public class ReplyComment extends BaseEntity {
 
     private String content;
 
+    private Boolean isAnonymous;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 

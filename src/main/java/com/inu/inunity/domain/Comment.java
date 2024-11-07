@@ -17,6 +17,8 @@ public class Comment extends BaseEntity {
 
     private String content;
 
+    private Boolean isAnonymous;
+
     @ManyToOne
     private User user;
 

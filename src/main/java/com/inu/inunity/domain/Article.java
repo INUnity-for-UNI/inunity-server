@@ -25,6 +25,8 @@ public class Article extends BaseEntity {
 
     private Boolean isDeleted;
 
+    private Boolean isAnonymous;
+
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
