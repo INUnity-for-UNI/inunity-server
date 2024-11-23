@@ -37,14 +37,13 @@ public class JwtProvider {
 
     @PostConstruct
     protected void init() {
-        log.info("[init] 시크릿키 초기화 시작");
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes(StandardCharsets.UTF_8));
         log.info("[init] 시크릿키 초기화 성공");
     }
 
     public String createRefreshToken(Long id, String email, List<String> roles) {
         Claims claims = Jwts.claims().setSubject(email);
-        claims.put("memberId", id);
+        claims.put("userId", id);
         claims.put("roles", roles);
         claims.put("type", "refresh");
         Date now = new Date();
@@ -59,7 +58,6 @@ public class JwtProvider {
 
 
     public String createAccessToken(Long id, String email, List<String> roles) {
-        log.info("[createAccessToken] 토큰 생성 시작");
         Claims claims = Jwts.claims().setSubject(email);
         claims.put("roles", roles);
         claims.put("memberId", id);
@@ -80,7 +78,6 @@ public class JwtProvider {
 
 
     public Authentication getAuthentication(String token) {
-        log.info("[getAuthentication] 토큰 인증 정보 조회 시작");
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(this.getMemberEmail(token));
         log.info("[getAuthentication] 토큰 인증 정보 조회 완료, UserDetails UserName : {}",
                 userDetails.getUsername());
@@ -90,7 +87,6 @@ public class JwtProvider {
 
 
     private String getMemberEmail(String token) {
-        log.info("[getMemberEmail] 토큰 기반 회원 구별 정보 추출");
         String email = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
         log.info("[getMemberEmail] 토큰 기반 회원 구별 정보 추출 완료, info : {}", email);
         return email;
@@ -98,7 +94,6 @@ public class JwtProvider {
 
 
     public Long getMemberId(String token) {
-        log.info("[getUsername] 토큰 기반 회원 구별 정보 추출");
         Long memberId = Long.valueOf(Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("memberId").toString());
         log.info("[getUsername] 토큰 기반 회원 구별 정보 추출 완료, info : {}", memberId);
         return memberId;
@@ -139,7 +134,6 @@ public class JwtProvider {
     }
 
     public boolean validDateToken(String token) {
-        log.info("[validateToken] 토큰 유효 체크 시작");
         Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
 
         if (!claims.getBody().getExpiration().before(new Date())) {
