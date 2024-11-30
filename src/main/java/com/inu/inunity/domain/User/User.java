@@ -12,9 +12,11 @@ import com.inu.inunity.domain.ReplyComment.ReplyComment;
 import com.inu.inunity.domain.profile.skill.Skill;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.management.relation.Role;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,4 +68,21 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Portfolio> portfolios = new ArrayList<>();
+
+    @Builder
+    public User(Long studentNumber, List<String> roles){
+        this.name = name;
+        this.studentNumber = studentNumber;
+        this.nickname = nickname;
+        this.description = description;
+        this.isGraduation = isGraduation;
+        this.roles = roles;
+    }
+
+    public User updateAuthentication(String name, List<String> roles){
+        this.name = name;
+        this.roles = roles;
+
+        return this;
+    }
 }

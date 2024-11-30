@@ -16,10 +16,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String studentNumber) {
-        User user = userRepository.findByStudentId(studentNumber)
+        Long studentId = Long.valueOf(studentNumber);
+        User user = userRepository.findByStudentId(studentId)
                 .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 유저입니다."));
         return CustomUserDetails.from(user);
     }
-
-
 }
