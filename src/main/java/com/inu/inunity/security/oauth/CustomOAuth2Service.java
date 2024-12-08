@@ -36,20 +36,32 @@ public class CustomOAuth2Service implements OAuth2UserService<OAuth2UserRequest,
         String provider = userRequest.getClientRegistration().getRegistrationId();
 
         OAuth2Attributes attributes = OAuth2Attributes.ofGoogle(provider, originAttributes);
-        departmentCertificationUpdate(attributes);
+        validateEmail(attributes.getEmail());
+        validateDepartment(attributes.getName());
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
 
         return new DefaultOAuth2User(authorities, attributes.getAttributes(), attributes.getNameAttributesKey());
     }
 
-    private void departmentCertificationUpdate(OAuth2Attributes authAttributes) {
-        String oAuth2Name = authAttributes.getName();
+    public void validateEmail(String email){
+        StringTokenizer st = new StringTokenizer(email, "@");
+        String emailId = st.nextToken();
+        String provider = st.nextToken();
+
+        if(!provider.equals("inu.ac.kr")){
+            throw new RuntimeException("학교이메일아님");
+        }
+    }
+
+    public void validateDepartment(String oAuth2Name){
         StringTokenizer st = new StringTokenizer(oAuth2Name, "/");
 
         String name = st.nextToken();
-        Long studentId = Long.valueOf(st.nextToken());
-        User user = userRepository.findByStudentId(studentId).get();
+        String department = st.nextToken();
 
-        user.updateAuthentication(name, List.of("ROLE_USER"));
+        if(!(department.equals("컴퓨터공학부") || department.equals("정보통신공학과") || department.equals("임베디드시스템공학과"))){
+            throw new RuntimeException("정보대 소속 학과가 아님");
+        }
     }
+
 }

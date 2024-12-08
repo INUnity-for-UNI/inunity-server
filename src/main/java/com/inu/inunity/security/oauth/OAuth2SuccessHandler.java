@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -46,12 +47,12 @@ class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
-        String oauth2UserName = oAuth2User.getName();
-        StringTokenizer st = new StringTokenizer(oauth2UserName, "/");
-        String name = st.nextToken();
-        Long studentId = Long.valueOf(st.nextToken());
-        User user = userRepository.findByStudentId(studentId).get();
+        Long userId = jwtProvider.getMemberId(jwtProvider.getAuthorizationToken(request));
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new RuntimeException("존재하는 유저가 아님"));
 
+        String oauth2UserName = oAuth2User.getName();
+        certificationUpdate(user, oauth2UserName);
         redirectToken(request, response, user);
     }
 
@@ -60,14 +61,23 @@ class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         Long memberId = user.getId();
 
         String accessToken = jwtProvider.createAccessToken(memberId, user.getStudentNumber(), List.of(Role.ROLE_USER));
-
-        String uri = createURI(accessToken, memberId).toString();
+        String refreshToken = jwtProvider.createRefreshToken(memberId, user.getStudentNumber(), List.of(Role.ROLE_USER));
+        String uri = createURI(response, accessToken, refreshToken, memberId).toString();
         getRedirectStrategy().sendRedirect(request, response, uri);
     }
 
-    private URI createURI(String accessToken, Long userId) {
+
+    private void certificationUpdate(User user, String oauth2UserName) {
+        StringTokenizer st = new StringTokenizer(oauth2UserName, "/");
+        String name = st.nextToken();
+        String department = st.nextToken();
+
+        user.updateAuthentication(name, department, List.of(Role.ROLE_USER));
+    }
+
+    private URI createURI(HttpServletResponse response, String accessToken, String refreshToken, Long userId) {
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-        queryParams.add("accessToken", accessToken);
+        setTokenCookies(response, accessToken, refreshToken);
         log.info("{}", frontHost);
         return UriComponentsBuilder.newInstance()
                 .scheme(frontScheme)
@@ -78,4 +88,27 @@ class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
                 .build()
                 .toUri();
     }
+
+    private void setTokenCookies(HttpServletResponse response, String accessToken, String refreshToken) {
+        // Access Token 쿠키
+        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", accessToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(3600)
+                .build();
+
+        // Refresh Token 쿠키
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(86400)
+                .build();
+
+        // 응답에 쿠키 추가
+        response.addHeader("Set-Cookie", accessTokenCookie.toString());
+        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+    }
+
 }

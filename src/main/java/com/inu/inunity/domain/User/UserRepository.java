@@ -7,7 +7,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByStudentId(Long studentNumber);
+    Optional<User> findByStudentId(Long studentId);
 
+    boolean existsByStudentId(Long studentId);
 
 }

@@ -10,13 +10,14 @@ import com.inu.inunity.domain.profile.contract.Contract;
 import com.inu.inunity.domain.profile.portfolio.Portfolio;
 import com.inu.inunity.domain.ReplyComment.ReplyComment;
 import com.inu.inunity.domain.profile.skill.Skill;
+import com.inu.inunity.security.Role;
+import com.inu.inunity.security.auth.LoginRegisterRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.management.relation.Role;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,10 +38,12 @@ public class User extends BaseEntity {
 
     private String description;
 
+    private String department;
+
     private Boolean isGraduation;
 
     @ElementCollection(fetch = FetchType.LAZY)
-    private List<String> roles = new ArrayList<>();
+    private List<Role> roles = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Article> articles = new ArrayList<>();
@@ -70,19 +73,27 @@ public class User extends BaseEntity {
     private List<Portfolio> portfolios = new ArrayList<>();
 
     @Builder
-    public User(Long studentNumber, List<String> roles){
+    public User(Long studentNumber, String name , String nickname, String description, Boolean isGraduation, String department, List<Role> roles){
         this.name = name;
         this.studentNumber = studentNumber;
         this.nickname = nickname;
         this.description = description;
         this.isGraduation = isGraduation;
+        this.department = department;
         this.roles = roles;
     }
 
-    public User updateAuthentication(String name, List<String> roles){
+    public User updateAuthentication(String name, String department, List<Role> roles){
         this.name = name;
         this.roles = roles;
-
+        this.department = department;
         return this;
+    }
+
+    public static User of(LoginRegisterRequest request, List<Role> roles){
+        return User.builder()
+                .studentNumber(request.getStudentId())
+                .roles(roles)
+                .build();
     }
 }

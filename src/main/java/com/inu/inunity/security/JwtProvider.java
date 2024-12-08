@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+
 
 @Service
 @Slf4j
@@ -34,6 +36,7 @@ public class JwtProvider {
     @Value("${spring.jwt.access-token-valid-time}")
     private Long accessTokenValidTime;
 
+    private static final String COOKIE_NAME = "jwtToken";
 
     @PostConstruct
     protected void init() {
@@ -41,8 +44,8 @@ public class JwtProvider {
         log.info("[init] 시크릿키 초기화 성공");
     }
 
-    public String createRefreshToken(Long id, String email, List<String> roles) {
-        Claims claims = Jwts.claims().setSubject(email);
+    public String createRefreshToken(Long id, Long studentNum, List<Role> roles) {
+        Claims claims = Jwts.claims().setSubject(String.valueOf(studentNum));
         claims.put("userId", id);
         claims.put("roles", roles);
         claims.put("type", "refresh");
@@ -115,21 +118,27 @@ public class JwtProvider {
     }
 
     public String getAuthorizationToken(HttpServletRequest request) {
-        log.info("[getAuthorizationToken] HTTP 헤더에서 Token 값 추출");
-
-        return request.getHeader("Authorization");
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (COOKIE_NAME.equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
     }
 
     public String resolveServiceToken(HttpServletRequest request) {
-        log.info("[resolveServiceToken] HTTP 헤더에서 Token 값 추출");
-
-        String token = request.getHeader("Authorization");
-
-        if (token == null) {
-            throw new RuntimeException("토큰이 없스용");
-        } else {
-            return token.substring(7);
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (COOKIE_NAME.equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
         }
+        return null;
     }
 
     public boolean validDateToken(String token) {
