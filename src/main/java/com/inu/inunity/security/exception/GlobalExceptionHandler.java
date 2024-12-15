@@ -12,6 +12,13 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+    @ExceptionHandler(value = AlreadyRegisteredException.class)
+    public ResponseEntity<CommonResponse> handleAlreadyRegisteredException(AlreadyRegisteredException ex) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        log.error("[handleAlreadyRegisteredException] {}", ex.getMessage());
+        return ResponseEntity.status(status).body(CommonResponse.error(status, ex.getMessage(), null));
+    }
+
     @ExceptionHandler(value = MismatchTokenTypeException.class)
     public ResponseEntity<CommonResponse> handleMismatchTokenTypeException(MismatchTokenTypeException ex) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
@@ -33,10 +40,24 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(status).body(CommonResponse.error(status, ex.getMessage(), null));
     }
 
+    @ExceptionHandler(value = NotRegisteredException.class)
+    public ResponseEntity<CommonResponse> handleNotRegisteredException(NotRegisteredException ex) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        log.error("[handleNotRegisteredException] {}", ex.getMessage());
+        return ResponseEntity.status(status).body(CommonResponse.error(status, ex.getMessage(), null));
+    }
+
     @ExceptionHandler(value = NotSchoolEmailException.class)
     public ResponseEntity<CommonResponse> handleNotSchoolEmailException(NotSchoolEmailException ex) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         log.error("[handleNotSchoolEmailException] {}", ex.getMessage());
+        return ResponseEntity.status(status).body(CommonResponse.error(status, ex.getMessage(), null));
+    }
+
+    @ExceptionHandler(value = PortalLoginException.class)
+    public ResponseEntity<CommonResponse> handlePortalLoginException(PortalLoginException ex) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        log.error("[handlePortalLoginException] {}", ex.getMessage());
         return ResponseEntity.status(status).body(CommonResponse.error(status, ex.getMessage(), null));
     }
 }

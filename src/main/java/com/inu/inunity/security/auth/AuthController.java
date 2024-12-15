@@ -22,9 +22,9 @@ public class AuthController {
         return CommonResponse.success("로그인 성공", null);
     }
 
-    @PostMapping("/v1/auth/register")
+    @PostMapping("/v1/auth/register/login")
     public ResponseEntity<CommonResponse> register(@RequestBody LoginRegisterRequest request, HttpServletResponse response) {
         authService.register(response, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("회원가입 성공", null));
+        return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("회원가입 여부 체그용 로그인 성공", null));
     }
 }
