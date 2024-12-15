@@ -2,6 +2,7 @@ package com.inu.inunity.security.config;
 
 import com.inu.inunity.security.JwtAuthFilter;
 import com.inu.inunity.security.JwtProvider;
+import com.inu.inunity.security.oauth.CustomOAuth2Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,6 +31,7 @@ public class SecurityConfig {
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
     private final CorsConfigurationSource corsConfigurationSource;
+    private final CustomOAuth2Service customOAuth2Service;
 
     @Bean
     protected SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
@@ -46,6 +48,10 @@ public class SecurityConfig {
                         .requestMatchers("**/**").permitAll()
                         .anyRequest().authenticated()
                 )
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
+                                .userService(customOAuth2Service)
+                        ))
                 .addFilterBefore(new JwtAuthFilter(jwtProvider),
                         UsernamePasswordAuthenticationFilter.class)
 
@@ -53,7 +59,6 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                         .authenticationEntryPoint(authenticationEntryPoint)
                 );
-
 
         return httpSecurity.build();
     }

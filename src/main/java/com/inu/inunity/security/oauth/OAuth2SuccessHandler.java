@@ -60,8 +60,8 @@ class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
         Long memberId = user.getId();
 
-        String accessToken = jwtProvider.createAccessToken(memberId, user.getStudentNumber(), List.of(Role.ROLE_USER));
-        String refreshToken = jwtProvider.createRefreshToken(memberId, user.getStudentNumber(), List.of(Role.ROLE_USER));
+        String accessToken = jwtProvider.createAccessToken(memberId, user.getStudentId(), List.of(Role.ROLE_USER));
+        String refreshToken = jwtProvider.createRefreshToken(memberId, user.getStudentId(), List.of(Role.ROLE_USER));
         String uri = createURI(response, accessToken, refreshToken, memberId).toString();
         getRedirectStrategy().sendRedirect(request, response, uri);
     }

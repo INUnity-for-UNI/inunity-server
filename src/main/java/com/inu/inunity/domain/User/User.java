@@ -32,7 +32,7 @@ public class User extends BaseEntity {
 
     private String name;
 
-    private Long studentNumber;
+    private Long studentId;
 
     private String nickname;
 
@@ -73,9 +73,9 @@ public class User extends BaseEntity {
     private List<Portfolio> portfolios = new ArrayList<>();
 
     @Builder
-    public User(Long studentNumber, String name , String nickname, String description, Boolean isGraduation, String department, List<Role> roles){
+    public User(Long studentId, String name , String nickname, String description, Boolean isGraduation, String department, List<Role> roles){
         this.name = name;
-        this.studentNumber = studentNumber;
+        this.studentId = studentId;
         this.nickname = nickname;
         this.description = description;
         this.isGraduation = isGraduation;
@@ -92,7 +92,7 @@ public class User extends BaseEntity {
 
     public static User of(LoginRegisterRequest request, List<Role> roles){
         return User.builder()
-                .studentNumber(request.getStudentId())
+                .studentId(request.getStudentId())
                 .roles(roles)
                 .build();
     }

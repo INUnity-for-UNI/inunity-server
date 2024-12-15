@@ -28,7 +28,7 @@ public class CustomUserDetails implements OAuth2User, UserDetails {
                 .collect(Collectors.toList());
 
         return new CustomUserDetails(user.getId(),
-                user.getStudentNumber(),
+                user.getStudentId(),
                 authorities);
     }
 

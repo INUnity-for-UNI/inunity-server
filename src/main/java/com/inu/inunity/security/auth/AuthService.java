@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,23 +26,24 @@ public class AuthService {
     private final RestTemplate restTemplate;
     private final JwtProvider jwtProvider;
 
-    private static final String AUTH_SERVER_URL = "https://api.inuappcenter.kr/auth/login";
+    private static final String AUTH_SERVER_URL = "https://api.inuappcenter.kr/account/status";
 
     public Boolean loginWithAuthServer(LoginRegisterRequest request) {
-        // 요청 헤더 설정
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        // 요청 본문 설정
-        String body = "id=" + request.studentId + "&password=" + request.password;
+        String body = request.getStudentId() + ":" + request.getPassword();
+        String encodedAuth = Base64.getEncoder().encodeToString(body.getBytes(StandardCharsets.UTF_8));
+        headers.set("Authorization", "Basic " + encodedAuth);
 
-        HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
+        System.out.println(encodedAuth);
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
         try {
-            // 인증 서버로 요청 전송
             ResponseEntity<Map> response = restTemplate.exchange(
                     AUTH_SERVER_URL,
-                    HttpMethod.POST,
+                    HttpMethod.GET,
                     requestEntity,
                     Map.class
             );
@@ -63,8 +66,8 @@ public class AuthService {
             throw new RuntimeException("포탈에 없는 아이디/비밀번호");
         }
 
-        String accessToken = jwtProvider.createAccessToken(user.getId(), user.getStudentNumber(), user.getRoles());
-        String refreshToken = jwtProvider.createRefreshToken(user.getId(), user.getStudentNumber(), user.getRoles());
+        String accessToken = jwtProvider.createAccessToken(user.getId(), user.getStudentId(), user.getRoles());
+        String refreshToken = jwtProvider.createRefreshToken(user.getId(), user.getStudentId(), user.getRoles());
 
         setTokenCookies(response, accessToken, refreshToken);
     }
@@ -72,6 +75,7 @@ public class AuthService {
     @Transactional
     public void register(HttpServletResponse response, LoginRegisterRequest request){
         isRegister(request);
+
         if(!loginWithAuthServer(request)){
             throw new RuntimeException("포탈에 없는 아이디/비밀번호");
         }
@@ -80,8 +84,8 @@ public class AuthService {
 
         userRepository.save(user);
 
-        String accessToken = jwtProvider.createAccessToken(user.getId(), user.getStudentNumber(), user.getRoles());
-        String refreshToken = jwtProvider.createRefreshToken(user.getId(), user.getStudentNumber(), user.getRoles());
+        String accessToken = jwtProvider.createAccessToken(user.getId(), user.getStudentId(), user.getRoles());
+        String refreshToken = jwtProvider.createRefreshToken(user.getId(), user.getStudentId(), user.getRoles());
 
         setTokenCookies(response, accessToken, refreshToken);
     }
