@@ -4,6 +4,10 @@ import com.inu.inunity.domain.User.User;
 import com.inu.inunity.domain.User.UserRepository;
 import com.inu.inunity.security.JwtProvider;
 import com.inu.inunity.security.Role;
+import com.inu.inunity.security.exception.AlreadyRegisteredException;
+import com.inu.inunity.security.exception.ExceptionMessage;
+import com.inu.inunity.security.exception.NotRegisteredException;
+import com.inu.inunity.security.exception.PortalLoginException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
@@ -55,15 +59,15 @@ public class AuthService {
 
     public void isRegister(LoginRegisterRequest request) {
         if (userRepository.existsByStudentId(request.getStudentId())) {
-            throw new IllegalArgumentException("이미 가입된 학번입니다.");
+            throw new AlreadyRegisteredException(ExceptionMessage.USER_ALREADY_REGISTERED);
         }
     }
 
     public void login(HttpServletResponse response, LoginRegisterRequest request){
         User user = userRepository.findByStudentId(request.getStudentId())
-                .orElseThrow(()->new RuntimeException("가입되지 않음."));
+                .orElseThrow(()->new NotRegisteredException(ExceptionMessage.USER_NOT_REGISTERED));
         if(!loginWithAuthServer(request)){
-            throw new RuntimeException("포탈에 없는 아이디/비밀번호");
+            throw new PortalLoginException(ExceptionMessage.PORTAL_LOGIN_FAILED_ID_PASSWORD_INCORRECT);
         }
 
         String accessToken = jwtProvider.createAccessToken(user.getId(), user.getStudentId(), user.getRoles());
@@ -77,7 +81,7 @@ public class AuthService {
         isRegister(request);
 
         if(!loginWithAuthServer(request)){
-            throw new RuntimeException("포탈에 없는 아이디/비밀번호");
+            throw new PortalLoginException(ExceptionMessage.PORTAL_LOGIN_FAILED_ID_PASSWORD_INCORRECT);
         }
 
         User user = User.of(request, List.of(Role.ROLE_TEST));

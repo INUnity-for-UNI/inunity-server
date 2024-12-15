@@ -4,6 +4,8 @@ import com.inu.inunity.domain.User.User;
 import com.inu.inunity.domain.User.UserRepository;
 import com.inu.inunity.security.JwtProvider;
 import com.inu.inunity.security.Role;
+import com.inu.inunity.security.exception.ExceptionMessage;
+import com.inu.inunity.security.exception.NotFoundElementException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +51,7 @@ class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
         Long userId = jwtProvider.getMemberId(jwtProvider.getAuthorizationToken(request));
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new RuntimeException("존재하는 유저가 아님"));
+                .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
 
         String oauth2UserName = oAuth2User.getName();
         certificationUpdate(user, oauth2UserName);

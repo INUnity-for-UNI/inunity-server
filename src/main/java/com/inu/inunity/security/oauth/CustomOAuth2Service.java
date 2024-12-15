@@ -2,6 +2,9 @@ package com.inu.inunity.security.oauth;
 
 import com.inu.inunity.domain.User.User;
 import com.inu.inunity.domain.User.UserRepository;
+import com.inu.inunity.security.exception.ExceptionMessage;
+import com.inu.inunity.security.exception.NotInformationMajorException;
+import com.inu.inunity.security.exception.NotSchoolEmailException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,15 +19,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.StringTokenizer;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class CustomOAuth2Service implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
-
-    private final UserRepository userRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -37,7 +37,7 @@ public class CustomOAuth2Service implements OAuth2UserService<OAuth2UserRequest,
 
         OAuth2Attributes attributes = OAuth2Attributes.ofGoogle(provider, originAttributes);
         validateEmail(attributes.getEmail());
-        validateDepartment(attributes.getName());
+        validateMajor(attributes.getName());
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
 
         return new DefaultOAuth2User(authorities, attributes.getAttributes(), attributes.getNameAttributesKey());
@@ -49,18 +49,18 @@ public class CustomOAuth2Service implements OAuth2UserService<OAuth2UserRequest,
         String provider = st.nextToken();
 
         if(!provider.equals("inu.ac.kr")){
-            throw new RuntimeException("학교이메일아님");
+            throw new NotSchoolEmailException(ExceptionMessage.EMAIL_NOT_INU);
         }
     }
 
-    public void validateDepartment(String oAuth2Name){
+    public void validateMajor(String oAuth2Name){
         StringTokenizer st = new StringTokenizer(oAuth2Name, "/");
 
         String name = st.nextToken();
         String department = st.nextToken();
 
         if(!(department.equals("컴퓨터공학부") || department.equals("정보통신공학과") || department.equals("임베디드시스템공학과"))){
-            throw new RuntimeException("정보대 소속 학과가 아님");
+            throw new NotInformationMajorException(ExceptionMessage.USER_NOT_INFORMATION_MAJOR);
         }
     }
 
