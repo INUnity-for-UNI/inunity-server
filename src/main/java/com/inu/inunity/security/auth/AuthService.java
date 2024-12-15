@@ -2,15 +2,14 @@ package com.inu.inunity.security.auth;
 
 import com.inu.inunity.domain.User.User;
 import com.inu.inunity.domain.User.UserRepository;
+import com.inu.inunity.security.CustomUserDetails;
 import com.inu.inunity.security.JwtProvider;
 import com.inu.inunity.security.Role;
-import com.inu.inunity.security.exception.AlreadyRegisteredException;
-import com.inu.inunity.security.exception.ExceptionMessage;
-import com.inu.inunity.security.exception.NotRegisteredException;
-import com.inu.inunity.security.exception.PortalLoginException;
+import com.inu.inunity.security.exception.*;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -92,6 +91,15 @@ public class AuthService {
         String refreshToken = jwtProvider.createRefreshToken(user.getId(), user.getStudentId(), user.getRoles());
 
         setTokenCookies(response, accessToken, refreshToken);
+    }
+
+    @Transactional
+    public String testCookie(UserDetails userDetails){
+        Long userId = ((CustomUserDetails) userDetails).getId();
+
+        User user = userRepository.findById(userId).orElseThrow(()-> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
+
+        return user.getName()+ " "+ user.getStudentId() + " " + user.getRoles() + " " + user.getDepartment();
     }
 
     private void setTokenCookies(HttpServletResponse response, String accessToken, String refreshToken) {

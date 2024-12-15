@@ -31,7 +31,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         log.info("[doFilterInternal] Token ={}", token);
 
         if (token != null) {
-            String jwtToken = token.substring(7);
+            String jwtToken = token.substring(6);
 
             if (servletRequest.getRequestURI().equals("/v1/auth/reissue")) {
                 jwtProvider.validRefreshToken(jwtToken);
