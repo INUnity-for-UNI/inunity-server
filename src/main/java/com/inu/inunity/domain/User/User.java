@@ -90,6 +90,20 @@ public class User extends BaseEntity {
         return this;
     }
 
+    public User setUser(String name, String department, List<Role> roles){
+        this.name = name;
+        this.roles = roles;
+        this.department = department;
+        return this;
+    }
+
+    public User updateUser(String name, String department, List<Role> roles){
+        this.name = name;
+        this.roles = roles;
+        this.department = department;
+        return this;
+    }
+
     public static User of(LoginRegisterRequest request, List<Role> roles){
         return User.builder()
                 .studentId(request.getStudentId())

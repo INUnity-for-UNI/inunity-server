@@ -21,16 +21,16 @@ public class AuthController {
         return CommonResponse.success("로그인 성공", null);
     }
 
-    @PostMapping("/v1/auth/register/login")
-    public ResponseEntity<CommonResponse> register(@RequestBody LoginRegisterRequest request, HttpServletResponse response) {
+    @PostMapping("/v1/auth/register")
+    public ResponseEntity<CommonResponse<?>> register(@RequestBody LoginRegisterRequest request, HttpServletResponse response) {
         authService.register(response, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("회원가입 여부 체그용 로그인 성공", null));
+        return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("회원가입 성공", null));
     }
 
     @GetMapping("/v1/auth/test")
-    public ResponseEntity<CommonResponse> register(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<CommonResponse<?>> test(@AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(CommonResponse.success("회원가입 여부 체그용 로그인 성공", authService.testCookie(userDetails)));
+                .body(CommonResponse.success("요거슨 토큰에서 사용자 정보 꺼내는 테스트인것이여", authService.testCookie(userDetails)));
     }
 
 }

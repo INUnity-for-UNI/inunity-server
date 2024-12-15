@@ -16,9 +16,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -56,10 +56,13 @@ public class AuthService {
         }
     }
 
-    public void isRegister(LoginRegisterRequest request) {
-        if (userRepository.existsByStudentId(request.getStudentId())) {
+    public Optional<User> isRegistered(LoginRegisterRequest request) {
+        Optional<User> user = userRepository.findByStudentId(request.getStudentId());
+        if (user.isPresent() && !user.get().getName().isEmpty()) {
             throw new AlreadyRegisteredException(ExceptionMessage.USER_ALREADY_REGISTERED);
         }
+
+        return user;
     }
 
     public void login(HttpServletResponse response, LoginRegisterRequest request){
@@ -77,20 +80,20 @@ public class AuthService {
 
     @Transactional
     public void register(HttpServletResponse response, LoginRegisterRequest request){
-        isRegister(request);
-
         if(!loginWithAuthServer(request)){
             throw new PortalLoginException(ExceptionMessage.PORTAL_LOGIN_FAILED_ID_PASSWORD_INCORRECT);
         }
-
-        User user = User.of(request, List.of(Role.ROLE_TEST));
-
+        User user = makeUser(isRegistered(request), request);
         userRepository.save(user);
 
         String accessToken = jwtProvider.createAccessToken(user.getId(), user.getStudentId(), user.getRoles());
         String refreshToken = jwtProvider.createRefreshToken(user.getId(), user.getStudentId(), user.getRoles());
 
         setTokenCookies(response, accessToken, refreshToken);
+    }
+
+    public User makeUser(Optional<User> user, LoginRegisterRequest request){
+        return user.orElseGet(() -> User.of(request, List.of(Role.ROLE_TEST)));
     }
 
     @Transactional

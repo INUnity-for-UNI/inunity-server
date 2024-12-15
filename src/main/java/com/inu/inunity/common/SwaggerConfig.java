@@ -11,22 +11,16 @@ import org.springframework.http.HttpHeaders;
 public class SwaggerConfig {
     @Bean
     public OpenAPI openAPI() {
-        // API 요청헤더에 인증정보 포함
-        SecurityRequirement securityRequirement = new SecurityRequirement();
-        securityRequirement.addList("JWT");
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList("JWT-Cookie");
 
-        // Security 스키마 설정
-        SecurityScheme bearerAuth = new SecurityScheme()
-                .type(SecurityScheme.Type.HTTP)
-                .scheme("bearer")
-                .bearerFormat("JWT")
-                .in(SecurityScheme.In.HEADER)
-                .name(HttpHeaders.AUTHORIZATION);
+        SecurityScheme cookieAuth = new SecurityScheme()
+                .type(SecurityScheme.Type.APIKEY)
+                .in(SecurityScheme.In.COOKIE)
+                .name("jwtToken");
 
         return new OpenAPI()
-                // Security 인증 컴포넌트 설정
-                .components(new Components().addSecuritySchemes("JWT", bearerAuth))
-                // API 마다 Security 인증 컴포넌트 설정
+                .components(new Components()
+                        .addSecuritySchemes("JWT-Cookie", cookieAuth))
                 .addSecurityItem(securityRequirement)
                 .info(info());
     }
@@ -34,8 +28,8 @@ public class SwaggerConfig {
 
     private io.swagger.v3.oas.models.info.Info info() {
         return new Info()
-                .title("Timepiece 프로젝트 API Document")
+                .title("")
                 .version("v0.1")
-                .description("Timepiece 프로젝트의 API 명세서입니다.");
+                .description("");
     }
 }
