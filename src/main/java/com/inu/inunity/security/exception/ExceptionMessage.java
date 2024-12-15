@@ -14,6 +14,7 @@ public enum ExceptionMessage {
     TOKEN_TYPE_INVALID("토큰 타입이 틀렸습니다.", 0, HttpStatus.BAD_REQUEST),
     FAILED_VALIDATION("유효성 검사 실패", 0, HttpStatus.BAD_REQUEST),
     EMAIL_NOT_INU("인천대학교 이메일이 아닌데요?!", 0, HttpStatus.BAD_REQUEST),
+    EMAIL_NOT_UNDEFINED("이메일의 이름이 참... 이걸론 인증 몬합니다!", 0, HttpStatus.BAD_REQUEST),
     USER_NOT_INFORMATION_MAJOR("정보대 구성원이 아닌데요!", 0, HttpStatus.BAD_REQUEST),
     USER_ALREADY_REGISTERED("이미 가입된 유저입니다", 0, HttpStatus.BAD_REQUEST),
     USER_NOT_REGISTERED("서비스에 가입되지 않은 유저입니다.", 0, HttpStatus.BAD_REQUEST),

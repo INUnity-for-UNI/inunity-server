@@ -28,7 +28,7 @@ import java.util.StringTokenizer;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtProvider jwtProvider;
 

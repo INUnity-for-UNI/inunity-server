@@ -3,6 +3,8 @@ package com.inu.inunity.security.config;
 import com.inu.inunity.security.JwtAuthFilter;
 import com.inu.inunity.security.JwtProvider;
 import com.inu.inunity.security.oauth.CustomOAuth2Service;
+import com.inu.inunity.security.oauth.OAuth2SuccessHandler;
+import com.inu.inunity.security.oauth.Oauth2FailHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,6 +34,8 @@ public class SecurityConfig {
 
     private final CorsConfigurationSource corsConfigurationSource;
     private final CustomOAuth2Service customOAuth2Service;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final Oauth2FailHandler oauth2FailHandler;
 
     @Bean
     protected SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
@@ -51,7 +55,9 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(customOAuth2Service)
-                        ))
+                        )
+                        .successHandler(oAuth2SuccessHandler)
+                        .failureHandler(oauth2FailHandler))
                 .addFilterBefore(new JwtAuthFilter(jwtProvider),
                         UsernamePasswordAuthenticationFilter.class)
 
