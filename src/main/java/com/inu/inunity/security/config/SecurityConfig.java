@@ -4,21 +4,18 @@ import com.inu.inunity.security.JwtAuthFilter;
 import com.inu.inunity.security.JwtProvider;
 import com.inu.inunity.security.oauth.CustomAuthorizationRequestResolver;
 import com.inu.inunity.security.oauth.CustomOAuth2Service;
+import com.inu.inunity.security.oauth.OAuth2FailHandler;
 import com.inu.inunity.security.oauth.OAuth2SuccessHandler;
-import com.inu.inunity.security.oauth.Oauth2FailHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HttpBasicConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -42,7 +39,7 @@ public class SecurityConfig {
     private final AuthenticationEntryPoint authenticationEntryPoint;
     private final CustomOAuth2Service customOAuth2Service;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
-    private final Oauth2FailHandler oauth2FailHandler;
+    private final OAuth2FailHandler oauth2FailHandler;
     private final CustomAuthorizationRequestResolver customAuthorizationRequestResolver;
 
     @Bean
@@ -74,8 +71,8 @@ public class SecurityConfig {
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(customOAuth2Service)
                         )
-                        .successHandler(oAuth2SuccessHandler)
-                        .failureHandler(oauth2FailHandler))
+                        .failureHandler(oauth2FailHandler)
+                        .successHandler(oAuth2SuccessHandler))
                 .addFilterBefore(new JwtAuthFilter(jwtProvider),
                         UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer

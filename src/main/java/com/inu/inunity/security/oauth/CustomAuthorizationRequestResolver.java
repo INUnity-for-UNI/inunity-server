@@ -68,7 +68,6 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
                 }
             }
         }
-        System.out.println("Cookie " + name + " not found.");
-        return null;
+        return "NO_STATE";
     }
 }

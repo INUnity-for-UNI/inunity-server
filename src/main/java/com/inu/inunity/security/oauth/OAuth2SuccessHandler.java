@@ -5,14 +5,16 @@ import com.inu.inunity.domain.User.UserRepository;
 import com.inu.inunity.security.JwtProvider;
 import com.inu.inunity.security.Role;
 import com.inu.inunity.security.exception.ExceptionMessage;
-import com.inu.inunity.security.exception.NotFoundElementException;
 import com.inu.inunity.security.exception.NotInformationMajorException;
+import com.inu.inunity.security.exception.NullTokenException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -47,23 +49,32 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private String frontPath;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+                                        Authentication authentication) throws IOException {
         DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
         String customAccessToken = request.getParameter("state");
 
+        //TODO: jwt 토큰 에러 관련 filter 추가하면서 이것도 같이 처리하기
+        if (customAccessToken.equals("NO_STATE")) {
+            throw new NullTokenException(new OAuth2Error("0", ExceptionMessage.TOKEN_NOT_FOUND.getMessage(), null));
+        }
+
         Long userId = jwtProvider.getMemberId(customAccessToken);
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
+                .orElseThrow(() -> new OAuth2AuthenticationException(new OAuth2Error("NotFoundElementException", ExceptionMessage.USER_NOT_FOUND.getMessage(), null)));
 
-        String oauth2UserName = oAuth2User.getName();
+        String oauth2UserName = oAuth2User.getAttribute("name");
         certificationUpdate(user, oauth2UserName, authentication);
         redirectToken(request, response, user);
     }
 
     private void redirectToken(HttpServletRequest request, HttpServletResponse response, User user) throws IOException {
         Long memberId = user.getId();
-        String accessToken = jwtProvider.createAccessToken(memberId, user.getStudentId(), List.of(Role.ROLE_USER));
-        String refreshToken = jwtProvider.createRefreshToken(memberId, user.getStudentId(), List.of(Role.ROLE_USER));
+
+        String accessToken = jwtProvider
+                .createAccessToken(memberId, user.getStudentId(), List.of(Role.ROLE_USER));
+        String refreshToken = jwtProvider
+                .createRefreshToken(memberId, user.getStudentId(), List.of(Role.ROLE_USER));
         String uri = createURI(response, accessToken, refreshToken).toString();
 
         getRedirectStrategy().sendRedirect(request, response, uri);
@@ -74,7 +85,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String[] parts = oAuth2Name.split("/");
 
         if (parts.length != 2) {
-            throw new NotInformationMajorException(ExceptionMessage.EMAIL_NOT_UNDEFINED);
+            log.error("[certificationUpdate] {}", ExceptionMessage.EMAIL_NOT_UNDEFINED);
+            throw new NotInformationMajorException(new OAuth2Error("0",
+                    ExceptionMessage.EMAIL_NOT_UNDEFINED.getMessage(), null));
         }
         String name = parts[0];
         String department = parts[1];
@@ -84,6 +97,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .collect(Collectors.toList());
 
         user.updateAuthentication(name, department, roles);
+        userRepository.save(user);
     }
 
     private URI createURI(HttpServletResponse response, String accessToken, String refreshToken) {

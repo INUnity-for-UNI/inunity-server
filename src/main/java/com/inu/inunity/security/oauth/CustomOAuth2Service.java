@@ -13,6 +13,7 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -43,12 +44,14 @@ public class CustomOAuth2Service implements OAuth2UserService<OAuth2UserRequest,
         String[] parts = email.split("@");
 
         if (parts.length != 2) {
-            throw new NotSchoolEmailException(ExceptionMessage.EMAIL_NOT_INU);
+            log.info("[validateEmail] {}", ExceptionMessage.EMAIL_NOT_INU.getMessage());
+            throw new NotSchoolEmailException(new OAuth2Error("0", ExceptionMessage.EMAIL_NOT_INU.getMessage(), null));
         }
         String provider = parts[1];
 
         if (!"inu.ac.kr".equals(provider)) {
-            throw new NotSchoolEmailException(ExceptionMessage.EMAIL_NOT_INU);
+            log.info("[validateEmail] {}", ExceptionMessage.EMAIL_NOT_INU.getMessage());
+            throw new NotSchoolEmailException(new OAuth2Error("0", ExceptionMessage.EMAIL_NOT_INU.getMessage(), null));
         }
     }
 
@@ -56,12 +59,14 @@ public class CustomOAuth2Service implements OAuth2UserService<OAuth2UserRequest,
         String[] parts = oAuth2Name.split("/");
 
         if (parts.length != 2) {
-            throw new NotInformationMajorException(ExceptionMessage.EMAIL_NOT_UNDEFINED);
+            log.info("[validateMajor] {}", ExceptionMessage.EMAIL_NOT_UNDEFINED.getMessage());
+            throw new NotInformationMajorException(new OAuth2Error("0", ExceptionMessage.EMAIL_NOT_UNDEFINED.getMessage(), null));
         }
         String department = parts[1];
 
         if (!Department.isValidDepartment(department)) {
-            throw new NotInformationMajorException(ExceptionMessage.USER_NOT_INFORMATION_MAJOR);
+            log.info("[validateMajor] {}", ExceptionMessage.EMAIL_NOT_UNDEFINED.getMessage());
+            throw new NotInformationMajorException(new OAuth2Error("0", ExceptionMessage.EMAIL_NOT_UNDEFINED.getMessage(), null));
         }
     }
 }
