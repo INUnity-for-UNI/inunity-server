@@ -2,6 +2,7 @@ package com.inu.inunity.security.oauth;
 
 import com.inu.inunity.domain.User.User;
 import com.inu.inunity.domain.User.UserRepository;
+import com.inu.inunity.security.CustomUserDetails;
 import com.inu.inunity.security.JwtProvider;
 import com.inu.inunity.security.Role;
 import com.inu.inunity.security.exception.ExceptionMessage;
@@ -13,6 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -23,6 +28,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 @Component
@@ -49,7 +55,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
-        Long userId = jwtProvider.getMemberId(jwtProvider.getAuthorizationToken(request));
+        String customState = request.getParameter("state");
+
+        Long userId = jwtProvider.getMemberId(customState);
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
 

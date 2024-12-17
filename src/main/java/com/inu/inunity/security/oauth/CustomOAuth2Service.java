@@ -2,6 +2,7 @@ package com.inu.inunity.security.oauth;
 
 import com.inu.inunity.domain.User.User;
 import com.inu.inunity.domain.User.UserRepository;
+import com.inu.inunity.security.CustomUserDetails;
 import com.inu.inunity.security.exception.ExceptionMessage;
 import com.inu.inunity.security.exception.NotFoundElementException;
 import com.inu.inunity.security.exception.NotInformationMajorException;
@@ -32,7 +33,6 @@ public class CustomOAuth2Service implements OAuth2UserService<OAuth2UserRequest,
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2UserService<OAuth2UserRequest, OAuth2User> service = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = service.loadUser(userRequest);
-
         Map<String, Object> originAttributes = oAuth2User.getAttributes();
 
         String provider = userRequest.getClientRegistration().getRegistrationId();
@@ -71,5 +71,4 @@ public class CustomOAuth2Service implements OAuth2UserService<OAuth2UserRequest,
             throw new NotInformationMajorException(ExceptionMessage.USER_NOT_INFORMATION_MAJOR);
         }
     }
-
 }
