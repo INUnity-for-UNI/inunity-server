@@ -58,7 +58,7 @@ public class AuthService {
 
     public Optional<User> isRegistered(LoginRegisterRequest request) {
         Optional<User> user = userRepository.findByStudentId(request.getStudentId());
-        if (user.isPresent() && !user.get().getName().isEmpty()) {
+        if (user.isPresent()) {
             throw new AlreadyRegisteredException(ExceptionMessage.USER_ALREADY_REGISTERED);
         }
 
@@ -111,6 +111,7 @@ public class AuthService {
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
+                .sameSite("None")
                 .maxAge(3600)
                 .build();
 

@@ -36,7 +36,7 @@ public class JwtProvider {
     @Value("${spring.jwt.access-token-valid-time}")
     private Long accessTokenValidTime;
 
-    private static final String COOKIE_NAME = "jwtToken";
+    private static final String COOKIE_NAME = "accessToken";
 
     @PostConstruct
     protected void init() {

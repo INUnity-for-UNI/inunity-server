@@ -19,7 +19,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -31,8 +35,6 @@ public class SecurityConfig {
     private final AccessDeniedHandler accessDeniedHandler;
 
     private final AuthenticationEntryPoint authenticationEntryPoint;
-
-    private final CorsConfigurationSource corsConfigurationSource;
     private final CustomOAuth2Service customOAuth2Service;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final Oauth2FailHandler oauth2FailHandler;
@@ -42,9 +44,7 @@ public class SecurityConfig {
         httpSecurity
                 .httpBasic(HttpBasicConfigurer::disable)
                 .csrf(CsrfConfigurer::disable)
-                .cors(security -> {
-                    security.configurationSource(corsConfigurationSource);
-                })
+                .cors(security -> security.configurationSource(corsConfigurationSource()))
                 .sessionManagement((sessionManagement) ->
                         sessionManagement
                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -67,6 +67,19 @@ public class SecurityConfig {
                 );
 
         return httpSecurity.build();
+    }
+
+    @Bean
+    protected CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOriginPatterns(List.of("*")); // 모든 출처 허용
+        configuration.setAllowedMethods(List.of("*"));       // 모든 HTTP 메서드 허용 (GET, POST, PUT 등)
+        configuration.setAllowedHeaders(List.of("*"));       // 모든 헤더 허용
+        configuration.setAllowCredentials(true);             // 쿠키, 인증 정보 허용 (필요 시)
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // 모든 경로에 대해 설정 적용
+        return source;
     }
 
     @Bean

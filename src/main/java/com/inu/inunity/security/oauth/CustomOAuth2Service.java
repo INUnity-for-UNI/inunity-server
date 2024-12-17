@@ -37,7 +37,7 @@ public class CustomOAuth2Service implements OAuth2UserService<OAuth2UserRequest,
 
         String provider = userRequest.getClientRegistration().getRegistrationId();
 
-        OAuth2Attributes attributes = OAuth2Attributes.ofGoogle(provider, originAttributes);
+        OAuth2Attributes attributes = OAuth2Attributes.ofGoogle("sub", originAttributes);
         System.out.println(originAttributes.toString());
         validateEmail(attributes.getEmail());
         validateMajor(attributes.getName());

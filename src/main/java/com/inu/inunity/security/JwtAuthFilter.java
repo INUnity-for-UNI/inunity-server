@@ -31,18 +31,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         log.info("[doFilterInternal] Token ={}", token);
 
         if (token != null) {
-            String jwtToken = token.substring(6);
 
             if (servletRequest.getRequestURI().equals("/v1/auth/reissue")) {
-                jwtProvider.validRefreshToken(jwtToken);
+                jwtProvider.validRefreshToken(token);
             } else {
-                jwtProvider.validAccessToken(jwtToken);
+                jwtProvider.validAccessToken(token);
             }
             log.info("[doFilterInternal] 토큰 타입 확인 완료");
 
-            jwtProvider.validDateToken(jwtToken);
-            log.info("결과: {}, ", jwtProvider.validDateToken(jwtToken));
-            Authentication authentication = jwtProvider.getAuthentication(jwtToken);
+            jwtProvider.validDateToken(token);
+            log.info("결과: {}, ", jwtProvider.validDateToken(token));
+            Authentication authentication = jwtProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             requestAttributeSecurityContextRepository.saveContext(SecurityContextHolder.getContext(), servletRequest, servletResponse);
             log.info("[doFilterInternal] 토큰 값 검증 완료.git");
