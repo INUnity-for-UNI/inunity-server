@@ -6,6 +6,7 @@ import com.inu.inunity.security.CustomUserDetails;
 import com.inu.inunity.security.JwtProvider;
 import com.inu.inunity.security.Role;
 import com.inu.inunity.security.exception.*;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
@@ -107,24 +108,21 @@ public class AuthService {
 
     private void setTokenCookies(HttpServletResponse response, String accessToken, String refreshToken) {
         // Access Token 쿠키
-        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", accessToken)
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .sameSite("None")
-                .maxAge(3600)
-                .build();
+        Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
+        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setSecure(false);
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setMaxAge(3600);
 
         // Refresh Token 쿠키
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge(86400)
-                .build();
+        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(false);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(86400);
 
         // 응답에 쿠키 추가
-        response.addHeader("Set-Cookie", accessTokenCookie.toString());
-        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+        response.addCookie(accessTokenCookie);
+        response.addCookie(refreshTokenCookie);
     }
 }
