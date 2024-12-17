@@ -6,7 +6,6 @@ import com.inu.inunity.security.CustomUserDetails;
 import com.inu.inunity.security.JwtProvider;
 import com.inu.inunity.security.Role;
 import com.inu.inunity.security.exception.*;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
@@ -66,22 +65,22 @@ public class AuthService {
         return user;
     }
 
-    public void login(HttpServletResponse response, LoginRegisterRequest request){
+    public void login(HttpServletResponse response, LoginRegisterRequest request) {
         User user = userRepository.findByStudentId(request.getStudentId())
-                .orElseThrow(()->new NotRegisteredException(ExceptionMessage.USER_NOT_REGISTERED));
-        if(!loginWithAuthServer(request)){
+                .orElseThrow(() -> new NotRegisteredException(ExceptionMessage.USER_NOT_REGISTERED));
+        if (!loginWithAuthServer(request)) {
             throw new PortalLoginException(ExceptionMessage.PORTAL_LOGIN_FAILED_ID_PASSWORD_INCORRECT);
         }
 
         String accessToken = jwtProvider.createAccessToken(user.getId(), user.getStudentId(), user.getRoles());
         String refreshToken = jwtProvider.createRefreshToken(user.getId(), user.getStudentId(), user.getRoles());
 
-        setTokenCookies(response, accessToken, refreshToken);
+        jwtProvider.setTokenCookies(response, accessToken, refreshToken);
     }
 
     @Transactional
-    public void register(HttpServletResponse response, LoginRegisterRequest request){
-        if(!loginWithAuthServer(request)){
+    public void register(HttpServletResponse response, LoginRegisterRequest request) {
+        if (!loginWithAuthServer(request)) {
             throw new PortalLoginException(ExceptionMessage.PORTAL_LOGIN_FAILED_ID_PASSWORD_INCORRECT);
         }
         User user = makeUser(isRegistered(request), request);
@@ -90,43 +89,19 @@ public class AuthService {
         String accessToken = jwtProvider.createAccessToken(user.getId(), user.getStudentId(), user.getRoles());
         String refreshToken = jwtProvider.createRefreshToken(user.getId(), user.getStudentId(), user.getRoles());
 
-        setTokenCookies(response, accessToken, refreshToken);
+        jwtProvider.setTokenCookies(response, accessToken, refreshToken);
     }
 
-    public User makeUser(Optional<User> user, LoginRegisterRequest request){
+    public User makeUser(Optional<User> user, LoginRegisterRequest request) {
         return user.orElseGet(() -> User.of(request, List.of(Role.ROLE_TEST)));
     }
 
     @Transactional
-    public String testCookie(UserDetails userDetails){
+    public String testCookie(UserDetails userDetails) {
         Long userId = ((CustomUserDetails) userDetails).getId();
 
-        User user = userRepository.findById(userId).orElseThrow(()-> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
 
-        return user.getName()+ " "+ user.getStudentId() + " " + user.getRoles() + " " + user.getDepartment();
-    }
-
-    private void setTokenCookies(HttpServletResponse response, String accessToken, String refreshToken) {
-        // Access Token 쿠키
-        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", accessToken)
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .sameSite("None")
-                .maxAge(3600)
-                .build();
-
-        // Refresh Token 쿠키
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .sameSite("None")
-                .maxAge(86400)
-                .build();
-
-        // 응답에 쿠키 추가
-        response.addHeader("Set-Cookie", accessTokenCookie.toString());
-        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+        return user.getName() + " " + user.getStudentId() + " " + user.getRoles() + " " + user.getDepartment();
     }
 }

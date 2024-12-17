@@ -14,4 +14,13 @@ public enum Role {
     public String getRole() {
         return role;
     }
+
+    public static Role fromString(String role) {
+        for (Role r : Role.values()) {
+            if (r.getRole().equals(role)) {
+                return r;
+            }
+        }
+        throw new IllegalArgumentException("No Role found for value: " + role);
+    }
 }
