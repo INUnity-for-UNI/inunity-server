@@ -59,7 +59,9 @@ public class AuthService {
     public Optional<User> isRegistered(LoginRegisterRequest request) {
         Optional<User> user = userRepository.findByStudentId(request.getStudentId());
         if (user.isPresent()) {
-            throw new AlreadyRegisteredException(ExceptionMessage.USER_ALREADY_REGISTERED);
+            if (user.get().getName().isEmpty()) {
+                throw new AlreadyRegisteredException(ExceptionMessage.USER_ALREADY_REGISTERED);
+            }
         }
 
         return user;
