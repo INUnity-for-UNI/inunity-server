@@ -37,5 +37,4 @@ public class OAuth2Attributes {
                 .provider("google")
                 .build();
     }
-
 }

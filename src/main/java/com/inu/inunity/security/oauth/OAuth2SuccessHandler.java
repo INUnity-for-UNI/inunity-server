@@ -2,10 +2,12 @@ package com.inu.inunity.security.oauth;
 
 import com.inu.inunity.domain.User.User;
 import com.inu.inunity.domain.User.UserRepository;
+import com.inu.inunity.security.Department;
 import com.inu.inunity.security.JwtProvider;
 import com.inu.inunity.security.Role;
 import com.inu.inunity.security.exception.ExceptionMessage;
 import com.inu.inunity.security.exception.NotInformationMajorException;
+import com.inu.inunity.security.exception.NotSchoolEmailException;
 import com.inu.inunity.security.exception.NullTokenException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -59,12 +61,15 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             throw new NullTokenException(new OAuth2Error("0", ExceptionMessage.TOKEN_NOT_FOUND.getMessage(), null));
         }
 
+        String oAuth2UserName = oAuth2User.getAttribute("name");
+        String oAuth2UserEmail = oAuth2User.getAttribute("email");
+        validateEmail(oAuth2UserEmail);
+
         Long userId = jwtProvider.getMemberId(customAccessToken);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new OAuth2AuthenticationException(new OAuth2Error("NotFoundElementException", ExceptionMessage.USER_NOT_FOUND.getMessage(), null)));
 
-        String oauth2UserName = oAuth2User.getAttribute("name");
-        certificationUpdate(user, oauth2UserName, authentication);
+        certificationUpdate(user, oAuth2UserName, authentication);
         redirectToken(request, response, user);
     }
 
@@ -80,15 +85,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         getRedirectStrategy().sendRedirect(request, response, uri);
     }
 
-
     private void certificationUpdate(User user, String oAuth2Name, Authentication authentication) {
         String[] parts = oAuth2Name.split("/");
-
-        if (parts.length != 2) {
-            log.error("[certificationUpdate] {}", ExceptionMessage.EMAIL_NOT_UNDEFINED);
-            throw new NotInformationMajorException(new OAuth2Error("0",
-                    ExceptionMessage.EMAIL_NOT_UNDEFINED.getMessage(), null));
-        }
+        validateMajor(parts);
         String name = parts[0];
         String department = parts[1];
 
@@ -98,6 +97,34 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         user.updateAuthentication(name, department, roles);
         userRepository.save(user);
+    }
+
+    private void validateEmail(String email) {
+        String[] parts = email.split("@");
+
+        if (parts.length != 2) {
+            log.info("[validateEmail] {}", ExceptionMessage.EMAIL_NOT_INU.getMessage());
+            throw new NotSchoolEmailException(new OAuth2Error("0", ExceptionMessage.EMAIL_NOT_INU.getMessage(), null));
+        }
+
+        String provider = parts[1];
+        if (!"inu.ac.kr".equals(provider)) {
+            log.info("[validateEmail] {}", ExceptionMessage.EMAIL_NOT_INU.getMessage());
+            throw new NotSchoolEmailException(new OAuth2Error("0", ExceptionMessage.EMAIL_NOT_INU.getMessage(), null));
+        }
+    }
+
+    private void validateMajor(String[] parts) {
+        if (parts.length != 2) {
+            log.info("[validateMajor] {}", ExceptionMessage.EMAIL_NOT_UNDEFINED.getMessage());
+            throw new NotInformationMajorException(new OAuth2Error("0", ExceptionMessage.EMAIL_NOT_UNDEFINED.getMessage(), null));
+        }
+
+        String department = parts[1];
+        if (!Department.isValidDepartment(department)) {
+            log.info("[validateMajor] {}", ExceptionMessage.EMAIL_NOT_UNDEFINED.getMessage());
+            throw new NotInformationMajorException(new OAuth2Error("0", ExceptionMessage.EMAIL_NOT_UNDEFINED.getMessage(), null));
+        }
     }
 
     private URI createURI(HttpServletResponse response, String accessToken, String refreshToken) {
