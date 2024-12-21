@@ -12,6 +12,7 @@ import org.springframework.http.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
@@ -25,31 +26,22 @@ import java.util.Optional;
 public class AuthService {
 
     private final UserRepository userRepository;
-
-    private final RestTemplate restTemplate;
+    private final RestClient restClient;
     private final JwtProvider jwtProvider;
 
-    private static final String AUTH_SERVER_URL = "https://api.inuappcenter.kr/account/status";
-
     public Boolean loginWithAuthServer(LoginRegisterRequest request) {
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
         String body = request.getStudentId() + ":" + request.getPassword();
         String encodedAuth = Base64.getEncoder().encodeToString(body.getBytes(StandardCharsets.UTF_8));
-        headers.set("Authorization", "Basic " + encodedAuth);
-
-        System.out.println(encodedAuth);
-        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
         try {
-            ResponseEntity<Map> response = restTemplate.exchange(
-                    AUTH_SERVER_URL,
-                    HttpMethod.GET,
-                    requestEntity,
-                    Map.class
-            );
+            restClient.get()
+                    .uri("/account/status")
+                    .headers(headers -> {
+                        headers.set("Authorization", "Basic " + encodedAuth);
+                        headers.set("Content-Type", "application/x-www-form-urlencoded");
+                    })
+                    .retrieve()
+                    .toEntity(Map.class);
             return true;
         } catch (Exception e) {
             return false;

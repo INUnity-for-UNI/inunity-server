@@ -10,8 +10,8 @@ public class RestClientConfig {
     @Bean
     public RestClient restClient() {
         return RestClient.builder()
-                .baseUrl("https://example.com")
-                .defaultHeader("User-Agent", "MyApp RestClient")
+                .baseUrl("https://api.inuappcenter.kr")
+                .defaultHeader("User-Agent", "UNI PORTAL LOGIN")
                 .build();
     }
 }
