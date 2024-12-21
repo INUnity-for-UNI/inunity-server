@@ -69,7 +69,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new OAuth2AuthenticationException(new OAuth2Error("NotFoundElementException", ExceptionMessage.USER_NOT_FOUND.getMessage(), null)));
 
-        certificationUpdate(user, oAuth2UserName, authentication);
+        updateCertification(user, oAuth2UserName, authentication);
         redirectToken(request, response, user);
     }
 
@@ -85,17 +85,16 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         getRedirectStrategy().sendRedirect(request, response, uri);
     }
 
-    private void certificationUpdate(User user, String oAuth2Name, Authentication authentication) {
+    private void updateCertification(User user, String oAuth2Name, Authentication authentication) {
         String[] parts = oAuth2Name.split("/");
         validateMajor(parts);
-        String name = parts[0];
         String department = parts[1];
 
         List<Role> roles = authentication.getAuthorities().stream()
                 .map(grantedAuthority -> Role.fromString(grantedAuthority.getAuthority()))
                 .collect(Collectors.toList());
 
-        user.updateAuthentication(name, department, roles);
+        user.updateAuthentication(department, roles);
         userRepository.save(user);
     }
 

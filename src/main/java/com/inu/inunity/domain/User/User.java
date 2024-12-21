@@ -18,6 +18,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +42,8 @@ public class User extends BaseEntity {
     private String department;
 
     private Boolean isGraduation;
+
+    private LocalDate graduateDate;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Role> roles = new ArrayList<>();
@@ -83,24 +86,22 @@ public class User extends BaseEntity {
         this.roles = roles;
     }
 
-    public User updateAuthentication(String name, String department, List<Role> roles){
-        this.name = name;
+    public User updateAuthentication(String department, List<Role> roles){
         this.roles = roles;
         this.department = department;
         return this;
     }
 
-    public User setUser(String name, String department, List<Role> roles){
+    public User setUser(String name, String nickname, LocalDate graduateDate){
         this.name = name;
-        this.roles = roles;
-        this.department = department;
+        this.nickname = nickname;
+        this.graduateDate = graduateDate;
         return this;
     }
 
-    public User updateUser(String name, String department, List<Role> roles){
-        this.name = name;
-        this.roles = roles;
-        this.department = department;
+    public User updateUser(String nickname, LocalDate graduateDate){
+        this.nickname = nickname;
+        this.graduateDate = graduateDate;
         return this;
     }
 
