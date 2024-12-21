@@ -31,7 +31,6 @@ dependencies {
 
     //oauth2 관련 의존성
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-authorization-server'
 
     //security 의존성
     implementation 'org.springframework.boot:spring-boot-starter-security'

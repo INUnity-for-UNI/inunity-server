@@ -1,7 +1,7 @@
 package com.inu.inunity.security.config;
 
-import com.inu.inunity.security.JwtAuthFilter;
-import com.inu.inunity.security.JwtProvider;
+import com.inu.inunity.security.jwt.JwtAuthFilter;
+import com.inu.inunity.security.jwt.JwtProvider;
 import com.inu.inunity.security.oauth.CustomAuthorizationRequestResolver;
 import com.inu.inunity.security.oauth.CustomOAuth2Service;
 import com.inu.inunity.security.oauth.OAuth2FailHandler;
@@ -20,7 +20,6 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -83,6 +82,7 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
+    //TODO: 실 서비스 할 때 제한 걸어야됨 ㅋㅋㅋㅋㅋㅋ
     @Bean
     protected CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -94,10 +94,5 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration); // 모든 경로에 대해 설정 적용
         return source;
-    }
-
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
     }
 }

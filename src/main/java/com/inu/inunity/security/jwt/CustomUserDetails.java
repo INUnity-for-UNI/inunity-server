@@ -1,4 +1,4 @@
-package com.inu.inunity.security;
+package com.inu.inunity.security.jwt;
 
 import com.inu.inunity.domain.User.User;
 import org.springframework.security.core.GrantedAuthority;

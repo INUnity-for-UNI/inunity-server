@@ -1,4 +1,4 @@
-package com.inu.inunity.security;
+package com.inu.inunity.security.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

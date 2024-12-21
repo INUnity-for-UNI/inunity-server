@@ -2,10 +2,10 @@ package com.inu.inunity.security.auth;
 
 import com.inu.inunity.domain.User.User;
 import com.inu.inunity.domain.User.UserRepository;
-import com.inu.inunity.security.CustomUserDetails;
-import com.inu.inunity.security.JwtProvider;
 import com.inu.inunity.security.Role;
 import com.inu.inunity.security.exception.*;
+import com.inu.inunity.security.jwt.CustomUserDetails;
+import com.inu.inunity.security.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
@@ -60,7 +60,7 @@ public class AuthService {
         Optional<User> user = userRepository.findByStudentId(request.getStudentId());
         if (user.isPresent()) {
             if (user.get().getName().isEmpty()) {
-                throw new AlreadyRegisteredException(ExceptionMessage.USER_ALREADY_REGISTERED);
+                throw new UserRegisteredException(ExceptionMessage.USER_ALREADY_REGISTERED);
             }
         }
 

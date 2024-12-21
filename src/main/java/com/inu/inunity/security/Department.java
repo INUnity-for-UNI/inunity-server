@@ -15,7 +15,6 @@ public enum Department {
         return name;
     }
 
-    // 학과 이름으로 Enum 매핑
     public static boolean isValidDepartment(String departmentName) {
         for (Department department : Department.values()) {
             if (department.getName().equals(departmentName)) {

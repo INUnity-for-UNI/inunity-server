@@ -11,8 +11,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-    @ExceptionHandler(value = AlreadyRegisteredException.class)
-    public ResponseEntity<CommonResponse> handleAlreadyRegisteredException(AlreadyRegisteredException ex) {
+    @ExceptionHandler(value = UserRegisteredException.class)
+    public ResponseEntity<CommonResponse> handleAlreadyRegisteredException(UserRegisteredException ex) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         log.error("[handleAlreadyRegisteredException] {}", ex.getMessage());
         return ResponseEntity.status(status).body(CommonResponse.error(status, ex.getMessage(), null));

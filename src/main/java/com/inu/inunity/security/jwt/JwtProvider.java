@@ -1,5 +1,6 @@
-package com.inu.inunity.security;
+package com.inu.inunity.security.jwt;
 
+import com.inu.inunity.security.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
