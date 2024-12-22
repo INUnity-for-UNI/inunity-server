@@ -17,6 +17,8 @@ public class Skill {
 
     private String name;
 
+    private SkillType type;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 }
