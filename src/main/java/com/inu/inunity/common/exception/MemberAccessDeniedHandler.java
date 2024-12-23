@@ -1,4 +1,4 @@
-package com.inu.inunity.security.exception;
+package com.inu.inunity.common.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inu.inunity.common.CommonResponse;

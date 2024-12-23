@@ -1,4 +1,4 @@
-package com.inu.inunity.security.exception;
+package com.inu.inunity.common.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

@@ -1,13 +1,13 @@
 package com.inu.inunity.domain.profile.contract;
 
+import com.inu.inunity.common.exception.ExceptionMessage;
+import com.inu.inunity.common.exception.NotFoundElementException;
 import com.inu.inunity.domain.User.User;
 import com.inu.inunity.domain.User.UserRepository;
 import com.inu.inunity.domain.profile.contract.dto.RequestCreateContract;
 import com.inu.inunity.domain.profile.contract.dto.RequestModifyContract;
 import com.inu.inunity.domain.profile.contract.dto.RequestUpdateContracts;
 import com.inu.inunity.domain.profile.contract.dto.ResponseContract;
-import com.inu.inunity.security.exception.ExceptionMessage;
-import com.inu.inunity.security.exception.NotFoundElementException;
 import com.inu.inunity.security.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,10 +1,9 @@
 package com.inu.inunity.domain.profile.skill;
 
+import com.inu.inunity.common.exception.ExceptionMessage;
+import com.inu.inunity.common.exception.NotFoundElementException;
 import com.inu.inunity.domain.User.User;
-import com.inu.inunity.domain.User.UserRepository;
 import com.inu.inunity.domain.profile.skill.dto.RequestUpdateSkill;
-import com.inu.inunity.security.exception.ExceptionMessage;
-import com.inu.inunity.security.exception.NotFoundElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
