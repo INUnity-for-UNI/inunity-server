@@ -5,6 +5,7 @@ import com.inu.inunity.domain.User.UserRepository;
 import com.inu.inunity.domain.profile.career.dto.RequestCreateCareer;
 import com.inu.inunity.domain.profile.career.dto.RequestModifyCareer;
 import com.inu.inunity.domain.profile.career.dto.RequestUpdateCareers;
+import com.inu.inunity.domain.profile.career.dto.ResponseCareer;
 import com.inu.inunity.security.exception.ExceptionMessage;
 import com.inu.inunity.security.exception.NotFoundElementException;
 import com.inu.inunity.security.jwt.CustomUserDetails;
@@ -21,6 +22,13 @@ public class CareerService {
 
     private final CareerRepository careerRepository;
     private final UserRepository userRepository;
+
+    public List<ResponseCareer> getCareers(User user){
+        return user.getCareers().stream()
+                .map(career -> ResponseCareer.of(career.getId(), career.getCompanyName(), career.getPosition(),
+                        career.getStartDate(), career.getEndDate()))
+                .toList();
+    }
 
     @Transactional
     public void updateCareers(RequestUpdateCareers requestUpdateCareers, UserDetails userDetails){
