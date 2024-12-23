@@ -47,7 +47,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Value("${spring.front-redirect-url.scheme}")
     private String frontScheme;
 
-    @Value("${spring.front-redirect-url.path}")
+    @Value("${spring.front-redirect-url.success-path}")
     private String frontPath;
 
     @Override

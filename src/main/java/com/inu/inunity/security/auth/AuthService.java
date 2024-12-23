@@ -8,12 +8,10 @@ import com.inu.inunity.security.jwt.CustomUserDetails;
 import com.inu.inunity.security.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -29,39 +27,10 @@ public class AuthService {
     private final RestClient restClient;
     private final JwtProvider jwtProvider;
 
-    public Boolean loginWithAuthServer(LoginRegisterRequest request) {
-        String body = request.getStudentId() + ":" + request.getPassword();
-        String encodedAuth = Base64.getEncoder().encodeToString(body.getBytes(StandardCharsets.UTF_8));
-
-        try {
-            restClient.get()
-                    .uri("/account/status")
-                    .headers(headers -> {
-                        headers.set("Authorization", "Basic " + encodedAuth);
-                        headers.set("Content-Type", "application/x-www-form-urlencoded");
-                    })
-                    .retrieve()
-                    .toEntity(Map.class);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public Optional<User> isRegistered(LoginRegisterRequest request) {
-        Optional<User> user = userRepository.findByStudentId(request.getStudentId());
-        if (user.isPresent()) {
-            if (user.get().getName().isEmpty()) {
-                throw new UserRegisteredException(ExceptionMessage.USER_ALREADY_REGISTERED);
-            }
-        }
-
-        return user;
-    }
-
     public void login(HttpServletResponse response, LoginRegisterRequest request) {
         User user = userRepository.findByStudentId(request.getStudentId())
                 .orElseThrow(() -> new NotRegisteredException(ExceptionMessage.USER_NOT_REGISTERED));
+
         if (!loginWithAuthServer(request)) {
             throw new PortalLoginException(ExceptionMessage.PORTAL_LOGIN_FAILED_ID_PASSWORD_INCORRECT);
         }
@@ -86,16 +55,43 @@ public class AuthService {
         jwtProvider.setTokenCookies(response, accessToken, refreshToken);
     }
 
+    public Optional<User> isRegistered(LoginRegisterRequest request) {
+        Optional<User> user = userRepository.findByStudentId(request.getStudentId());
+        if (user.isPresent()) {
+            if (!user.get().getName().isEmpty()) {
+                throw new UserRegisteredException(ExceptionMessage.USER_ALREADY_REGISTERED);
+            }
+        }
+        return user;
+    }
+
     public User makeUser(Optional<User> user, LoginRegisterRequest request) {
         return user.orElseGet(() -> User.of(request, List.of(Role.ROLE_TEST)));
+    }
+
+    public Boolean loginWithAuthServer(LoginRegisterRequest request) {
+        String body = request.getStudentId() + ":" + request.getPassword();
+        String encodedAuth = Base64.getEncoder().encodeToString(body.getBytes(StandardCharsets.UTF_8));
+
+        try {
+            restClient.get()
+                    .uri("/account/status")
+                    .headers(headers -> {
+                        headers.set("Authorization", "Basic " + encodedAuth);
+                        headers.set("Content-Type", "application/x-www-form-urlencoded");
+                    })
+                    .retrieve()
+                    .toEntity(Map.class);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Transactional
     public String testCookie(UserDetails userDetails) {
         Long userId = ((CustomUserDetails) userDetails).getId();
-
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
-
         return user.getName() + " " + user.getStudentId() + " " + user.getRoles() + " " + user.getDepartment();
     }
 }
