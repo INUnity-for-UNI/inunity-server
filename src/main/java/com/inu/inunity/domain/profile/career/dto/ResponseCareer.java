@@ -1,2 +1,4 @@
-package com.inu.inunity.domain.profile.career.dto;public class ResponseCareer {
+package com.inu.inunity.domain.profile.career.dto;
+
+public class ResponseCareer {
 }
