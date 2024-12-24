@@ -10,8 +10,11 @@ import com.inu.inunity.domain.profile.contract.Contract;
 import com.inu.inunity.domain.profile.portfolio.Portfolio;
 import com.inu.inunity.domain.ReplyComment.ReplyComment;
 import com.inu.inunity.domain.profile.skill.Skill;
+import com.inu.inunity.security.Role;
+import com.inu.inunity.security.auth.LoginRegisterRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,16 +32,18 @@ public class User extends BaseEntity {
 
     private String name;
 
-    private Long studentNumber;
+    private Long studentId;
 
     private String nickname;
 
     private String description;
 
+    private String department;
+
     private Boolean isGraduation;
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    private List<String> roles = new ArrayList<>();
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<Role> roles = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Article> articles = new ArrayList<>();
@@ -66,4 +71,43 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Portfolio> portfolios = new ArrayList<>();
+
+    @Builder
+    public User(Long studentId, String name , String nickname, String description, Boolean isGraduation, String department, List<Role> roles){
+        this.name = name;
+        this.studentId = studentId;
+        this.nickname = nickname;
+        this.description = description;
+        this.isGraduation = isGraduation;
+        this.department = department;
+        this.roles = roles;
+    }
+
+    public User updateAuthentication(String name, String department, List<Role> roles){
+        this.name = name;
+        this.roles = roles;
+        this.department = department;
+        return this;
+    }
+
+    public User setUser(String name, String department, List<Role> roles){
+        this.name = name;
+        this.roles = roles;
+        this.department = department;
+        return this;
+    }
+
+    public User updateUser(String name, String department, List<Role> roles){
+        this.name = name;
+        this.roles = roles;
+        this.department = department;
+        return this;
+    }
+
+    public static User of(LoginRegisterRequest request, List<Role> roles){
+        return User.builder()
+                .studentId(request.getStudentId())
+                .roles(roles)
+                .build();
+    }
 }
