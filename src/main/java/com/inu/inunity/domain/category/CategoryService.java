@@ -1,7 +1,7 @@
 package com.inu.inunity.domain.category;
 
-import com.inu.inunity.domain.category.data.RequestCreateCategory;
-import com.inu.inunity.domain.category.data.ResponseCategory;
+import com.inu.inunity.domain.category.dto.RequestCreateCategory;
+import com.inu.inunity.domain.category.dto.ResponseCategory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -81,4 +81,12 @@ public class CategoryService {
     public void deleteCategory(Long category_id) {
         categoryRepository.deleteById(category_id);
     }
+
+
+    /**
+     * 카테고리가 가지고 있는 아티클을 모두 보여주는 메서드
+     * @author 김원정
+     * @param category_id 카테고리 ID
+     * @return page 클래스에 감싸진 responseArticleForList 클래스
+     */
 }

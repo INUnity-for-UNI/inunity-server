@@ -1,4 +1,4 @@
-package com.inu.inunity.domain.category.data;
+package com.inu.inunity.domain.category.dto;
 
 import lombok.Builder;
 

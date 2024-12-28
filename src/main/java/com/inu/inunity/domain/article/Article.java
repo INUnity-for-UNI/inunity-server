@@ -1,6 +1,7 @@
 package com.inu.inunity.domain.article;
 
 import com.inu.inunity.common.BaseEntity;
+import com.inu.inunity.domain.article.dto.RequestModifyArticle;
 import com.inu.inunity.domain.articleLike.ArticleLike;
 import com.inu.inunity.domain.articleReport.ArticleReport;
 import com.inu.inunity.domain.category.Category;
@@ -8,6 +9,7 @@ import com.inu.inunity.domain.comment.Comment;
 import com.inu.inunity.domain.User.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,7 +28,7 @@ public class Article extends BaseEntity {
 
     private String content;
 
-    private Long view;
+    private Integer view;
 
     private Boolean isDeleted;
 
@@ -46,4 +48,23 @@ public class Article extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Category category;
+
+    @Builder
+    public Article(String title, String content, Boolean isAnonymous, Integer view, Boolean isDeleted) {
+        this.title = title;
+        this.content = content;
+        this.isAnonymous = isAnonymous;
+        this.view = view;
+        this.isDeleted = isDeleted;
+    }
+
+    public void increaseView() {
+        this.view++;
+    }
+
+    public void modifyArticle(RequestModifyArticle requestModifyArticle) {
+        this.title = requestModifyArticle.title();
+        this.content = requestModifyArticle.content();
+        this.isAnonymous = requestModifyArticle.isAnonymous();
+    }
 }
