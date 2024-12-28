@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class CategoryService {
      * @param requestCreateCategory Record Class
      * @return Long 생성된 Category ID
      */
+    @Transactional
     Long createCategory(RequestCreateCategory requestCreateCategory) {
         Category newCategory = Category.builder()
                 .name(requestCreateCategory.name())
@@ -39,6 +41,7 @@ public class CategoryService {
      * @author 김원정
      * @return List<ResponseCategory> List 클래스에 감싸진 ResponseCategory
      */
+    @Transactional(readOnly = true)
     List<ResponseCategory> findAllCategories() {
         List<Category> foundCategories = categoryRepository.findAll();
         return foundCategories.stream().map(category -> ResponseCategory.builder()
@@ -56,6 +59,7 @@ public class CategoryService {
      * @param category_name 바뀔 Category 이름
      * @return Long 수정된 Category ID
      */
+    @Transactional
     Long editCategoryName(Long category_id, String category_name) {
         Category foundCategory = categoryRepository.findById(category_id)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
@@ -71,6 +75,7 @@ public class CategoryService {
      * @param status 바뀔 Category의 활성 상태
      * @return Long 수정된 Category ID
      */
+    @Transactional
     Long changeStatus(Long category_id, boolean status) {
         Category foundCategory = categoryRepository.findById(category_id)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
@@ -84,6 +89,7 @@ public class CategoryService {
      * @author 김원정
      * @param category_id Category ID
      */
+    @Transactional
     void deleteCategory(Long category_id) {
         categoryRepository.deleteById(category_id);
     }
@@ -95,6 +101,7 @@ public class CategoryService {
      * @param category_id 카테고리 ID
      * @return page 클래스에 감싸진 responseArticleForList 클래스
      */
+    @Transactional(readOnly = true)
     Page<ResponseArticleForList> getArticles(Long category_id, Pageable pageable) {
         Page<Article> pagingArticle = articleRepository.findAllByCategoryId(category_id, pageable);
         return pagingArticle.map(article -> ResponseArticleForList.builder()
