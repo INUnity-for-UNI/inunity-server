@@ -27,6 +27,10 @@ dependencies {
 
 	//mysql 의존성
 	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	//swagger-ui 의존성 추가
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+
 }
 
 tasks.named('test') {
