@@ -1,13 +1,13 @@
 package com.inu.inunity.security.oauth;
 
+import com.inu.inunity.common.exception.ExceptionMessage;
+import com.inu.inunity.common.exception.NotInformationMajorException;
+import com.inu.inunity.common.exception.NotSchoolEmailException;
+import com.inu.inunity.common.exception.NullTokenException;
 import com.inu.inunity.domain.User.User;
 import com.inu.inunity.domain.User.UserRepository;
 import com.inu.inunity.security.Department;
 import com.inu.inunity.security.Role;
-import com.inu.inunity.security.exception.ExceptionMessage;
-import com.inu.inunity.security.exception.NotInformationMajorException;
-import com.inu.inunity.security.exception.NotSchoolEmailException;
-import com.inu.inunity.security.exception.NullTokenException;
 import com.inu.inunity.security.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -69,7 +69,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new OAuth2AuthenticationException(new OAuth2Error("NotFoundElementException", ExceptionMessage.USER_NOT_FOUND.getMessage(), null)));
 
-        certificationUpdate(user, oAuth2UserName, authentication);
+        updateCertification(user, oAuth2UserName, authentication);
         redirectToken(request, response, user);
     }
 
@@ -85,17 +85,16 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         getRedirectStrategy().sendRedirect(request, response, uri);
     }
 
-    private void certificationUpdate(User user, String oAuth2Name, Authentication authentication) {
+    private void updateCertification(User user, String oAuth2Name, Authentication authentication) {
         String[] parts = oAuth2Name.split("/");
         validateMajor(parts);
-        String name = parts[0];
         String department = parts[1];
 
         List<Role> roles = authentication.getAuthorities().stream()
                 .map(grantedAuthority -> Role.fromString(grantedAuthority.getAuthority()))
                 .collect(Collectors.toList());
 
-        user.updateAuthentication(name, department, roles);
+        user.updateAuthentication(department, roles);
         userRepository.save(user);
     }
 

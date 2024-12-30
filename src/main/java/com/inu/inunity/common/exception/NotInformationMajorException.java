@@ -1,4 +1,4 @@
-package com.inu.inunity.security.exception;
+package com.inu.inunity.common.exception;
 
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
