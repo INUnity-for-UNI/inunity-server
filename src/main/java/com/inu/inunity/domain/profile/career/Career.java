@@ -49,13 +49,10 @@ public class Career {
                 .build();
     }
 
-    public Career modify(String companyName, String position, LocalDate startDate, LocalDate endDate){
+    public void modify(String companyName, String position, LocalDate startDate, LocalDate endDate){
         this.companyName = companyName;
         this.position = position;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.user = user;
-
-        return this;
     }
 }

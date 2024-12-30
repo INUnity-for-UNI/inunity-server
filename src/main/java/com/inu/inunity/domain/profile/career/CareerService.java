@@ -4,17 +4,16 @@ import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
 import com.inu.inunity.domain.User.User;
 import com.inu.inunity.domain.User.UserRepository;
-import com.inu.inunity.domain.profile.career.dto.RequestCreateCareer;
-import com.inu.inunity.domain.profile.career.dto.RequestModifyCareer;
 import com.inu.inunity.domain.profile.career.dto.RequestUpdateCareers;
 import com.inu.inunity.domain.profile.career.dto.ResponseCareer;
-import com.inu.inunity.security.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,18 +30,29 @@ public class CareerService {
     }
 
     @Transactional
-    public void updateCareers(RequestUpdateCareers requestUpdateCareers, UserDetails userDetails){
-        Long userId = ((CustomUserDetails) userDetails).getId();
+    public void updateCareers(List<RequestUpdateCareers> requestUpdateCareers, User user){
+        List<Career> existingCareers = user.getCareers();
+        List<RequestUpdateCareers> careersToCreate = new ArrayList<>();
+        List<RequestUpdateCareers> careersToModify = new ArrayList<>();
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
+        Map<Long, Career> skillMap = existingCareers.stream()
+                .collect(Collectors.toMap(Career::getId, Career -> Career));
 
-        createCareers(requestUpdateCareers.createCareers(), user);
-        modifyCareers(requestUpdateCareers.modifyCareers());
-        deleteCareers(requestUpdateCareers.deleteCareers());
+        requestUpdateCareers.forEach(requestUpdateCareer -> {
+            if (requestUpdateCareer.careerId() == null) {
+                careersToCreate.add(requestUpdateCareer);
+            } else {
+                careersToModify.add(requestUpdateCareer);
+                skillMap.remove(requestUpdateCareer.careerId());
+            }
+        });
+
+        createCareers(careersToCreate, user);
+        modifyCareers(careersToModify);
+        deleteCareers(skillMap.keySet().stream().toList());
     }
 
-    private void createCareers(List<RequestCreateCareer> requestCreateCareers, User user){
+    private void createCareers(List<RequestUpdateCareers> requestCreateCareers, User user){
         List<Career> careers = requestCreateCareers.stream()
                 .map(requestCreateCareer -> Career.of(requestCreateCareer.companyName(), requestCreateCareer.position(),
                         requestCreateCareer.startDate(), requestCreateCareer.endDate(), user))
@@ -51,7 +61,7 @@ public class CareerService {
         careerRepository.saveAll(careers);
     }
 
-    private void modifyCareers(List<RequestModifyCareer> requestModifyCareers){
+    private void modifyCareers(List<RequestUpdateCareers> requestModifyCareers){
         requestModifyCareers.forEach(requestModifyCareer -> {
             Career career = careerRepository.findById(requestModifyCareer.careerId())
                     .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.CAREER_NOT_FOUND));
