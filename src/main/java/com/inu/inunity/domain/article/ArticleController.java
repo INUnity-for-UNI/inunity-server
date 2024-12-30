@@ -4,7 +4,10 @@ import com.inu.inunity.common.CommonResponse;
 import com.inu.inunity.domain.article.dto.RequestCreateArticle;
 import com.inu.inunity.domain.article.dto.RequestModifyArticle;
 import com.inu.inunity.domain.article.dto.ResponseArticle;
+import com.inu.inunity.security.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,9 +26,12 @@ public class ArticleController {
     @PostMapping("/{category_id}")
     CommonResponse<Long> createArticle(
             @RequestBody RequestCreateArticle requestCreateArticle,
-            @PathVariable Long category_id
-    ) {
-        Long result = articleService.createArticle(requestCreateArticle, category_id);
+            @PathVariable Long category_id,
+            @AuthenticationPrincipal UserDetails userDetails
+            ) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
+        Long userId = customUserDetails.getId();
+        Long result = articleService.createArticle(requestCreateArticle, category_id, userId);
         return CommonResponse.success("아티클 생성 완료", result);
     }
 

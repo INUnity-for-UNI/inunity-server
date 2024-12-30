@@ -50,13 +50,15 @@ public class Article extends BaseEntity {
     private Category category;
 
     @Builder
-    public Article(String title, String content, Boolean isAnonymous, Integer view, Boolean isDeleted, Category category) {
+    public Article(String title, String content, Boolean isAnonymous, Integer view, Boolean isDeleted, Category category,
+                   User user) {
         this.title = title;
         this.content = content;
         this.isAnonymous = isAnonymous;
         this.view = view;
         this.isDeleted = isDeleted;
         this.category = category;
+        this.user = user;
     }
 
     public void increaseView() {

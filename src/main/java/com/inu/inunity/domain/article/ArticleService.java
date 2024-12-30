@@ -1,5 +1,7 @@
 package com.inu.inunity.domain.article;
 
+import com.inu.inunity.domain.User.User;
+import com.inu.inunity.domain.User.UserRepository;
 import com.inu.inunity.domain.article.dto.RequestCreateArticle;
 import com.inu.inunity.domain.article.dto.RequestModifyArticle;
 import com.inu.inunity.domain.article.dto.ResponseArticle;
@@ -14,18 +16,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class ArticleService {
     private final ArticleRepository articleRepository;
     private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
 
     /**
      * 아티클을 생성하는 메서드
      * @author 김원정
      * @param requestCreateArticle RequestCreateArticle Record
      * @param category_id 아티클이 소속될 Category ID
+     * @param user_id 아티클을 생성하도록 요청한 User ID
      * @return Long 생성된 아티클의 게시글 번호
      */
     @Transactional
-    Long createArticle(RequestCreateArticle requestCreateArticle, Long category_id) {
+    Long createArticle(RequestCreateArticle requestCreateArticle, Long category_id, Long user_id) {
         Category foundCategory = categoryRepository.findById(category_id)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
+        User foundUser = userRepository.findById(user_id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
         Article newArticle = Article.builder()
                 .title(requestCreateArticle.title())
                 .content(requestCreateArticle.content())
@@ -33,6 +39,7 @@ public class ArticleService {
                 .view(0)
                 .isDeleted(false)
                 .category(foundCategory)
+                .user(foundUser)
                 .build();
 
         Article savedArticle = articleRepository.save(newArticle);
