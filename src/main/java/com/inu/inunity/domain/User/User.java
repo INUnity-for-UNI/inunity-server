@@ -1,14 +1,14 @@
 package com.inu.inunity.domain.User;
 
 import com.inu.inunity.common.BaseEntity;
+import com.inu.inunity.domain.ReplyComment.ReplyComment;
 import com.inu.inunity.domain.article.Article;
 import com.inu.inunity.domain.articleLike.ArticleLike;
 import com.inu.inunity.domain.articleReport.ArticleReport;
-import com.inu.inunity.domain.profile.career.Career;
 import com.inu.inunity.domain.comment.Comment;
+import com.inu.inunity.domain.profile.career.Career;
 import com.inu.inunity.domain.profile.contract.Contract;
 import com.inu.inunity.domain.profile.portfolio.Portfolio;
-import com.inu.inunity.domain.ReplyComment.ReplyComment;
 import com.inu.inunity.domain.profile.skill.Skill;
 import com.inu.inunity.security.Role;
 import com.inu.inunity.security.auth.LoginRegisterRequest;
@@ -18,6 +18,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,35 +43,37 @@ public class User extends BaseEntity {
 
     private Boolean isGraduation;
 
+    private LocalDate graduateDate;
+
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Role> roles = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Article> articles = new ArrayList<>();
+    private final List<Article> articles = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<ArticleLike> articleLikes = new ArrayList<>();
+    private final List<ArticleLike> articleLikes = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<ArticleReport> articleReports = new ArrayList<>();
+    private final List<ArticleReport> articleReports = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Comment> comments = new ArrayList<>();
+    private final List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<ReplyComment> replyComments = new ArrayList<>();
+    private final List<ReplyComment> replyComments = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Career> careers = new ArrayList<>();
+    private final List<Career> careers = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Skill> skills = new ArrayList<>();
+    private final List<Skill> skills = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Contract> contracts = new ArrayList<>();
+    private final List<Contract> contracts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Portfolio> portfolios = new ArrayList<>();
+    private final List<Portfolio> portfolios = new ArrayList<>();
 
     @Builder
     public User(Long studentId, String name , String nickname, String description, Boolean isGraduation, String department, List<Role> roles){
@@ -83,25 +86,17 @@ public class User extends BaseEntity {
         this.roles = roles;
     }
 
-    public User updateAuthentication(String name, String department, List<Role> roles){
-        this.name = name;
+    public User updateAuthentication(String department, List<Role> roles){
         this.roles = roles;
         this.department = department;
         return this;
     }
 
-    public User setUser(String name, String department, List<Role> roles){
+    public void setUser(String name, String nickname, LocalDate graduateDate, Boolean isGraduation){
         this.name = name;
-        this.roles = roles;
-        this.department = department;
-        return this;
-    }
-
-    public User updateUser(String name, String department, List<Role> roles){
-        this.name = name;
-        this.roles = roles;
-        this.department = department;
-        return this;
+        this.nickname = nickname;
+        this.graduateDate = graduateDate;
+        this.isGraduation = isGraduation;
     }
 
     public static User of(LoginRegisterRequest request, List<Role> roles){

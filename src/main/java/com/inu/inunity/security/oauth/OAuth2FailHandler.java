@@ -1,8 +1,8 @@
 package com.inu.inunity.security.oauth;
 
-import com.inu.inunity.security.exception.NotInformationMajorException;
-import com.inu.inunity.security.exception.NotSchoolEmailException;
-import com.inu.inunity.security.exception.NullTokenException;
+import com.inu.inunity.common.exception.NotInformationMajorException;
+import com.inu.inunity.common.exception.NotSchoolEmailException;
+import com.inu.inunity.common.exception.NullTokenException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
