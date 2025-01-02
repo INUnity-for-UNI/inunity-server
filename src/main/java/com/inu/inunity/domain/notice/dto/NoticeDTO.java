@@ -1,4 +1,4 @@
-package com.inu.inunity.dto.notice;
+package com.inu.inunity.domain.notice.dto;
 
 import lombok.Builder;
 
