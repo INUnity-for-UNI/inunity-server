@@ -3,6 +3,7 @@ package com.inu.inunity.domain.profile.skill;
 import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
 import com.inu.inunity.domain.profile.skill.dto.RequestUpdateSkill;
+import com.inu.inunity.domain.profile.skill.dto.ResponseSkill;
 import com.inu.inunity.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,13 @@ import java.util.stream.Collectors;
 public class SkillService {
 
     private final SkillRepository skillRepository;
+
+    @Transactional(readOnly = true)
+    public List<ResponseSkill> getSkills(User user){
+        return user.getSkills().stream()
+                .map(skill -> ResponseSkill.of(skill.getId(), skill.getType(), skill.getName(), skill.getLevel()))
+                .toList();
+    }
 
     @Transactional
     public void updateSkills(List<RequestUpdateSkill> requestUpdateSkills, User user) {
