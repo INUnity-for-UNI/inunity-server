@@ -1,5 +1,7 @@
 package com.inu.inunity.domain.article;
 
+import com.inu.inunity.common.exception.ExceptionMessage;
+import com.inu.inunity.common.exception.NotFoundElementException;
 import com.inu.inunity.domain.User.User;
 import com.inu.inunity.domain.User.UserRepository;
 import com.inu.inunity.domain.article.dto.RequestCreateArticle;
@@ -29,9 +31,9 @@ public class ArticleService {
     @Transactional
     Long createArticle(RequestCreateArticle requestCreateArticle, Long category_id, Long user_id) {
         Category foundCategory = categoryRepository.findById(category_id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.CONTRACT_NOT_FOUND));
         User foundUser = userRepository.findById(user_id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
         Article newArticle = Article.builder()
                 .title(requestCreateArticle.title())
                 .content(requestCreateArticle.content())
@@ -55,7 +57,7 @@ public class ArticleService {
     @Transactional(readOnly = true)
     ResponseArticle getArticle(Long article_id) {
         Article foundArticle = articleRepository.findById(article_id)
-                .orElseThrow(() -> new RuntimeException("Article not found"));
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ARTICLE_NOT_FOUND));
         foundArticle.increaseView();
         Article savedArticle = articleRepository.save(foundArticle);
         return ResponseArticle.builder()
@@ -78,7 +80,7 @@ public class ArticleService {
     @Transactional
     Long modifyArticle(Long article_id, RequestModifyArticle requestModifyArticle) {
         Article foundArticle = articleRepository.findById(article_id)
-                .orElseThrow(() -> new RuntimeException("Article not found"));
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ARTICLE_NOT_FOUND));
         foundArticle.modifyArticle(requestModifyArticle);
         Article savedArticle = articleRepository.save(foundArticle);
         return savedArticle.getId();

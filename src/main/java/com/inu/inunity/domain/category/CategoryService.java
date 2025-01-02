@@ -1,5 +1,7 @@
 package com.inu.inunity.domain.category;
 
+import com.inu.inunity.common.exception.ExceptionMessage;
+import com.inu.inunity.common.exception.NotFoundElementException;
 import com.inu.inunity.domain.article.Article;
 import com.inu.inunity.domain.article.ArticleRepository;
 import com.inu.inunity.domain.category.dto.RequestCreateCategory;
@@ -62,7 +64,7 @@ public class CategoryService {
     @Transactional
     Long editCategoryName(Long category_id, String category_name) {
         Category foundCategory = categoryRepository.findById(category_id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.CATEGORY_NOT_FOUND));
         foundCategory.editName(category_name);
         Category savedCategory = categoryRepository.save(foundCategory);
         return savedCategory.getId();
@@ -78,7 +80,7 @@ public class CategoryService {
     @Transactional
     Long changeStatus(Long category_id, boolean status) {
         Category foundCategory = categoryRepository.findById(category_id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.CATEGORY_NOT_FOUND));
         foundCategory.changeStatus(status);
         Category savedCategory = categoryRepository.save(foundCategory);
         return savedCategory.getId();

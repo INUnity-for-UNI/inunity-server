@@ -22,7 +22,9 @@ public enum ExceptionMessage {
     PORTAL_LOGIN_FAILED_SERVER_ERROR("포탈 로그인 실패: 예기치않은 서버 통신 오류", 0, HttpStatus.BAD_REQUEST),
     CONTRACT_NOT_FOUND("SNS/Link 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND),
     CAREER_NOT_FOUND("경력 이력이 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND),
-    SKILL_NOT_FOUND("스킬이 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND)
+    SKILL_NOT_FOUND("스킬이 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND),
+    CATEGORY_NOT_FOUND("카테고리를 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
+    ARTICLE_NOT_FOUND("아티클을 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND)
     ;
 
 
