@@ -1,5 +1,7 @@
 package com.inu.inunity.domain.profile.portfolio;
 
+import com.inu.inunity.common.exception.ExceptionMessage;
+import com.inu.inunity.common.exception.NotFoundElementException;
 import com.inu.inunity.domain.profile.portfolio.dto.RequestPortfolio;
 import com.inu.inunity.domain.profile.portfolio.dto.ResponsePortfolio;
 import com.inu.inunity.domain.user.User;
@@ -47,15 +49,24 @@ public class PortfolioService {
         deletePortfolio(skillMap.keySet().stream().toList());
     }
 
-    public void createPortfolio(List<RequestPortfolio> requestModifyPortfolios, User user){
+    public void createPortfolio(List<RequestPortfolio> requestCreatePortfolios, User user){
+        List<Portfolio> portfolios = requestCreatePortfolios.stream()
+                .map(requestPortfolio -> Portfolio.of(requestPortfolio.url(), requestPortfolio.startDate(), requestPortfolio.endDate(), user))
+                .toList();
 
+        portfolioRepository.saveAll(portfolios);
     }
 
-    public void modifyPortfolio(List<RequestPortfolio> requestCreatePortfolios){
+    public void modifyPortfolio(List<RequestPortfolio> requestModifyPortfolios){
+        requestModifyPortfolios.forEach(requestPortfolio -> {
+            Portfolio portfolio = portfolioRepository.findById(requestPortfolio.portfolioId())
+                    .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.PORTFOLIO_NOT_FOUND));
 
+            portfolio.update(requestPortfolio.url(), requestPortfolio.startDate(), requestPortfolio.endDate());
+        });
     }
 
     public void deletePortfolio(List<Long> deleteDeletePortfolios){
-
+        portfolioRepository.deleteAllById(deleteDeletePortfolios);
     }
 }
