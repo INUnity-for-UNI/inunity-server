@@ -2,7 +2,7 @@ package com.inu.inunity.domain.ReplyComment;
 
 import com.inu.inunity.common.BaseEntity;
 import com.inu.inunity.domain.comment.Comment;
-import com.inu.inunity.domain.User.User;
+import com.inu.inunity.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

@@ -1,8 +1,8 @@
-package com.inu.inunity.domain.User;
+package com.inu.inunity.domain.user;
 
 import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
-import com.inu.inunity.domain.User.dto.RequestSetUser;
+import com.inu.inunity.domain.user.dto.RequestSetUser;
 import com.inu.inunity.security.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

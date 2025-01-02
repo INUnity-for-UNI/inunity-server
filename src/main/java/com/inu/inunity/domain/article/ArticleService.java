@@ -1,12 +1,12 @@
 package com.inu.inunity.domain.article;
 
-import com.inu.inunity.domain.User.User;
-import com.inu.inunity.domain.User.UserRepository;
 import com.inu.inunity.domain.article.dto.RequestCreateArticle;
 import com.inu.inunity.domain.article.dto.RequestModifyArticle;
 import com.inu.inunity.domain.article.dto.ResponseArticle;
 import com.inu.inunity.domain.category.Category;
 import com.inu.inunity.domain.category.CategoryRepository;
+import com.inu.inunity.domain.user.User;
+import com.inu.inunity.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

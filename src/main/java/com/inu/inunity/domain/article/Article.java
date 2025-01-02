@@ -6,7 +6,7 @@ import com.inu.inunity.domain.articleLike.ArticleLike;
 import com.inu.inunity.domain.articleReport.ArticleReport;
 import com.inu.inunity.domain.category.Category;
 import com.inu.inunity.domain.comment.Comment;
-import com.inu.inunity.domain.User.User;
+import com.inu.inunity.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

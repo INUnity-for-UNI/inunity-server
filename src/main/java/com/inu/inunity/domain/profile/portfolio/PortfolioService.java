@@ -1,8 +1,8 @@
 package com.inu.inunity.domain.profile.portfolio;
 
-import com.inu.inunity.domain.User.User;
 import com.inu.inunity.domain.profile.portfolio.dto.RequestPortfolio;
 import com.inu.inunity.domain.profile.portfolio.dto.ResponsePortfolio;
+import com.inu.inunity.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

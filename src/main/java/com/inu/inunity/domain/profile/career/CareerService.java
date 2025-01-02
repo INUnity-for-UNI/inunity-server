@@ -2,10 +2,10 @@ package com.inu.inunity.domain.profile.career;
 
 import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
-import com.inu.inunity.domain.User.User;
-import com.inu.inunity.domain.User.UserRepository;
 import com.inu.inunity.domain.profile.career.dto.RequestUpdateCareers;
 import com.inu.inunity.domain.profile.career.dto.ResponseCareer;
+import com.inu.inunity.domain.user.User;
+import com.inu.inunity.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
