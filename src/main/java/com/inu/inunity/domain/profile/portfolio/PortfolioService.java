@@ -7,6 +7,7 @@ import com.inu.inunity.domain.profile.portfolio.dto.ResponsePortfolio;
 import com.inu.inunity.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -20,6 +21,7 @@ public class PortfolioService {
 
     private final PortfolioRepository portfolioRepository;
 
+    @Transactional(readOnly = true)
     public List<ResponsePortfolio> getPortfolios(User user){
         return user.getPortfolios().stream()
                 .sorted(Comparator.comparing(Portfolio::getStartDate))
@@ -27,6 +29,7 @@ public class PortfolioService {
                 .toList();
     }
 
+    @Transactional
     public void updatePortfolios(List<RequestPortfolio> requestUpdatePortfolios, User user){
         List<Portfolio> existingPortfolios = user.getPortfolios();
         List<RequestPortfolio> portfolioToCreate = new ArrayList<>();

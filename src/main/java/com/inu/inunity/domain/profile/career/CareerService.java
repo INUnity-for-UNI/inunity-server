@@ -22,6 +22,7 @@ public class CareerService {
     private final CareerRepository careerRepository;
     private final UserRepository userRepository;
 
+    @Transactional(readOnly = true)
     public List<ResponseCareer> getCareers(User user){
         return user.getCareers().stream()
                 .map(career -> ResponseCareer.of(career.getId(), career.getCompanyName(), career.getPosition(),
