@@ -3,26 +3,22 @@ package com.inu.inunity.domain.profile.contract;
 import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
 import com.inu.inunity.domain.User.User;
-import com.inu.inunity.domain.User.UserRepository;
-import com.inu.inunity.domain.profile.contract.dto.RequestCreateContract;
-import com.inu.inunity.domain.profile.contract.dto.RequestModifyContract;
-import com.inu.inunity.domain.profile.contract.dto.RequestUpdateContracts;
+import com.inu.inunity.domain.profile.contract.dto.RequestUpdateContract;
 import com.inu.inunity.domain.profile.contract.dto.ResponseContract;
-import com.inu.inunity.security.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ContractService {
 
     private final ContractRepository contractRepository;
-    private final UserRepository userRepository;
-
 
     @Transactional(readOnly = true)
     public List<ResponseContract> getContracts(User user){
@@ -32,18 +28,29 @@ public class ContractService {
     }
 
     @Transactional
-    public void updateContracts(RequestUpdateContracts requestUpdateContracts, UserDetails userDetails){
-        Long userId = ((CustomUserDetails) userDetails).getId();
+    public void updateContracts(List<RequestUpdateContract> requestUpdateContracts, User user){
+        List<Contract> existingContracts = user.getContracts();
+        List<RequestUpdateContract> contractsToCreate = new ArrayList<>();
+        List<RequestUpdateContract> contractsToModify = new ArrayList<>();
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
+        Map<Long, Contract> skillMap = existingContracts.stream()
+                .collect(Collectors.toMap(Contract::getId, Contract -> Contract));
 
-        createContracts(requestUpdateContracts.createContracts(), user);
-        modifyContracts(requestUpdateContracts.modifyContracts());
-        deleteContracts(requestUpdateContracts.deleteContracts());
+        requestUpdateContracts.forEach(requestUpdateCareer -> {
+            if (requestUpdateCareer.contractId() == null) {
+                contractsToCreate.add(requestUpdateCareer);
+            } else {
+                contractsToModify.add(requestUpdateCareer);
+                skillMap.remove(requestUpdateCareer.contractId());
+            }
+        });
+
+        createContracts(contractsToCreate, user);
+        modifyContracts(contractsToModify);
+        deleteContracts(skillMap.keySet().stream().toList());
     }
 
-    private void createContracts(List<RequestCreateContract> requestCreateContracts, User user){
+    private void createContracts(List<RequestUpdateContract> requestCreateContracts, User user){
         List<Contract> contracts = requestCreateContracts.stream()
                 .map(createContract -> Contract.of(createContract.name(),createContract.url(), createContract.type(), user))
                 .toList();
@@ -51,7 +58,7 @@ public class ContractService {
         contractRepository.saveAll(contracts);
     }
 
-    private void modifyContracts(List<RequestModifyContract> requestModifyContracts){
+    private void modifyContracts(List<RequestUpdateContract> requestModifyContracts){
         requestModifyContracts.forEach(modifyContract -> {
             Contract contract = contractRepository.findById(modifyContract.contractId())
                     .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.CONTRACT_NOT_FOUND));

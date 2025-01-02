@@ -3,11 +3,7 @@ package com.inu.inunity.domain.profile.portfolio;
 import com.inu.inunity.domain.User.User;
 import com.inu.inunity.domain.profile.portfolio.dto.RequestPortfolio;
 import com.inu.inunity.domain.profile.portfolio.dto.ResponsePortfolio;
-import com.inu.inunity.domain.profile.skill.Skill;
-import com.inu.inunity.domain.profile.skill.dto.RequestUpdateSkill;
-import com.inu.inunity.security.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
