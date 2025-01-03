@@ -3,8 +3,10 @@ package com.inu.inunity.domain.comment;
 import com.inu.inunity.common.BaseEntity;
 import com.inu.inunity.domain.article.Article;
 import com.inu.inunity.domain.User.User;
+import com.inu.inunity.domain.comment.dto.RequestModifyComment;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,4 +28,17 @@ public class Comment extends BaseEntity {
 
     @ManyToOne
     private Article article;
+
+    @Builder
+    Comment(String content, Boolean isAnonymous, User user, Article article) {
+        this.content = content;
+        this.isAnonymous = isAnonymous;
+        this.user = user;
+        this.article = article;
+    }
+
+    void modifyComment(RequestModifyComment requestModifyComment) {
+        this.content = requestModifyComment.content();
+        this.isAnonymous = requestModifyComment.isAnonymous();
+    }
 }

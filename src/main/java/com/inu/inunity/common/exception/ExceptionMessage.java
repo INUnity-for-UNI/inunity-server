@@ -24,7 +24,8 @@ public enum ExceptionMessage {
     CAREER_NOT_FOUND("경력 이력이 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND),
     SKILL_NOT_FOUND("스킬이 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND),
     CATEGORY_NOT_FOUND("카테고리를 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
-    ARTICLE_NOT_FOUND("아티클을 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND)
+    ARTICLE_NOT_FOUND("아티클을 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
+    COMMENT_NOT_FOUND("댓글을 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
     ;
 
 

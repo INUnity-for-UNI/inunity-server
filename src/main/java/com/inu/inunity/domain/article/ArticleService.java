@@ -61,12 +61,17 @@ public class ArticleService {
         foundArticle.increaseView();
         Article savedArticle = articleRepository.save(foundArticle);
         return ResponseArticle.builder()
-                .id(savedArticle.getId())
+                .userId(savedArticle.getUser().getId())
+                .department(savedArticle.getUser().getDepartment())
+                .nickname(savedArticle.getUser().getNickname())
+                .articleId(savedArticle.getId())
                 .title(savedArticle.getTitle())
                 .content(savedArticle.getContent())
                 .view(savedArticle.getView())
                 .isDeleted(savedArticle.getIsDeleted())
                 .isAnonymous(savedArticle.getIsAnonymous())
+                .createAt(savedArticle.getCreateAt())
+                .updateAt(savedArticle.getUpdateAt())
                 .build();
     }
 
