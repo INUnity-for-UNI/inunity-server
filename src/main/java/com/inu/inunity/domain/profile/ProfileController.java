@@ -5,6 +5,8 @@ import com.inu.inunity.domain.profile.career.dto.RequestCreateCareer;
 import com.inu.inunity.domain.profile.career.dto.RequestUpdateCareer;
 import com.inu.inunity.domain.profile.contract.dto.RequestCreateContract;
 import com.inu.inunity.domain.profile.contract.dto.RequestUpdateContract;
+import com.inu.inunity.domain.profile.portfolio.dto.RequestCreatePortfolio;
+import com.inu.inunity.domain.profile.portfolio.dto.RequestUpdatePortfolio;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -68,6 +70,33 @@ public class ProfileController {
                                                @AuthenticationPrincipal UserDetails userDetails) {
         profileService.deleteContract(contractid, userid, userDetails);
         return CommonResponse.success("contract 삭제 성공", null);
+    }
+
+    @PostMapping("/users/{userid}/profile/portfolio")
+    public ResponseEntity<CommonResponse<?>> createUserPortfolio(@RequestBody RequestCreatePortfolio request, @PathVariable Long userid,
+                                                                 @AuthenticationPrincipal UserDetails userDetails) {
+        profileService.createPortfolio(request, userid, userDetails);
+        return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("portfolio 생성 성공", null));
+    }
+
+    @GetMapping("/users/{userid}/profile/portfolio")
+    public CommonResponse<?> getUserPortfolios(@PathVariable Long userid,
+                                              @AuthenticationPrincipal UserDetails userDetails) {
+        return CommonResponse.success("유저의 portfolio 가져오기 성공", profileService.getPortfolios(userDetails));
+    }
+
+    @PutMapping("/users/{userid}/profile/portfolio")
+    public CommonResponse<?> updateUserPortfolio(@RequestBody RequestUpdatePortfolio request, @PathVariable Long userid,
+                                                 @AuthenticationPrincipal UserDetails userDetails) {
+        profileService.updatePortfolio(request, userid, userDetails);
+        return CommonResponse.success("portfolio 수정 성공", null);
+    }
+
+    @DeleteMapping("/users/{userid}/profile/portfolio/{portfolioid}")
+    public CommonResponse<?> deleteUserPortfolio(@PathVariable Long portfolioid, @PathVariable Long userid,
+                                                @AuthenticationPrincipal UserDetails userDetails) {
+        profileService.deletePortfolio(portfolioid, userid, userDetails);
+        return CommonResponse.success("portfolio 삭제 성공", null);
     }
 
 }

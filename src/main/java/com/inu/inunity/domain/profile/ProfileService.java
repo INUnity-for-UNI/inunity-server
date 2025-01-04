@@ -11,6 +11,9 @@ import com.inu.inunity.domain.profile.contract.dto.RequestCreateContract;
 import com.inu.inunity.domain.profile.contract.dto.RequestUpdateContract;
 import com.inu.inunity.domain.profile.contract.dto.ResponseContract;
 import com.inu.inunity.domain.profile.portfolio.PortfolioService;
+import com.inu.inunity.domain.profile.portfolio.dto.RequestCreatePortfolio;
+import com.inu.inunity.domain.profile.portfolio.dto.RequestUpdatePortfolio;
+import com.inu.inunity.domain.profile.portfolio.dto.ResponsePortfolio;
 import com.inu.inunity.domain.profile.skill.SkillService;
 import com.inu.inunity.domain.user.User;
 import com.inu.inunity.domain.user.UserService;
@@ -82,6 +85,32 @@ public class ProfileService {
         Long userTokenId = ((CustomUserDetails) userDetails).getId();
         checkOwner(userId, userTokenId);
         contractService.deleteContract(contractId);
+    }
+
+    public void createPortfolio(RequestCreatePortfolio requestCreatePortfolio, Long userId, UserDetails userDetails) {
+        Long userTokenId = ((CustomUserDetails) userDetails).getId();
+        checkOwner(userId, userTokenId);
+        User user = userService.findUserById(userTokenId);
+        portfolioService.createPortfolio(requestCreatePortfolio, user);
+    }
+
+    public List<ResponsePortfolio> getPortfolios(UserDetails userDetails) {
+        Long userId = ((CustomUserDetails) userDetails).getId();
+        User user = userService.findUserById(userId);
+
+        return portfolioService.getPortfolios(user);
+    }
+
+    public void updatePortfolio(RequestUpdatePortfolio requestUpdatePortfolio, Long userId, UserDetails userDetails) {
+        Long userTokenId = ((CustomUserDetails) userDetails).getId();
+        checkOwner(userId, userTokenId);
+        portfolioService.updatePortfolio(requestUpdatePortfolio);
+    }
+
+    public void deletePortfolio(Long portfolioId, Long userId, UserDetails userDetails) {
+        Long userTokenId = ((CustomUserDetails) userDetails).getId();
+        checkOwner(userId, userTokenId);
+        portfolioService.deletePortfolio(portfolioId);
     }
 
     public void checkOwner(Long userId, Long userTokenId){
