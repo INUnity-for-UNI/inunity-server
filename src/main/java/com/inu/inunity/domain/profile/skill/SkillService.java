@@ -32,7 +32,7 @@ public class SkillService {
     }
 
     @Transactional
-    public void modifySkill(RequestUpdateSkill requestUpdateSkill) {
+    public void updateSkill(RequestUpdateSkill requestUpdateSkill) {
         Skill skill = skillRepository.findById(requestUpdateSkill.skillId())
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.SKILL_NOT_FOUND));
         skill.update(requestUpdateSkill.type(), requestUpdateSkill.name(), requestUpdateSkill.level());

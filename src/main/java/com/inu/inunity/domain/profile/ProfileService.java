@@ -15,6 +15,9 @@ import com.inu.inunity.domain.profile.portfolio.dto.RequestCreatePortfolio;
 import com.inu.inunity.domain.profile.portfolio.dto.RequestUpdatePortfolio;
 import com.inu.inunity.domain.profile.portfolio.dto.ResponsePortfolio;
 import com.inu.inunity.domain.profile.skill.SkillService;
+import com.inu.inunity.domain.profile.skill.dto.RequestCreateSkill;
+import com.inu.inunity.domain.profile.skill.dto.RequestUpdateSkill;
+import com.inu.inunity.domain.profile.skill.dto.ResponseSkill;
 import com.inu.inunity.domain.user.User;
 import com.inu.inunity.domain.user.UserService;
 import com.inu.inunity.security.jwt.CustomUserDetails;
@@ -111,6 +114,32 @@ public class ProfileService {
         Long userTokenId = ((CustomUserDetails) userDetails).getId();
         checkOwner(userId, userTokenId);
         portfolioService.deletePortfolio(portfolioId);
+    }
+
+    public void createSkill(RequestCreateSkill requestCreateSkill, Long userId, UserDetails userDetails) {
+        Long userTokenId = ((CustomUserDetails) userDetails).getId();
+        checkOwner(userId, userTokenId);
+        User user = userService.findUserById(userTokenId);
+        skillService.createSkill(requestCreateSkill, user);
+    }
+
+    public List<ResponseSkill> getSkills(UserDetails userDetails) {
+        Long userId = ((CustomUserDetails) userDetails).getId();
+        User user = userService.findUserById(userId);
+
+        return skillService.getSkills(user);
+    }
+
+    public void updateSkill(RequestUpdateSkill requestUpdateSkill, Long userId, UserDetails userDetails) {
+        Long userTokenId = ((CustomUserDetails) userDetails).getId();
+        checkOwner(userId, userTokenId);
+        skillService.updateSkill(requestUpdateSkill);
+    }
+
+    public void deleteSkill(Long skillId, Long userId, UserDetails userDetails) {
+        Long userTokenId = ((CustomUserDetails) userDetails).getId();
+        checkOwner(userId, userTokenId);
+        skillService.deleteSkill(skillId);
     }
 
     public void checkOwner(Long userId, Long userTokenId){

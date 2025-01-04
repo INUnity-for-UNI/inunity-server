@@ -7,6 +7,8 @@ import com.inu.inunity.domain.profile.contract.dto.RequestCreateContract;
 import com.inu.inunity.domain.profile.contract.dto.RequestUpdateContract;
 import com.inu.inunity.domain.profile.portfolio.dto.RequestCreatePortfolio;
 import com.inu.inunity.domain.profile.portfolio.dto.RequestUpdatePortfolio;
+import com.inu.inunity.domain.profile.skill.dto.RequestCreateSkill;
+import com.inu.inunity.domain.profile.skill.dto.RequestUpdateSkill;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -99,4 +101,30 @@ public class ProfileController {
         return CommonResponse.success("portfolio 삭제 성공", null);
     }
 
+    @PostMapping("/users/{userid}/profile/skill")
+    public ResponseEntity<CommonResponse<?>> createUserSkill(@RequestBody RequestCreateSkill request, @PathVariable Long userid,
+                                                             @AuthenticationPrincipal UserDetails userDetails) {
+        profileService.createSkill(request, userid, userDetails);
+        return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("skill 생성 성공", null));
+    }
+
+    @GetMapping("/users/{userid}/profile/skill")
+    public CommonResponse<?> getUserSkills(@PathVariable Long userid,
+                                               @AuthenticationPrincipal UserDetails userDetails) {
+        return CommonResponse.success("유저의 skill 가져오기 성공", profileService.getSkills(userDetails));
+    }
+
+    @PutMapping("/users/{userid}/profile/skill")
+    public CommonResponse<?> updateUserSkill(@RequestBody RequestUpdateSkill request, @PathVariable Long userid,
+                                             @AuthenticationPrincipal UserDetails userDetails) {
+        profileService.updateSkill(request, userid, userDetails);
+        return CommonResponse.success("skill 수정 성공", null);
+    }
+
+    @DeleteMapping("/users/{userid}/profile/skill/{skillid}")
+    public CommonResponse<?> deleteUserSkill(@PathVariable Long skillid, @PathVariable Long userid,
+                                                 @AuthenticationPrincipal UserDetails userDetails) {
+        profileService.deleteSkill(skillid, userid, userDetails);
+        return CommonResponse.success("skill 삭제 성공", null);
+    }
 }
