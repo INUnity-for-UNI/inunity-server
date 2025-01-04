@@ -27,36 +27,53 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private final List<Article> articles = new ArrayList<>();
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private final List<ArticleLike> articleLikes = new ArrayList<>();
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private final List<ArticleReport> articleReports = new ArrayList<>();
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private final List<Comment> comments = new ArrayList<>();
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private final List<ReplyComment> replyComments = new ArrayList<>();
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private final List<Career> careers = new ArrayList<>();
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private final List<Skill> skills = new ArrayList<>();
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private final List<Contract> contracts = new ArrayList<>();
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private final List<Portfolio> portfolios = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
+
     private Long studentId;
+
     private String nickname;
+
     private String description;
+
     private String department;
+
     private Boolean isGraduation;
+
     private LocalDate graduateDate;
+
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Role> roles = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private final List<Article> articles = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private final List<ArticleLike> articleLikes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private final List<ArticleReport> articleReports = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private final List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private final List<ReplyComment> replyComments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private final List<Career> careers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private final List<Skill> skills = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private final List<Contract> contracts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private final List<Portfolio> portfolios = new ArrayList<>();
 
     @Builder
     public User(Long studentId, String name , String nickname, String description, Boolean isGraduation, String department, List<Role> roles){

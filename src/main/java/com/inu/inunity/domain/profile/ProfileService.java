@@ -22,13 +22,16 @@ import com.inu.inunity.domain.user.User;
 import com.inu.inunity.domain.user.UserService;
 import com.inu.inunity.security.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 
+
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ProfileService {
 
@@ -45,8 +48,8 @@ public class ProfileService {
         careerService.createCareer(requestCreateCareer, user);
     }
 
-    public List<ResponseCareer> getCareers(UserDetails userDetails){
-        Long userId = ((CustomUserDetails) userDetails).getId();
+    public List<ResponseCareer> getCareers(Long userId, UserDetails userDetails){
+        Long userTokenId = ((CustomUserDetails) userDetails).getId();
         User user = userService.findUserById(userId);
 
         return careerService.getCareers(user);
@@ -71,8 +74,8 @@ public class ProfileService {
         contractService.createContract(requestCreateContract, user);
     }
 
-    public List<ResponseContract> getContracts(UserDetails userDetails) {
-        Long userId = ((CustomUserDetails) userDetails).getId();
+    public List<ResponseContract> getContracts(Long userId, UserDetails userDetails) {
+        Long userTokenId = ((CustomUserDetails) userDetails).getId();
         User user = userService.findUserById(userId);
 
         return contractService.getContracts(user);
@@ -97,8 +100,8 @@ public class ProfileService {
         portfolioService.createPortfolio(requestCreatePortfolio, user);
     }
 
-    public List<ResponsePortfolio> getPortfolios(UserDetails userDetails) {
-        Long userId = ((CustomUserDetails) userDetails).getId();
+    public List<ResponsePortfolio> getPortfolios(Long userId, UserDetails userDetails) {
+        Long userTokenId = ((CustomUserDetails) userDetails).getId();
         User user = userService.findUserById(userId);
 
         return portfolioService.getPortfolios(user);
@@ -123,10 +126,9 @@ public class ProfileService {
         skillService.createSkill(requestCreateSkill, user);
     }
 
-    public List<ResponseSkill> getSkills(UserDetails userDetails) {
-        Long userId = ((CustomUserDetails) userDetails).getId();
+    public List<ResponseSkill> getSkills(Long userId, UserDetails userDetails) {
+        Long userTokenId = ((CustomUserDetails) userDetails).getId();
         User user = userService.findUserById(userId);
-
         return skillService.getSkills(user);
     }
 
@@ -142,13 +144,14 @@ public class ProfileService {
         skillService.deleteSkill(skillId);
     }
 
-    public void checkOwner(Long userId, Long userTokenId){
+    public void checkOwner(Long userId, Long userTokenId) {
+        log.info(isOwner(userId, userTokenId).toString());
         if(!isOwner(userId, userTokenId)){
             throw new NotOwnerException(ExceptionMessage.NOT_AUTHORIZATION_ACCESS);
         }
     }
 
-    public Boolean isOwner(Long userId, Long userTokenId){
-        return Objects.equals(userId, userTokenId);
+    public Boolean isOwner(Long userId, Long userTokenId) {
+        return Objects.equals(userTokenId, userId);
     }
 }
