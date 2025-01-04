@@ -3,6 +3,8 @@ package com.inu.inunity.domain.profile;
 import com.inu.inunity.common.CommonResponse;
 import com.inu.inunity.domain.profile.career.dto.RequestCreateCareer;
 import com.inu.inunity.domain.profile.career.dto.RequestUpdateCareer;
+import com.inu.inunity.domain.profile.contract.dto.RequestCreateContract;
+import com.inu.inunity.domain.profile.contract.dto.RequestUpdateContract;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,18 +30,44 @@ public class ProfileController {
     }
 
     @PutMapping("/users/{userid}/profile/career")
-    public CommonResponse<?> updateUserCareers(@RequestBody RequestUpdateCareer request, @PathVariable Long userid,
+    public CommonResponse<?> updateUserCareer(@RequestBody RequestUpdateCareer request, @PathVariable Long userid,
                                                @AuthenticationPrincipal UserDetails userDetails) {
         profileService.updateCareer(request, userid, userDetails);
         return CommonResponse.success("career 수정 성공", null);
     }
 
     @DeleteMapping("/users/{userid}/profile/career/{careerid}")
-    public CommonResponse<?> deleteUserCareers(@PathVariable Long careerid, @PathVariable Long userid,
+    public CommonResponse<?> deleteUserCareer(@PathVariable Long careerid, @PathVariable Long userid,
                                                @AuthenticationPrincipal UserDetails userDetails) {
         profileService.deleteCareer(careerid, userid, userDetails);
         return CommonResponse.success("career 삭제 성공", null);
     }
 
+    @PostMapping("/users/{userid}/profile/contract")
+    public ResponseEntity<CommonResponse<?>> createUserContract(@RequestBody RequestCreateContract request, @PathVariable Long userid,
+                                                                @AuthenticationPrincipal UserDetails userDetails) {
+        profileService.createContract(request, userid, userDetails);
+        return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("contract 생성 성공", null));
+    }
+
+    @GetMapping("/users/{userid}/profile/contract")
+    public CommonResponse<?> getUserContracts(@PathVariable Long userid,
+                                            @AuthenticationPrincipal UserDetails userDetails) {
+        return CommonResponse.success("유저의 contract 가져오기 성공", profileService.getContracts(userDetails));
+    }
+
+    @PutMapping("/users/{userid}/profile/contract")
+    public CommonResponse<?> updateUserContract(@RequestBody RequestUpdateContract request, @PathVariable Long userid,
+                                                @AuthenticationPrincipal UserDetails userDetails) {
+        profileService.updateContract(request, userid, userDetails);
+        return CommonResponse.success("contract 수정 성공", null);
+    }
+
+    @DeleteMapping("/users/{userid}/profile/contract/{contractid}")
+    public CommonResponse<?> deleteUserContract(@PathVariable Long contractid, @PathVariable Long userid,
+                                               @AuthenticationPrincipal UserDetails userDetails) {
+        profileService.deleteContract(contractid, userid, userDetails);
+        return CommonResponse.success("contract 삭제 성공", null);
+    }
 
 }

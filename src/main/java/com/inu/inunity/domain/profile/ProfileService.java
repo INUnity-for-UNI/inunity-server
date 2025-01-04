@@ -7,6 +7,9 @@ import com.inu.inunity.domain.profile.career.dto.RequestCreateCareer;
 import com.inu.inunity.domain.profile.career.dto.RequestUpdateCareer;
 import com.inu.inunity.domain.profile.career.dto.ResponseCareer;
 import com.inu.inunity.domain.profile.contract.ContractService;
+import com.inu.inunity.domain.profile.contract.dto.RequestCreateContract;
+import com.inu.inunity.domain.profile.contract.dto.RequestUpdateContract;
+import com.inu.inunity.domain.profile.contract.dto.ResponseContract;
 import com.inu.inunity.domain.profile.portfolio.PortfolioService;
 import com.inu.inunity.domain.profile.skill.SkillService;
 import com.inu.inunity.domain.user.User;
@@ -53,6 +56,32 @@ public class ProfileService {
         Long userTokenId = ((CustomUserDetails) userDetails).getId();
         checkOwner(userId, userTokenId);
         careerService.deleteCareer(careerId);
+    }
+
+    public void createContract(RequestCreateContract requestCreateContract, Long userId, UserDetails userDetails) {
+        Long userTokenId = ((CustomUserDetails) userDetails).getId();
+        checkOwner(userId, userTokenId);
+        User user = userService.findUserById(userTokenId);
+        contractService.createContract(requestCreateContract, user);
+    }
+
+    public List<ResponseContract> getContracts(UserDetails userDetails) {
+        Long userId = ((CustomUserDetails) userDetails).getId();
+        User user = userService.findUserById(userId);
+
+        return contractService.getContracts(user);
+    }
+
+    public void updateContract(RequestUpdateContract requestUpdateContract, Long userId, UserDetails userDetails) {
+        Long userTokenId = ((CustomUserDetails) userDetails).getId();
+        checkOwner(userId, userTokenId);
+        contractService.updateContract(requestUpdateContract);
+    }
+
+    public void deleteContract(Long contractId, Long userId, UserDetails userDetails) {
+        Long userTokenId = ((CustomUserDetails) userDetails).getId();
+        checkOwner(userId, userTokenId);
+        contractService.deleteContract(contractId);
     }
 
     public void checkOwner(Long userId, Long userTokenId){
