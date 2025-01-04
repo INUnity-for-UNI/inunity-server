@@ -18,10 +18,12 @@ public class UserService {
     @Transactional
     public void setUser(RequestSetUser request, UserDetails userDetails) {
         Long userId = ((CustomUserDetails) userDetails).getId();
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
-
+        User user = findUserById(userId);
         user.setUser(request.userName(), request.nickName(), request.graduationDate(), request.isGraduation());
+    }
+
+    public User findUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
     }
 }

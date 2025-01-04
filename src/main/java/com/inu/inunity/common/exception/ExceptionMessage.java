@@ -23,7 +23,8 @@ public enum ExceptionMessage {
     CONTRACT_NOT_FOUND("SNS/Link 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND),
     CAREER_NOT_FOUND("경력 이력이 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND),
     SKILL_NOT_FOUND("스킬이 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND),
-    PORTFOLIO_NOT_FOUND("포트폴리오가 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND)
+    PORTFOLIO_NOT_FOUND("포트폴리오가 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND),
+    NOT_AUTHORIZATION_ACCESS("잘못된 접근입니다.", 0, HttpStatus.BAD_REQUEST)
     ;
 
 

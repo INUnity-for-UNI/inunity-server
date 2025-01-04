@@ -45,4 +45,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("[handlePortalLoginException] {}", ex.getMessage());
         return ResponseEntity.status(status).body(CommonResponse.error(status, ex.getMessage(), null));
     }
+
+    @ExceptionHandler(value = NotOwnerException.class)
+    public ResponseEntity<CommonResponse> handleNotOwnerException(NotOwnerException ex) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        log.error("[handleNotOwnerException] {}", ex.getMessage());
+        return ResponseEntity.status(status).body(CommonResponse.error(status, ex.getMessage(), null));
+    }
 }
