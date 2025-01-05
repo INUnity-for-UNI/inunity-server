@@ -29,9 +29,8 @@ public class ProfileController {
     }
 
     @GetMapping("/users/{userid}/profile/career")
-    public CommonResponse<?> getUserCareers(@PathVariable Long userid,
-                                            @AuthenticationPrincipal UserDetails userDetails) {
-        return CommonResponse.success("유저의 career 가져오기 성공", profileService.getCareers(userid, userDetails));
+    public CommonResponse<?> getUserCareers(@PathVariable Long userid) {
+        return CommonResponse.success("유저의 career 가져오기 성공", profileService.getCareers(userid));
     }
 
     @PutMapping("/users/{userid}/profile/career")
@@ -56,9 +55,8 @@ public class ProfileController {
     }
 
     @GetMapping("/users/{userid}/profile/contract")
-    public CommonResponse<?> getUserContracts(@PathVariable Long userid,
-                                            @AuthenticationPrincipal UserDetails userDetails) {
-        return CommonResponse.success("유저의 contract 가져오기 성공", profileService.getContracts(userid, userDetails));
+    public CommonResponse<?> getUserContracts(@PathVariable Long userid) {
+        return CommonResponse.success("유저의 contract 가져오기 성공", profileService.getContracts(userid));
     }
 
     @PutMapping("/users/{userid}/profile/contract")
@@ -83,9 +81,8 @@ public class ProfileController {
     }
 
     @GetMapping("/users/{userid}/profile/portfolio")
-    public CommonResponse<?> getUserPortfolios(@PathVariable Long userid,
-                                              @AuthenticationPrincipal UserDetails userDetails) {
-        return CommonResponse.success("유저의 portfolio 가져오기 성공", profileService.getPortfolios(userid, userDetails));
+    public CommonResponse<?> getUserPortfolios(@PathVariable Long userid) {
+        return CommonResponse.success("유저의 portfolio 가져오기 성공", profileService.getPortfolios(userid));
     }
 
     @PutMapping("/users/{userid}/profile/portfolio")
@@ -110,9 +107,8 @@ public class ProfileController {
     }
 
     @GetMapping("/users/{userid}/profile/skill")
-    public CommonResponse<?> getUserSkills(@PathVariable Long userid,
-                                               @AuthenticationPrincipal UserDetails userDetails) {
-        return CommonResponse.success("유저의 skill 가져오기 성공", profileService.getSkills(userid, userDetails));
+    public CommonResponse<?> getUserSkills(@PathVariable Long userid) {
+        return CommonResponse.success("유저의 skill 가져오기 성공", profileService.getSkills(userid));
     }
 
     @PutMapping("/users/{userid}/profile/skill")

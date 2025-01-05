@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 
-
+/// TODO: 2025-01-05 정보 가져올때 본인인지 표기가 필요한지 프론트에 문의 후 개발
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -48,10 +48,8 @@ public class ProfileService {
         careerService.createCareer(requestCreateCareer, user);
     }
 
-    public List<ResponseCareer> getCareers(Long userId, UserDetails userDetails){
-        Long userTokenId = ((CustomUserDetails) userDetails).getId();
+    public List<ResponseCareer> getCareers(Long userId){
         User user = userService.findUserById(userId);
-
         return careerService.getCareers(user);
     }
 
@@ -74,10 +72,8 @@ public class ProfileService {
         contractService.createContract(requestCreateContract, user);
     }
 
-    public List<ResponseContract> getContracts(Long userId, UserDetails userDetails) {
-        Long userTokenId = ((CustomUserDetails) userDetails).getId();
+    public List<ResponseContract> getContracts(Long userId) {
         User user = userService.findUserById(userId);
-
         return contractService.getContracts(user);
     }
 
@@ -100,10 +96,8 @@ public class ProfileService {
         portfolioService.createPortfolio(requestCreatePortfolio, user);
     }
 
-    public List<ResponsePortfolio> getPortfolios(Long userId, UserDetails userDetails) {
-        Long userTokenId = ((CustomUserDetails) userDetails).getId();
+    public List<ResponsePortfolio> getPortfolios(Long userId) {
         User user = userService.findUserById(userId);
-
         return portfolioService.getPortfolios(user);
     }
 
@@ -126,8 +120,7 @@ public class ProfileService {
         skillService.createSkill(requestCreateSkill, user);
     }
 
-    public List<ResponseSkill> getSkills(Long userId, UserDetails userDetails) {
-        Long userTokenId = ((CustomUserDetails) userDetails).getId();
+    public List<ResponseSkill> getSkills(Long userId) {
         User user = userService.findUserById(userId);
         return skillService.getSkills(user);
     }
