@@ -7,7 +7,7 @@ import com.inu.inunity.domain.User.UserRepository;
 import com.inu.inunity.domain.article.Article;
 import com.inu.inunity.domain.article.ArticleRepository;
 import com.inu.inunity.domain.comment.dto.RequestCreateComment;
-import com.inu.inunity.domain.comment.dto.RequestModifyComment;
+import com.inu.inunity.domain.comment.dto.RequestUpdateComment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +29,7 @@ public class CommentService {
      * @return Long 작성된 댓글의 ID
      */
     @Transactional
-    Long createComment(RequestCreateComment requestCreateComment, Long article_id, Long user_id) {
+    public Long createComment(RequestCreateComment requestCreateComment, Long article_id, Long user_id) {
         Article foundArticle = articleRepository.findById(article_id)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ARTICLE_NOT_FOUND));
         User foundUser = userRepository.findById(user_id)
@@ -47,14 +47,14 @@ public class CommentService {
     /**
      * 댓글을 수정하는 메서드
      * @author 김원정
-     * @param requestModifyComment RequestModifyComment Record
+     * @param requestUpdateComment RequestUpdateComment Record
      * @return Long 수정된 댓글의 ID
      */
     @Transactional
-    Long modifyComment(RequestModifyComment requestModifyComment) {
-        Comment foundComment = commentRepository.findById(requestModifyComment.commentId())
+    public Long modifyComment(RequestUpdateComment requestUpdateComment) {
+        Comment foundComment = commentRepository.findById(requestUpdateComment.commentId())
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.COMMENT_NOT_FOUND));
-        foundComment.modifyComment(requestModifyComment);
+        foundComment.modifyComment(requestUpdateComment);
         Comment savedComment = commentRepository.save(foundComment);
         return savedComment.getId();
     }
@@ -65,7 +65,7 @@ public class CommentService {
      * @param comment_id Comment ID
      */
     @Transactional
-    void deleteComment(Long comment_id) {
+    public void deleteComment(Long comment_id) {
         commentRepository.deleteById(comment_id);
     }
 }

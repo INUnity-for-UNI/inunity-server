@@ -1,35 +1,30 @@
 package com.inu.inunity.domain.article.dto;
 
 import com.inu.inunity.domain.article.Article;
-import com.inu.inunity.domain.comment.dto.ResponseComment;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Builder
-public record ResponseArticle(
+public record ResponseArticleThumbnail(
         Long userId,
-        String department,
-        String nickname,
         String userImageUrl,
+        String nickname,
+        String department,
         Boolean isAnonymous,
         Long articleId,
         String title,
         String content,
-        Integer viewNum,
-        Boolean isOwner,
-        Integer likeNum,
-        Boolean isLiked,
         LocalDateTime createAt,
         LocalDateTime updateAt,
+        Integer viewNum,
         Integer commentNum,
-        List<ResponseComment> comments
+        Integer likeNum,
+        Boolean isLiked
 ) {
 
-    public static ResponseArticle of(Article article, Integer likeNum, Boolean isLiked, Boolean isOwner, Integer commentNum,
-                                     List<ResponseComment> comments) {
-        return ResponseArticle.builder()
+    public static ResponseArticleThumbnail of(Article article, Integer likeNum, Boolean isLiked, Integer commentNum){
+        return ResponseArticleThumbnail.builder()
                 .userId(article.getUser().getId())
                 .department(article.getUser().getDepartment())
                 .nickname(article.getUser().getNickname())
@@ -38,14 +33,12 @@ public record ResponseArticle(
                 .articleId(article.getId())
                 .title(article.getTitle())
                 .content(article.getContent())
-                .viewNum(article.getView())
-                .isOwner(isOwner)
-                .likeNum(likeNum)
-                .isLiked(isLiked)
+                .commentNum(commentNum)
                 .createAt(article.getCreateAt())
                 .updateAt(article.getUpdateAt())
-                .commentNum(commentNum)
-                .comments(comments)
+                .viewNum(article.getView())
+                .likeNum(likeNum)
+                .isLiked(isLiked)
                 .build();
     }
 }
