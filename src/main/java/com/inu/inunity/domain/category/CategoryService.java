@@ -1,9 +1,11 @@
 package com.inu.inunity.domain.category;
 
+import com.inu.inunity.common.exception.ExceptionMessage;
+import com.inu.inunity.common.exception.NotFoundElementException;
 import com.inu.inunity.domain.article.Article;
 import com.inu.inunity.domain.article.ArticleRepository;
+import com.inu.inunity.domain.article.dto.ResponseArticleThumbnail;
 import com.inu.inunity.domain.category.dto.RequestCreateCategory;
-import com.inu.inunity.domain.category.dto.ResponseArticleForList;
 import com.inu.inunity.domain.category.dto.ResponseCategory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,7 +28,7 @@ public class CategoryService {
      * @return Long 생성된 Category ID
      */
     @Transactional
-    Long createCategory(RequestCreateCategory requestCreateCategory) {
+    public Long createCategory(RequestCreateCategory requestCreateCategory) {
         Category newCategory = Category.builder()
                 .name(requestCreateCategory.name())
                 .description(requestCreateCategory.description())
@@ -42,7 +44,7 @@ public class CategoryService {
      * @return List<ResponseCategory> List 클래스에 감싸진 ResponseCategory
      */
     @Transactional(readOnly = true)
-    List<ResponseCategory> findAllCategories() {
+    public List<ResponseCategory> findAllCategories() {
         List<Category> foundCategories = categoryRepository.findAll();
         return foundCategories.stream().map(category -> ResponseCategory.builder()
                  .id(category.getId())
@@ -55,14 +57,14 @@ public class CategoryService {
     /**
      * 카테고리 이름 수정 메서드
      * @author 김원정
-     * @param category_id Category ID
+     * @param categoryId Category ID
      * @param category_name 바뀔 Category 이름
      * @return Long 수정된 Category ID
      */
     @Transactional
-    Long editCategoryName(Long category_id, String category_name) {
-        Category foundCategory = categoryRepository.findById(category_id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+    public Long editCategoryName(Long categoryId, String category_name) {
+        Category foundCategory = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.CATEGORY_NOT_FOUND));
         foundCategory.editName(category_name);
         Category savedCategory = categoryRepository.save(foundCategory);
         return savedCategory.getId();
@@ -76,9 +78,9 @@ public class CategoryService {
      * @return Long 수정된 Category ID
      */
     @Transactional
-    Long changeStatus(Long category_id, boolean status) {
+    public Long changeStatus(Long category_id, boolean status) {
         Category foundCategory = categoryRepository.findById(category_id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.CATEGORY_NOT_FOUND));
         foundCategory.changeStatus(status);
         Category savedCategory = categoryRepository.save(foundCategory);
         return savedCategory.getId();
@@ -90,7 +92,7 @@ public class CategoryService {
      * @param category_id Category ID
      */
     @Transactional
-    void deleteCategory(Long category_id) {
+    public void deleteCategory(Long category_id) {
         categoryRepository.deleteById(category_id);
     }
 
@@ -102,14 +104,14 @@ public class CategoryService {
      * @return page 클래스에 감싸진 responseArticleForList 클래스
      */
     @Transactional(readOnly = true)
-    Page<ResponseArticleForList> getArticles(Long category_id, Pageable pageable) {
+    public Page<ResponseArticleThumbnail> getArticles(Long category_id, Pageable pageable) {
         Page<Article> pagingArticle = articleRepository.findAllByCategoryId(category_id, pageable);
-        return pagingArticle.map(article -> ResponseArticleForList.builder()
-                .id(article.getId())
-                .title(article.getTitle())
-                .isAnonymous(article.getIsAnonymous())
-                .view(article.getView())
-                .isDeleted(article.getIsDeleted())
-                .build());
+
+        //todo: 이후 이슈로 해당기능 개발
+        Boolean isLiked = false;
+        Integer likeNum = 0;
+        Integer commentNum = 0;
+
+        return pagingArticle.map(article -> ResponseArticleThumbnail.of(article, likeNum, isLiked,  commentNum));
     }
 }

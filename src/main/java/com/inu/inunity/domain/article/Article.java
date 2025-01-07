@@ -1,12 +1,13 @@
 package com.inu.inunity.domain.article;
 
 import com.inu.inunity.common.BaseEntity;
+import com.inu.inunity.domain.User.User;
+import com.inu.inunity.domain.article.dto.RequestCreateArticle;
 import com.inu.inunity.domain.article.dto.RequestModifyArticle;
 import com.inu.inunity.domain.articleLike.ArticleLike;
 import com.inu.inunity.domain.articleReport.ArticleReport;
 import com.inu.inunity.domain.category.Category;
 import com.inu.inunity.domain.comment.Comment;
-import com.inu.inunity.domain.User.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -59,6 +60,19 @@ public class Article extends BaseEntity {
         this.isDeleted = isDeleted;
         this.category = category;
         this.user = user;
+    }
+
+    public static Article of(RequestCreateArticle request, Integer view, Boolean isDeleted, Category category,
+                   User user) {
+        return Article.builder()
+                .title(request.title())
+                .content(request.content())
+                .isAnonymous(request.isAnonymous())
+                .view(view)
+                .isDeleted(isDeleted)
+                .category(category)
+                .user(user)
+                .build();
     }
 
     public void increaseView() {

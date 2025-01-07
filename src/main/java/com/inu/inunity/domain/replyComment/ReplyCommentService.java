@@ -1,4 +1,4 @@
-package com.inu.inunity.domain.ReplyComment;
+package com.inu.inunity.domain.replyComment;
 
 import org.springframework.stereotype.Service;
 
