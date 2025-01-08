@@ -4,13 +4,18 @@ import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
 import com.inu.inunity.domain.User.User;
 import com.inu.inunity.domain.User.UserRepository;
+import com.inu.inunity.domain.User.UserService;
 import com.inu.inunity.domain.article.dto.RequestCreateArticle;
 import com.inu.inunity.domain.article.dto.RequestModifyArticle;
 import com.inu.inunity.domain.article.dto.ResponseArticle;
+import com.inu.inunity.domain.articleLike.ArticleLikeService;
 import com.inu.inunity.domain.category.Category;
 import com.inu.inunity.domain.category.CategoryRepository;
 import com.inu.inunity.domain.comment.dto.ResponseComment;
+import com.inu.inunity.security.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,11 +23,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ArticleService {
     private final ArticleRepository articleRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final ArticleLikeService articleLikeService;
+    private final UserService userService;
 
     /**
      * 아티클을 생성하는 메서드
@@ -51,20 +59,19 @@ public class ArticleService {
      * @return responseArticle Record
      */
     @Transactional(readOnly = true)
-    public ResponseArticle getArticle(Long article_id) {
-        Article foundArticle = articleRepository.findById(article_id)
+    public ResponseArticle getArticle(Long article_id, UserDetails userDetails) {
+        Article article = articleRepository.findById(article_id)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ARTICLE_NOT_FOUND));
-        foundArticle.increaseView();
-        Article savedArticle = articleRepository.save(foundArticle);
+        article.increaseView();
 
         //todo: 새 이슈에서 해당 기능 구현. 프론트와의 빠른 협업을 위해 mock 삽입 후 배포.
-        Integer likeNum = 0;
-        Boolean isLike = false;
+        Integer likeNum = articleLikeService.getLikeNum(article);
+        Boolean isLike = articleLikeService.isLike(article_id, getUserIdAtUserDetails(userDetails));
         Integer commentNum = 0;
         Boolean isOwner = false;
         List<ResponseComment> comments = new ArrayList<>();
 
-        return ResponseArticle.of(savedArticle, likeNum, isLike, isOwner, commentNum, comments);
+        return ResponseArticle.of(article, likeNum, isLike, isOwner, commentNum, comments);
     }
 
     /**
@@ -90,6 +97,24 @@ public class ArticleService {
     @Transactional
     public void deleteArticle(Long articleId) {
         articleRepository.deleteById(articleId);
+    }
+
+    public Long getUserIdAtUserDetails(UserDetails userDetails){
+        if(userDetails == null){
+            return null;
+        }else{
+            return ((CustomUserDetails) userDetails).getId();
+        }
+    }
+
+    public Integer pushArticleLike(Long articleId, UserDetails userDetails){
+        Long userId = ((CustomUserDetails) userDetails).getId();
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ARTICLE_NOT_FOUND));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
+
+        return articleLikeService.toggleLike(article, user);
     }
 
 }
