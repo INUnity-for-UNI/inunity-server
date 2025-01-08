@@ -62,8 +62,11 @@ public class ArticleService {
     public ResponseArticle getArticle(Long articleId, UserDetails userDetails) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ARTICLE_NOT_FOUND));
-        article.increaseView();
+        if(article.getIsDeleted()){
+            throw new NotFoundElementException(ExceptionMessage.ARTICLE_IS_DELETED);
+        }
 
+        article.increaseView();
         Long userId = getUserIdAtUserDetails(userDetails);
         Integer likeNum = articleLikeService.getLikeNum(article);
         Boolean isLike = articleLikeService.isLike(articleId, userId);
@@ -96,7 +99,9 @@ public class ArticleService {
      */
     @Transactional
     public void deleteArticle(Long articleId) {
-        articleRepository.deleteById(articleId);
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ARTICLE_NOT_FOUND));
+        article.deleteArticle();
     }
 
     public Long getUserIdAtUserDetails(UserDetails userDetails){
@@ -116,5 +121,4 @@ public class ArticleService {
 
         return articleLikeService.toggleLike(article, user);
     }
-
 }

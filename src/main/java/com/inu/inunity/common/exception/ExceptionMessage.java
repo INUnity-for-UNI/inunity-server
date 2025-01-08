@@ -26,7 +26,8 @@ public enum ExceptionMessage {
     CATEGORY_NOT_FOUND("카테고리를 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
     ARTICLE_NOT_FOUND("아티클을 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
     COMMENT_NOT_FOUND("댓글을 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
-    ARTICLE_LIKE_NOT_FOUND("유저가 좋아요를 누른 기록을 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND)
+    ARTICLE_LIKE_NOT_FOUND("유저가 좋아요를 누른 기록을 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
+    ARTICLE_IS_DELETED("삭제된 게시글입니다.", 0, HttpStatus.NOT_FOUND)
     ;
 
 
