@@ -4,13 +4,13 @@ import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
 import com.inu.inunity.domain.User.User;
 import com.inu.inunity.domain.User.UserRepository;
-import com.inu.inunity.domain.User.UserService;
 import com.inu.inunity.domain.article.dto.RequestCreateArticle;
 import com.inu.inunity.domain.article.dto.RequestModifyArticle;
 import com.inu.inunity.domain.article.dto.ResponseArticle;
 import com.inu.inunity.domain.articleLike.ArticleLikeService;
 import com.inu.inunity.domain.category.Category;
 import com.inu.inunity.domain.category.CategoryRepository;
+import com.inu.inunity.domain.comment.CommentService;
 import com.inu.inunity.domain.comment.dto.ResponseComment;
 import com.inu.inunity.security.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +19,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -30,7 +30,7 @@ public class ArticleService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final ArticleLikeService articleLikeService;
-    private final UserService userService;
+    private final CommentService commentService;
 
     /**
      * 아티클을 생성하는 메서드
@@ -55,21 +55,21 @@ public class ArticleService {
     /**
      * 아티클 단 건 조회 메서드
      * @author 김원정
-     * @param article_id 아티클 ID
+     * @param articleId 아티클 ID
      * @return responseArticle Record
      */
     @Transactional(readOnly = true)
-    public ResponseArticle getArticle(Long article_id, UserDetails userDetails) {
-        Article article = articleRepository.findById(article_id)
+    public ResponseArticle getArticle(Long articleId, UserDetails userDetails) {
+        Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ARTICLE_NOT_FOUND));
         article.increaseView();
 
-        //todo: 새 이슈에서 해당 기능 구현. 프론트와의 빠른 협업을 위해 mock 삽입 후 배포.
+        Long userId = getUserIdAtUserDetails(userDetails);
         Integer likeNum = articleLikeService.getLikeNum(article);
-        Boolean isLike = articleLikeService.isLike(article_id, getUserIdAtUserDetails(userDetails));
-        Integer commentNum = 0;
-        Boolean isOwner = false;
-        List<ResponseComment> comments = new ArrayList<>();
+        Boolean isLike = articleLikeService.isLike(articleId, userId);
+        Integer commentNum = commentService.getCommentNum(articleId);
+        Boolean isOwner = Objects.equals(article.getUser().getId(), userId);
+        List<ResponseComment> comments = commentService.getComments(article, userId);
 
         return ResponseArticle.of(article, likeNum, isLike, isOwner, commentNum, comments);
     }

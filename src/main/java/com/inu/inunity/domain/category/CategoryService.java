@@ -9,6 +9,7 @@ import com.inu.inunity.domain.article.dto.ResponseArticleThumbnail;
 import com.inu.inunity.domain.articleLike.ArticleLikeService;
 import com.inu.inunity.domain.category.dto.RequestCreateCategory;
 import com.inu.inunity.domain.category.dto.ResponseCategory;
+import com.inu.inunity.domain.comment.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,7 @@ public class CategoryService {
     private final ArticleRepository articleRepository;
     private final ArticleService articleService;
     private final ArticleLikeService articleLikeService;
+    private final CommentService commentService;
     /**
      * 카테고리 생성 메서드
      * @author 김원정
@@ -114,7 +116,7 @@ public class CategoryService {
         return pagingArticle.map(article -> {
             Boolean isLiked = articleLikeService.isLike(article.getId(), articleService.getUserIdAtUserDetails(userDetails));
             Integer likeNum = articleLikeService.getLikeNum(article);
-            Integer commentNum = 0;
+            Integer commentNum = commentService.getCommentNum(article.getId());
             return ResponseArticleThumbnail.of(article, likeNum, isLiked,  commentNum);
         });
     }

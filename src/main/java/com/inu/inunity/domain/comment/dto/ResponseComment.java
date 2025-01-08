@@ -8,20 +8,18 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
-public class ResponseComment {
-
-    Long commentId;
-    Long userId;
-    Boolean isAnonymous;
-    String department;
-    String nickname;
-    String userImageUrl;
-    String content;
-    Boolean isOwner;
-    LocalDateTime createAt;
-
-    List<ResponseReplyComment> replyComments;
-
+public record ResponseComment(
+        Long commentId,
+        Long userId,
+        Boolean isAnonymous,
+        String department,
+        String nickname,
+        String userImageUrl,
+        String content,
+        Boolean isOwner,
+        LocalDateTime createAt,
+        List<ResponseReplyComment> replyComments
+) {
     public static ResponseComment of(Comment comment, Boolean isOwner, List<ResponseReplyComment> replyComments){
         return ResponseComment.builder()
                 .commentId(comment.getId())
