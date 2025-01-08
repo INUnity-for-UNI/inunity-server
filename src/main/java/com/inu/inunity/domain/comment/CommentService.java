@@ -86,7 +86,7 @@ public class CommentService {
      * @return Long 수정된 댓글의 ID
      */
     @Transactional
-    public Long modifyComment(RequestUpdateComment requestUpdateComment) {
+    public Long updateComment(RequestUpdateComment requestUpdateComment) {
         Comment comment = commentRepository.findById(requestUpdateComment.commentId())
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.COMMENT_NOT_FOUND));
         comment.modifyComment(requestUpdateComment);

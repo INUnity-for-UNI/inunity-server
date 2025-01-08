@@ -37,7 +37,7 @@ public class ReplyCommentService {
     }
 
     @Transactional
-    public Long modifyReplyComment(RequestUpdateReplyComment requestUpdateReplyComment) {
+    public Long updateReplyComment(RequestUpdateReplyComment requestUpdateReplyComment) {
         ReplyComment replyComment = replyCommentRepository.findById(requestUpdateReplyComment.replyCommentId())
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.COMMENT_NOT_FOUND));
 

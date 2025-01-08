@@ -32,19 +32,17 @@ public class CommentController {
                 .body(CommonResponse.success("댓글 생성 완료", commentService.createComment(requestCreateComment, articleid, userId)));
     }
 
-    @PutMapping("/v1/articles/{articleid}/comment")
+    @PutMapping("/v1/articles/comment")
     CommonResponse<Long> updateComment(
             @RequestBody RequestUpdateComment requestUpdateComment,
-            @PathVariable Long articleid,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         Long userId = ((CustomUserDetails) userDetails).getId();
-        return CommonResponse.success("댓글 수정 완료", commentService.modifyComment(requestUpdateComment));
+        return CommonResponse.success("댓글 수정 완료", commentService.updateComment(requestUpdateComment));
     }
 
     @DeleteMapping("/v1/comment/{commentid}")
     CommonResponse<?> deleteComment(
-            @RequestBody RequestUpdateComment requestUpdateComment,
             @PathVariable Long commentid,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
@@ -69,7 +67,7 @@ public class CommentController {
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         Long userId = ((CustomUserDetails) userDetails).getId();
-        return CommonResponse.success("대댓글 수정 완료", replyCommentService.modifyReplyComment(requestUpdateReplyComment));
+        return CommonResponse.success("대댓글 수정 완료", replyCommentService.updateReplyComment(requestUpdateReplyComment));
     }
 
     @DeleteMapping("/v1/replycomment/{replycommentid}")
