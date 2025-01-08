@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/v1/articles")
+@RequestMapping("")
 @RequiredArgsConstructor
 public class ArticleController {
     private final ArticleService articleService;
@@ -23,7 +23,7 @@ public class ArticleController {
      * @param category_id @Path
      * @return CommonResponse에 감싸진 Long Category ID
      */
-    @PostMapping("/{category_id}")
+    @PostMapping("/v1/articles/{category_id}")
     CommonResponse<Long> createArticle(
             @RequestBody RequestCreateArticle requestCreateArticle,
             @PathVariable Long category_id,
@@ -35,15 +35,23 @@ public class ArticleController {
         return CommonResponse.success("아티클 생성 완료", result);
     }
 
+    @PostMapping("/v1/articles/{article_id}/like")
+    CommonResponse<Integer> pushArticleLike(
+            @PathVariable Long article_id,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        return CommonResponse.success("좋아요 누르기 성공", articleService.pushArticleLike(article_id, userDetails));
+    }
+
     /**
      * 아티클 단 건 조회 메서드
      * @author 김원정
      * @param article_id @PathVariable Long 아티클 ID
      * @return CommonResponse에 감싸진 ResponseArticle 클래스
      */
-    @GetMapping("/{article_id}")
-    CommonResponse<ResponseArticle> getArticle(@PathVariable Long article_id) {
-        ResponseArticle result = articleService.getArticle(article_id);
+    @GetMapping("/v1/articles/{article_id}")
+    CommonResponse<ResponseArticle> getArticle(@PathVariable Long article_id, @AuthenticationPrincipal UserDetails userDetails) {
+        ResponseArticle result = articleService.getArticle(article_id, userDetails);
         return CommonResponse.success("아티클 조회 완료", result);
     }
 
@@ -54,7 +62,7 @@ public class ArticleController {
      * @param requestModifyArticle @RequestBody RequestModifyArticle 수정된 Record Class
      * @return CommonResponse에 감싸진 Long Category ID
      */
-    @PutMapping("/{article_id}")
+    @PutMapping("/v1/articles/{article_id}")
     CommonResponse<Long> updateArticle(
             @PathVariable Long article_id,
             @RequestBody RequestModifyArticle requestModifyArticle
@@ -68,10 +76,9 @@ public class ArticleController {
      * @author 김원정
      * @param article_id @PathVariable 삭제될 아티클의 ID
      */
-    @DeleteMapping("/{article_id}")
+    @DeleteMapping("/v1/articles/{article_id}")
     CommonResponse<Void> deleteArticle(@PathVariable Long article_id) {
         articleService.deleteArticle(article_id);
         return CommonResponse.success("아이클 삭재 완료", null);
     }
-
 }

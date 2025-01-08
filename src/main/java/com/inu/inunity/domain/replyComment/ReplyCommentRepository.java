@@ -1,7 +1,7 @@
-package com.inu.inunity.domain.ReplyComment;
+package com.inu.inunity.domain.replyComment;
 
-import com.inu.inunity.domain.ReplyComment.ReplyComment;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReplyCommentRepository extends JpaRepository<ReplyComment, Long> {
+    Integer countByCommentArticleId(Long articleId);
 }

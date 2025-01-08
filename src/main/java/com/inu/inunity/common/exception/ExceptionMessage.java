@@ -23,8 +23,13 @@ public enum ExceptionMessage {
     CONTRACT_NOT_FOUND("SNS/Link 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND),
     CAREER_NOT_FOUND("경력 이력이 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND),
     SKILL_NOT_FOUND("스킬이 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND),
-    PORTFOLIO_NOT_FOUND("포트폴리오가 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND),
-    NOT_AUTHORIZATION_ACCESS("잘못된 접근입니다.", 0, HttpStatus.BAD_REQUEST)
+    CATEGORY_NOT_FOUND("카테고리를 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
+    ARTICLE_NOT_FOUND("아티클을 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
+    COMMENT_NOT_FOUND("댓글을 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
+    ARTICLE_LIKE_NOT_FOUND("유저가 좋아요를 누른 기록을 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
+    ARTICLE_IS_DELETED("삭제된 게시글입니다.", 0, HttpStatus.NOT_FOUND),
+    IMAGE_UPLOAD_FAILED("이미지서버 업로드에 실패했습니다.", 0, HttpStatus.BAD_REQUEST),
+    IMAGE_UPLOAD_FAILED_UNDEFINED("이미지서버가 불안정합니다.", 0, HttpStatus.BAD_REQUEST)
     ;
 
 

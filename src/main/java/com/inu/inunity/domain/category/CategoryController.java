@@ -1,18 +1,20 @@
 package com.inu.inunity.domain.category;
 
 import com.inu.inunity.common.CommonResponse;
+import com.inu.inunity.domain.article.dto.ResponseArticleThumbnail;
 import com.inu.inunity.domain.category.dto.RequestCreateCategory;
-import com.inu.inunity.domain.category.dto.ResponseArticleForList;
 import com.inu.inunity.domain.category.dto.ResponseCategory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/categories")
+@RequestMapping("")
 @RequiredArgsConstructor
 public class CategoryController {
     private final CategoryService categoryService;
@@ -23,7 +25,7 @@ public class CategoryController {
      * @param requestCreateCategory @RequestBody Record Class
      * @return CommonResponse에 감싸진 Long Category ID
      */
-    @PostMapping
+    @PostMapping("/v1/categories")
     CommonResponse<Long> createCategory(@RequestBody RequestCreateCategory requestCreateCategory) {
         Long result = categoryService.createCategory(requestCreateCategory);
         return CommonResponse.success("카테고리 생성 완료", result);
@@ -34,7 +36,7 @@ public class CategoryController {
      * @author 김원정
      * @return CommonResponse에 감싸진 List 클래스에 감싸진 ResponseCategory
      */
-    @GetMapping
+    @GetMapping("/v1/categories")
     CommonResponse<List<ResponseCategory>> getAllCategories() {
         List<ResponseCategory> result = categoryService.findAllCategories();
         return CommonResponse.success("카테고리 목록 조회 완료", result);
@@ -47,9 +49,9 @@ public class CategoryController {
      * @param category_name @RequestParam 바뀔 Category 이름
      * @return CommonResponse에 감싸진 Long Category ID
      */
-    @PutMapping("/name")
+    @PutMapping("/v1/categories/{category-id}/name")
     CommonResponse<Long> updateCategoryName(
-            @RequestParam("categoryId") Long category_id,
+            @PathVariable("category-id") Long category_id,
             @RequestParam("categoryName") String category_name
     ) {
         Long result = categoryService.editCategoryName(category_id, category_name);
@@ -63,9 +65,9 @@ public class CategoryController {
      * @param status @RequestParam 바뀔 Category의 활성 상태
      * @return CommonResponse에 감싸진 수정된 Long Category ID
      */
-    @PutMapping("/status")
+    @PutMapping("/v1/categories/status")
     CommonResponse<Long> updateCategoryStatus(
-            @RequestParam("categoryId") Long category_id,
+            @PathVariable("category_id") Long category_id,
             @RequestParam Boolean status
     ) {
         Long result = categoryService.changeStatus(category_id, status);
@@ -77,8 +79,8 @@ public class CategoryController {
      * @author 김원정
      * @param category_id @PathValue Category ID
      */
-    @DeleteMapping("/{category_id}")
-    CommonResponse<Void> deleteCategory(@PathVariable Long category_id) {
+    @DeleteMapping("/v1/categories/{category_id}")
+    CommonResponse<Void> deleteCategory(@PathVariable("category_id") Long category_id) {
         categoryService.deleteCategory(category_id);
         return CommonResponse.success("카테고리 삭제 완료", null);
     }
@@ -90,12 +92,13 @@ public class CategoryController {
      * @param category_id @PathValue Category ID
      * @return CommonReponse에 감싸진 Page 클래스에 감싸진 ResponseArticleForList
      */
-    @GetMapping("/{category_id}/articles")
-    CommonResponse<Page<ResponseArticleForList>> getArticlesByCategory(
+    @GetMapping("/v1/categories/{category_id}/articles")
+    CommonResponse<Page<ResponseArticleThumbnail>> getArticlesByCategory(
             @PathVariable("category_id") Long category_id,
+            @AuthenticationPrincipal UserDetails userDetails,
             Pageable pageable
     ) {
-        Page<ResponseArticleForList> result = categoryService.getArticles(category_id, pageable);
+        Page<ResponseArticleThumbnail> result = categoryService.getArticles(category_id, userDetails, pageable);
         return CommonResponse.success("카테고리 내 아티클 목록 조회 완료", result);
     }
 }
