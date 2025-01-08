@@ -22,7 +22,7 @@ public record ResponseArticle(
         Integer likeNum,
         Boolean isLiked,
         LocalDateTime createAt,
-        LocalDateTime updateAt,
+        LocalDateTime updatedAt,
         Integer commentNum,
         List<ResponseComment> comments
 ) {
@@ -43,7 +43,7 @@ public record ResponseArticle(
                 .likeNum(likeNum)
                 .isLiked(isLiked)
                 .createAt(article.getCreateAt())
-                .updateAt(article.getUpdateAt())
+                .updatedAt(article.getUpdateAt())
                 .commentNum(commentNum)
                 .comments(comments)
                 .build();

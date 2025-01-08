@@ -16,7 +16,7 @@ public record ResponseArticleThumbnail(
         String title,
         String content,
         LocalDateTime createAt,
-        LocalDateTime updateAt,
+        LocalDateTime updatedAt,
         Integer viewNum,
         Integer commentNum,
         Integer likeNum,
@@ -35,7 +35,7 @@ public record ResponseArticleThumbnail(
                 .content(article.getContent())
                 .commentNum(commentNum)
                 .createAt(article.getCreateAt())
-                .updateAt(article.getUpdateAt())
+                .updatedAt(article.getUpdateAt())
                 .viewNum(article.getView())
                 .likeNum(likeNum)
                 .isLiked(isLiked)
