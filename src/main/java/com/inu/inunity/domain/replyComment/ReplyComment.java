@@ -23,25 +23,32 @@ public class ReplyComment extends BaseEntity {
 
     private Boolean isAnonymous;
 
+    private Boolean isDeleted;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Comment comment;
 
-    public ReplyComment(String content, Boolean isAnonymous, User user, Comment comment) {
+    public ReplyComment(String content, Boolean isAnonymous, Boolean isDeleted, User user, Comment comment) {
         this.content = content;
         this.isAnonymous = isAnonymous;
+        this.isDeleted = isDeleted;
         this.user = user;
         this.comment = comment;
     }
 
     public static ReplyComment of(RequestCreateReplyComment requestCreateReplyComment, User user, Comment comment) {
-        return new ReplyComment(requestCreateReplyComment.content(), requestCreateReplyComment.isAnonymous(), user, comment);
+        return new ReplyComment(requestCreateReplyComment.content(), requestCreateReplyComment.isAnonymous(), false, user, comment);
     }
 
-    public void modifyReplyComment(RequestUpdateReplyComment requestUpdateReplyComment) {
+    public void updateReplyComment(RequestUpdateReplyComment requestUpdateReplyComment) {
         this.content = requestUpdateReplyComment.content();
         this.isAnonymous = requestUpdateReplyComment.isAnonymous();
+    }
+
+    public void deleteReplyComment() {
+        this.isDeleted = true;
     }
 }

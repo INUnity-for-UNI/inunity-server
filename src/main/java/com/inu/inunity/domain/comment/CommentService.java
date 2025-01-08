@@ -39,11 +39,16 @@ public class CommentService {
     public List<ResponseComment> getCommentsForLoginUser(Article article, Long userId) {
         return article.getComments().stream().map(comment -> {
             boolean commentIsOwner = Objects.equals(comment.getUser().getId(), userId);
-            return ResponseComment.of(comment, commentIsOwner, comment.getReplyComments().stream().map(replyComment -> {
-                boolean replyCommentIsOwner = Objects.equals(replyComment.getUser().getId(), userId);
-                return ResponseReplyComment.of(replyComment, replyCommentIsOwner);
-            }).toList());
-        }).toList();
+            if (comment.getIsDeleted()) {
+                return ResponseComment.ofDeleted(comment.getId(), replyCommentService.getReplyComment(comment, userId));
+            } else {
+            return ResponseComment.of(
+                    comment,
+                    commentIsOwner,
+                    replyCommentService.getReplyComment(comment, userId)
+            );
+        }
+    }).toList();
     }
 
     public List<ResponseComment> getCommentsForUnLoginUser(Article article) {
@@ -100,6 +105,9 @@ public class CommentService {
      */
     @Transactional
     public void deleteComment(Long commentId) {
-        commentRepository.deleteById(commentId);
+       Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.COMMENT_NOT_FOUND));
+
+        comment.deleteComment();
     }
 }

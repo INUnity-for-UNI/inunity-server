@@ -28,6 +28,8 @@ public class Comment extends BaseEntity {
 
     private Boolean isAnonymous;
 
+    private Boolean isDeleted;
+
     @ManyToOne
     private User user;
 
@@ -41,6 +43,7 @@ public class Comment extends BaseEntity {
     Comment(String content, Boolean isAnonymous, User user, Article article) {
         this.content = content;
         this.isAnonymous = isAnonymous;
+        this.isDeleted = false;
         this.user = user;
         this.article = article;
     }
@@ -54,8 +57,12 @@ public class Comment extends BaseEntity {
                 .build();
     }
 
-    void modifyComment(RequestUpdateComment requestUpdateComment) {
+    public void modifyComment(RequestUpdateComment requestUpdateComment) {
         this.content = requestUpdateComment.content();
         this.isAnonymous = requestUpdateComment.isAnonymous();
+    }
+
+    public void deleteComment(){
+        this.isDeleted = true;
     }
 }

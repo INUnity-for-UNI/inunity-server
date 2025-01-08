@@ -34,4 +34,13 @@ public record ResponseComment(
                 .replyComments(replyComments)
                 .build();
     }
+
+    public static ResponseComment ofDeleted(Long commentId, List<ResponseReplyComment> replyComments) {
+        return ResponseComment.builder()
+                .commentId(commentId)
+                .isOwner(false)
+                .content("[삭제된 댓글입니다.]")
+                .replyComments(replyComments)
+                .build();
+    }
 }

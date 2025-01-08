@@ -8,9 +8,13 @@ import com.inu.inunity.domain.comment.Comment;
 import com.inu.inunity.domain.comment.CommentRepository;
 import com.inu.inunity.domain.replyComment.dto.RequestCreateReplyComment;
 import com.inu.inunity.domain.replyComment.dto.RequestUpdateReplyComment;
+import com.inu.inunity.domain.replyComment.dto.ResponseReplyComment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +22,18 @@ public class ReplyCommentService {
     private final ReplyCommentRepository replyCommentRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+
+    public List<ResponseReplyComment> getReplyComment(Comment comment, Long userId){
+        return comment.getReplyComments().stream().map(replyComment -> {
+            boolean replyCommentIsOwner = Objects.equals(replyComment.getUser().getId(), userId);
+
+            if (replyComment.getIsDeleted()) {
+                return ResponseReplyComment.ofDeleted(replyComment.getId());
+            } else {
+                return ResponseReplyComment.of(replyComment, replyCommentIsOwner);
+            }
+        }).toList();
+    }
 
     public Integer getReplyCommentNum(Long articleId) {
         return replyCommentRepository.countByCommentArticleId(articleId);
@@ -41,13 +57,16 @@ public class ReplyCommentService {
         ReplyComment replyComment = replyCommentRepository.findById(requestUpdateReplyComment.replyCommentId())
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.COMMENT_NOT_FOUND));
 
-        replyComment.modifyReplyComment(requestUpdateReplyComment);
+        replyComment.updateReplyComment(requestUpdateReplyComment);
 
         return replyComment.getComment().getArticle().getId();
     }
 
     @Transactional
     public void deleteReplyComment(Long replyCommentId) {
-        replyCommentRepository.deleteById(replyCommentId);
+        ReplyComment replyComment = replyCommentRepository.findById(replyCommentId)
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.COMMENT_NOT_FOUND));
+
+        replyComment.deleteReplyComment();
     }
 }
