@@ -2,8 +2,6 @@ package com.inu.inunity.domain.comment;
 
 import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
-import com.inu.inunity.domain.User.User;
-import com.inu.inunity.domain.User.UserRepository;
 import com.inu.inunity.domain.article.Article;
 import com.inu.inunity.domain.article.ArticleRepository;
 import com.inu.inunity.domain.comment.dto.RequestCreateComment;
@@ -11,6 +9,8 @@ import com.inu.inunity.domain.comment.dto.RequestUpdateComment;
 import com.inu.inunity.domain.comment.dto.ResponseComment;
 import com.inu.inunity.domain.replyComment.ReplyCommentService;
 import com.inu.inunity.domain.replyComment.dto.ResponseReplyComment;
+import com.inu.inunity.domain.user.User;
+import com.inu.inunity.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

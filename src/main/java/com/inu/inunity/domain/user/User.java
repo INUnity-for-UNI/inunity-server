@@ -1,4 +1,4 @@
-package com.inu.inunity.domain.User;
+package com.inu.inunity.domain.user;
 
 import com.inu.inunity.common.BaseEntity;
 import com.inu.inunity.domain.article.Article;

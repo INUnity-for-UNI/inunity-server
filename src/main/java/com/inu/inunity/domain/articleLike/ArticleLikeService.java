@@ -1,7 +1,7 @@
 package com.inu.inunity.domain.articleLike;
 
-import com.inu.inunity.domain.User.User;
 import com.inu.inunity.domain.article.Article;
+import com.inu.inunity.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

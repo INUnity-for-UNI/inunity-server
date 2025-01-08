@@ -2,8 +2,6 @@ package com.inu.inunity.domain.article;
 
 import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
-import com.inu.inunity.domain.User.User;
-import com.inu.inunity.domain.User.UserRepository;
 import com.inu.inunity.domain.article.dto.RequestCreateArticle;
 import com.inu.inunity.domain.article.dto.RequestModifyArticle;
 import com.inu.inunity.domain.article.dto.ResponseArticle;
@@ -12,6 +10,8 @@ import com.inu.inunity.domain.category.Category;
 import com.inu.inunity.domain.category.CategoryRepository;
 import com.inu.inunity.domain.comment.CommentService;
 import com.inu.inunity.domain.comment.dto.ResponseComment;
+import com.inu.inunity.domain.user.User;
+import com.inu.inunity.domain.user.UserRepository;
 import com.inu.inunity.security.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
