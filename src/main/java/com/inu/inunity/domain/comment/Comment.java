@@ -3,12 +3,17 @@ package com.inu.inunity.domain.comment;
 import com.inu.inunity.common.BaseEntity;
 import com.inu.inunity.domain.User.User;
 import com.inu.inunity.domain.article.Article;
+import com.inu.inunity.domain.comment.dto.RequestCreateComment;
 import com.inu.inunity.domain.comment.dto.RequestUpdateComment;
+import com.inu.inunity.domain.replyComment.ReplyComment;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -23,22 +28,41 @@ public class Comment extends BaseEntity {
 
     private Boolean isAnonymous;
 
+    private Boolean isDeleted;
+
     @ManyToOne
     private User user;
 
     @ManyToOne
     private Article article;
 
+    @OneToMany(mappedBy = "comment", fetch = FetchType.LAZY)
+    private List<ReplyComment> replyComments = new ArrayList<>();
+
     @Builder
     Comment(String content, Boolean isAnonymous, User user, Article article) {
         this.content = content;
         this.isAnonymous = isAnonymous;
+        this.isDeleted = false;
         this.user = user;
         this.article = article;
     }
 
-    void modifyComment(RequestUpdateComment requestUpdateComment) {
+    public static Comment of(RequestCreateComment request, User user, Article article){
+        return Comment.builder()
+                .content(request.content())
+                .isAnonymous(request.isAnonymous())
+                .user(user)
+                .article(article)
+                .build();
+    }
+
+    public void modifyComment(RequestUpdateComment requestUpdateComment) {
         this.content = requestUpdateComment.content();
         this.isAnonymous = requestUpdateComment.isAnonymous();
+    }
+
+    public void deleteComment(){
+        this.isDeleted = true;
     }
 }

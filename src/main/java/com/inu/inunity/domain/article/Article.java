@@ -84,4 +84,8 @@ public class Article extends BaseEntity {
         this.content = requestModifyArticle.content();
         this.isAnonymous = requestModifyArticle.isAnonymous();
     }
+
+    public void deleteArticle(){
+        this.isDeleted = true;
+    }
 }

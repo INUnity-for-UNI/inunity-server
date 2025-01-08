@@ -1,8 +1,8 @@
 package com.inu.inunity.domain.articleLike;
 
 import com.inu.inunity.common.BaseEntity;
-import com.inu.inunity.domain.article.Article;
 import com.inu.inunity.domain.User.User;
+import com.inu.inunity.domain.article.Article;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,4 +22,13 @@ public class ArticleLike extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Article article;
+
+    public ArticleLike(Article article, User user) {
+        this.user = user;
+        this.article = article;
+    }
+
+    public static ArticleLike of(Article article, User user){
+        return new ArticleLike(article, user);
+    }
 }

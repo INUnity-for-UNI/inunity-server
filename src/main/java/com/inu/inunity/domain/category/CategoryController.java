@@ -7,6 +7,8 @@ import com.inu.inunity.domain.category.dto.ResponseCategory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -93,9 +95,10 @@ public class CategoryController {
     @GetMapping("/v1/categories/{category_id}/articles")
     CommonResponse<Page<ResponseArticleThumbnail>> getArticlesByCategory(
             @PathVariable("category_id") Long category_id,
+            @AuthenticationPrincipal UserDetails userDetails,
             Pageable pageable
     ) {
-        Page<ResponseArticleThumbnail> result = categoryService.getArticles(category_id, pageable);
+        Page<ResponseArticleThumbnail> result = categoryService.getArticles(category_id, userDetails, pageable);
         return CommonResponse.success("카테고리 내 아티클 목록 조회 완료", result);
     }
 }

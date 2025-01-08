@@ -4,12 +4,16 @@ import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
 import com.inu.inunity.domain.article.Article;
 import com.inu.inunity.domain.article.ArticleRepository;
+import com.inu.inunity.domain.article.ArticleService;
 import com.inu.inunity.domain.article.dto.ResponseArticleThumbnail;
+import com.inu.inunity.domain.articleLike.ArticleLikeService;
 import com.inu.inunity.domain.category.dto.RequestCreateCategory;
 import com.inu.inunity.domain.category.dto.ResponseCategory;
+import com.inu.inunity.domain.comment.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +24,9 @@ import java.util.List;
 public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final ArticleRepository articleRepository;
-
+    private final ArticleService articleService;
+    private final ArticleLikeService articleLikeService;
+    private final CommentService commentService;
     /**
      * 카테고리 생성 메서드
      * @author 김원정
@@ -104,14 +110,14 @@ public class CategoryService {
      * @return page 클래스에 감싸진 responseArticleForList 클래스
      */
     @Transactional(readOnly = true)
-    public Page<ResponseArticleThumbnail> getArticles(Long category_id, Pageable pageable) {
+    public Page<ResponseArticleThumbnail> getArticles(Long category_id, UserDetails userDetails, Pageable pageable) {
         Page<Article> pagingArticle = articleRepository.findAllByCategoryId(category_id, pageable);
 
-        //todo: 이후 이슈로 해당기능 개발
-        Boolean isLiked = false;
-        Integer likeNum = 0;
-        Integer commentNum = 0;
-
-        return pagingArticle.map(article -> ResponseArticleThumbnail.of(article, likeNum, isLiked,  commentNum));
+        return pagingArticle.map(article -> {
+            Boolean isLiked = articleLikeService.isLike(article.getId(), articleService.getUserIdAtUserDetails(userDetails));
+            Integer likeNum = articleLikeService.getLikeNum(article);
+            Integer commentNum = commentService.getCommentNum(article.getId());
+            return ResponseArticleThumbnail.of(article, likeNum, isLiked,  commentNum);
+        });
     }
 }
