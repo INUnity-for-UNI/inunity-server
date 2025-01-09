@@ -6,6 +6,7 @@ import com.inu.inunity.domain.article.dto.RequestCreateArticle;
 import com.inu.inunity.domain.article.dto.RequestModifyArticle;
 import com.inu.inunity.domain.article.dto.ResponseArticle;
 import com.inu.inunity.domain.article.dto.ResponseArticleThumbnail;
+import com.inu.inunity.domain.articleLike.ArticleLike;
 import com.inu.inunity.domain.articleLike.ArticleLikeService;
 import com.inu.inunity.domain.category.Category;
 import com.inu.inunity.domain.category.CategoryRepository;
@@ -17,6 +18,8 @@ import com.inu.inunity.domain.user.UserRepository;
 import com.inu.inunity.security.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -127,22 +130,22 @@ public class ArticleService {
     }
 
     @Transactional(readOnly = true)
-    public List<ResponseArticleThumbnail> getUserLikedArticles(User user){
-        return user.getArticleLikes().stream()
-                .filter(articleLike -> !articleLike.getArticle().getIsDeleted())
-                .map(articleLike -> {
+    public Page<ResponseArticleThumbnail> getUserLikedArticles(Long userId, Pageable pageable){
+        Page<ArticleLike> articleLikes = articleLikeService.getUserLikePost(userId, pageable);
+
+        return articleLikes.map(articleLike -> {
                     Article article = articleLike.getArticle();
                     return ResponseArticleThumbnail.of(article, articleLikeService.getLikeNum(article),
-                            articleLikeService.isLike(article.getId(), user.getId()), commentService.getCommentNum(article.getId()));
-                }).toList();
+                            articleLikeService.isLike(article.getId(), userId), commentService.getCommentNum(article.getId()));
+                });
     }
 
     @Transactional(readOnly = true)
-    public List<ResponseArticleThumbnail> getUserWroteArticles(User user){
-        return user.getArticles().stream()
-                .filter(article -> !article.getIsDeleted())
-                .map(article -> ResponseArticleThumbnail.of(article, articleLikeService.getLikeNum(article),
-                        articleLikeService.isLike(article.getId(), user.getId()), commentService.getCommentNum(article.getId()))).toList();
+    public Page<ResponseArticleThumbnail> getUserWroteArticles(Long userId, Pageable pageable){
+        Page<Article> articles = articleRepository.findAllByUserIdAndIsDeletedIsFalse(userId, pageable);
+
+        return articles.map(article -> ResponseArticleThumbnail.of(article, articleLikeService.getLikeNum(article),
+                                articleLikeService.isLike(article.getId(), userId), commentService.getCommentNum(article.getId())));
     }
 
     @Transactional(readOnly = true)
