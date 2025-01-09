@@ -1,7 +1,7 @@
 package com.inu.inunity.security.jwt;
 
-import com.inu.inunity.domain.User.User;
-import com.inu.inunity.domain.User.UserRepository;
+import com.inu.inunity.domain.user.User;
+import com.inu.inunity.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

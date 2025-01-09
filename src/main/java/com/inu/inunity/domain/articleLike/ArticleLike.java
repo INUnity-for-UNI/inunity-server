@@ -1,8 +1,8 @@
 package com.inu.inunity.domain.articleLike;
 
 import com.inu.inunity.common.BaseEntity;
-import com.inu.inunity.domain.User.User;
 import com.inu.inunity.domain.article.Article;
+import com.inu.inunity.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

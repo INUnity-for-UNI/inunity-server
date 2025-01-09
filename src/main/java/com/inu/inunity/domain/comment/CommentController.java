@@ -2,10 +2,10 @@ package com.inu.inunity.domain.comment;
 
 import com.inu.inunity.common.CommonResponse;
 import com.inu.inunity.domain.comment.dto.RequestCreateComment;
+import com.inu.inunity.domain.comment.dto.RequestCreateReplyComment;
 import com.inu.inunity.domain.comment.dto.RequestUpdateComment;
-import com.inu.inunity.domain.replyComment.ReplyCommentService;
-import com.inu.inunity.domain.replyComment.dto.RequestCreateReplyComment;
-import com.inu.inunity.domain.replyComment.dto.RequestUpdateReplyComment;
+import com.inu.inunity.domain.comment.dto.RequestUpdateReplyComment;
+import com.inu.inunity.domain.comment.replyComment.ReplyCommentService;
 import com.inu.inunity.security.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

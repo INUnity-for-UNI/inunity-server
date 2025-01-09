@@ -1,8 +1,6 @@
-package com.inu.inunity.service.notice;
+package com.inu.inunity.domain.notice;
 
-import com.inu.inunity.domain.notice.Notice;
-import com.inu.inunity.domain.notice.NoticeRepository;
-import com.inu.inunity.dto.notice.NoticeDTO;
+import com.inu.inunity.domain.notice.dto.NoticeDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

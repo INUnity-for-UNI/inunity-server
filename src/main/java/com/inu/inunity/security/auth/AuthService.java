@@ -1,8 +1,8 @@
 package com.inu.inunity.security.auth;
 
 import com.inu.inunity.common.exception.*;
-import com.inu.inunity.domain.User.User;
-import com.inu.inunity.domain.User.UserRepository;
+import com.inu.inunity.domain.user.User;
+import com.inu.inunity.domain.user.UserRepository;
 import com.inu.inunity.security.Role;
 import com.inu.inunity.security.jwt.CustomUserDetails;
 import com.inu.inunity.security.jwt.JwtProvider;

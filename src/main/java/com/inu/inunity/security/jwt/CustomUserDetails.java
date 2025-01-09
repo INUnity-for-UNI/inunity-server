@@ -1,6 +1,6 @@
 package com.inu.inunity.security.jwt;
 
-import com.inu.inunity.domain.User.User;
+import com.inu.inunity.domain.user.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,9 +11,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class CustomUserDetails implements OAuth2User, UserDetails {
-    private Long id;
-    private Long studentNumber;
-    private List<? extends GrantedAuthority> authorities;
+    private final Long id;
+    private final Long studentNumber;
+    private final List<? extends GrantedAuthority> authorities;
     private Map<String, Object> attributes;
 
     private CustomUserDetails(Long id, Long studentNumber, List<? extends GrantedAuthority> authorities) {

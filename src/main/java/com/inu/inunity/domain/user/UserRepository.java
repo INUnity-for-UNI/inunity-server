@@ -1,8 +1,6 @@
-package com.inu.inunity.domain.User;
+package com.inu.inunity.domain.user;
 
-import com.inu.inunity.domain.User.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Optional;
 

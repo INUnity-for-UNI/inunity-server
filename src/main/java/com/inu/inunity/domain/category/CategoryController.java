@@ -49,12 +49,15 @@ public class CategoryController {
      * @param category_name @RequestParam 바뀔 Category 이름
      * @return CommonResponse에 감싸진 Long Category ID
      */
-    @PutMapping("/v1/categories/{category-id}/name")
+    @PutMapping("/v1/categories/{category-id}")
     CommonResponse<Long> updateCategoryName(
             @PathVariable("category-id") Long category_id,
-            @RequestParam("categoryName") String category_name
+            @RequestParam("categoryName") String category_name,
+            @RequestParam String icon,
+            @RequestParam Boolean isActive,
+            @RequestParam String description
     ) {
-        Long result = categoryService.editCategoryName(category_id, category_name);
+        Long result = categoryService.updateCategory(category_id, category_name, description, icon, isActive);
         return CommonResponse.success("카테고리 이름 수정 완료", result);
     }
 

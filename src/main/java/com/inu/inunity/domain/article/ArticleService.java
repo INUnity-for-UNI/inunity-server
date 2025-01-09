@@ -2,16 +2,18 @@ package com.inu.inunity.domain.article;
 
 import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
-import com.inu.inunity.domain.User.User;
-import com.inu.inunity.domain.User.UserRepository;
 import com.inu.inunity.domain.article.dto.RequestCreateArticle;
 import com.inu.inunity.domain.article.dto.RequestModifyArticle;
 import com.inu.inunity.domain.article.dto.ResponseArticle;
+import com.inu.inunity.domain.article.dto.ResponseArticleThumbnail;
 import com.inu.inunity.domain.articleLike.ArticleLikeService;
 import com.inu.inunity.domain.category.Category;
 import com.inu.inunity.domain.category.CategoryRepository;
 import com.inu.inunity.domain.comment.CommentService;
 import com.inu.inunity.domain.comment.dto.ResponseComment;
+import com.inu.inunity.domain.comment.dto.ResponseMyPageComment;
+import com.inu.inunity.domain.user.User;
+import com.inu.inunity.domain.user.UserRepository;
 import com.inu.inunity.security.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +21,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -120,5 +124,55 @@ public class ArticleService {
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
 
         return articleLikeService.toggleLike(article, user);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ResponseArticleThumbnail> getUserLikedArticles(User user){
+        return user.getArticleLikes().stream()
+                .filter(articleLike -> !articleLike.getArticle().getIsDeleted())
+                .map(articleLike -> {
+                    Article article = articleLike.getArticle();
+                    return ResponseArticleThumbnail.of(article, articleLikeService.getLikeNum(article),
+                            articleLikeService.isLike(article.getId(), user.getId()), commentService.getCommentNum(article.getId()));
+                }).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ResponseArticleThumbnail> getUserWroteArticles(User user){
+        return user.getArticles().stream()
+                .filter(article -> !article.getIsDeleted())
+                .map(article -> ResponseArticleThumbnail.of(article, articleLikeService.getLikeNum(article),
+                        articleLikeService.isLike(article.getId(), user.getId()), commentService.getCommentNum(article.getId()))).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ResponseMyPageComment> getUserWroteComments(User user){
+        return Stream.concat(
+                        user.getComments().stream()
+                                .filter(comment -> !comment.getIsDeleted())
+                                .map(comment -> {
+                                    Article article = comment.getArticle();
+                                    return ResponseMyPageComment.of(
+                                            article.getId(),
+                                            article.getTitle(),
+                                            comment.getId(),
+                                            comment.getContent(),
+                                            comment.getCreateAt()
+                                    );
+                                }),
+                        user.getReplyComments().stream()
+                                .filter(replyComment -> !replyComment.getIsDeleted())
+                                .map(replyComment -> {
+                                    Article article = replyComment.getComment().getArticle();
+                                    return ResponseMyPageComment.of(
+                                            article.getId(),
+                                            article.getTitle(),
+                                            replyComment.getId(),
+                                            replyComment.getContent(),
+                                            replyComment.getCreateAt()
+                                    );
+                                })
+                ).sorted(Comparator.comparing(ResponseMyPageComment::createAt).reversed())
+                .toList();
     }
 }

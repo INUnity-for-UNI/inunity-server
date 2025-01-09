@@ -1,14 +1,14 @@
-package com.inu.inunity.domain.replyComment;
+package com.inu.inunity.domain.comment.replyComment;
 
 import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
-import com.inu.inunity.domain.User.User;
-import com.inu.inunity.domain.User.UserRepository;
 import com.inu.inunity.domain.comment.Comment;
 import com.inu.inunity.domain.comment.CommentRepository;
-import com.inu.inunity.domain.replyComment.dto.RequestCreateReplyComment;
-import com.inu.inunity.domain.replyComment.dto.RequestUpdateReplyComment;
-import com.inu.inunity.domain.replyComment.dto.ResponseReplyComment;
+import com.inu.inunity.domain.comment.dto.RequestCreateReplyComment;
+import com.inu.inunity.domain.comment.dto.RequestUpdateReplyComment;
+import com.inu.inunity.domain.comment.dto.ResponseReplyComment;
+import com.inu.inunity.domain.user.User;
+import com.inu.inunity.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

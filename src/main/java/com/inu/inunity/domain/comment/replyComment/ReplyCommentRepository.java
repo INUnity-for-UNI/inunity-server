@@ -1,4 +1,4 @@
-package com.inu.inunity.domain.replyComment;
+package com.inu.inunity.domain.comment.replyComment;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

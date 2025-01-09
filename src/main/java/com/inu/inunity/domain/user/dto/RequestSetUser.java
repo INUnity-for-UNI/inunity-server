@@ -1,4 +1,4 @@
-package com.inu.inunity.domain.User.dto;
+package com.inu.inunity.domain.user.dto;
 
 import java.time.LocalDate;
 

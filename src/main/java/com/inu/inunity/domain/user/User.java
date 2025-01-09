@@ -1,15 +1,15 @@
-package com.inu.inunity.domain.User;
+package com.inu.inunity.domain.user;
 
 import com.inu.inunity.common.BaseEntity;
 import com.inu.inunity.domain.article.Article;
 import com.inu.inunity.domain.articleLike.ArticleLike;
 import com.inu.inunity.domain.articleReport.ArticleReport;
 import com.inu.inunity.domain.comment.Comment;
+import com.inu.inunity.domain.comment.replyComment.ReplyComment;
 import com.inu.inunity.domain.profile.career.Career;
 import com.inu.inunity.domain.profile.contract.Contract;
 import com.inu.inunity.domain.profile.portfolio.Portfolio;
 import com.inu.inunity.domain.profile.skill.Skill;
-import com.inu.inunity.domain.replyComment.ReplyComment;
 import com.inu.inunity.security.Role;
 import com.inu.inunity.security.auth.LoginRegisterRequest;
 import jakarta.persistence.*;
@@ -47,6 +47,12 @@ public class User extends BaseEntity {
 
     private LocalDate graduateDate;
 
+    private Boolean isAnonymous;
+
+    private String organization;
+
+    private String job;
+
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Role> roles = new ArrayList<>();
 
@@ -78,7 +84,8 @@ public class User extends BaseEntity {
     private final List<Portfolio> portfolios = new ArrayList<>();
 
     @Builder
-    public User(Long studentId, String name , String nickname, String profileImageUrl, String description, Boolean isGraduation, String department, List<Role> roles){
+    public User(Long studentId, String name , String nickname, String profileImageUrl, String description, Boolean isGraduation,
+                String department, Boolean isAnonymous, String organization, String job, List<Role> roles){
         this.name = name;
         this.studentId = studentId;
         this.nickname = nickname;
@@ -86,6 +93,9 @@ public class User extends BaseEntity {
         this.description = description;
         this.isGraduation = isGraduation;
         this.department = department;
+        this.isAnonymous = isAnonymous;
+        this.organization = organization;
+        this.job = job;
         this.roles = roles;
     }
 
@@ -100,6 +110,17 @@ public class User extends BaseEntity {
         this.nickname = nickname;
         this.graduateDate = graduateDate;
         this.isGraduation = isGraduation;
+        this.isAnonymous = true;
+    }
+
+    public void updateUserProfile(String nickname, LocalDate graduateDate, Boolean isGraduation,
+                           Boolean isAnonymous, String organization, String job){
+        this.nickname = nickname;
+        this.graduateDate = graduateDate;
+        this.isGraduation = isGraduation;
+        this.isAnonymous = isAnonymous;
+        this.organization = organization;
+        this.job = job;
     }
 
     public static User of(LoginRegisterRequest request, List<Role> roles){

@@ -1,4 +1,4 @@
-package com.inu.inunity.domain.replyComment.dto;
+package com.inu.inunity.domain.comment.dto;
 
 public record RequestUpdateReplyComment(
         Long replyCommentId,
