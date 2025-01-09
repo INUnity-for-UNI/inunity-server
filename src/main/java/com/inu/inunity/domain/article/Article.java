@@ -62,11 +62,11 @@ public class Article extends BaseEntity {
         this.user = user;
     }
 
-    public static Article of(RequestCreateArticle request, Integer view, Boolean isDeleted, Category category,
+    public static Article of(RequestCreateArticle request, String content, Integer view, Boolean isDeleted, Category category,
                    User user) {
         return Article.builder()
                 .title(request.title())
-                .content(request.content())
+                .content(content)
                 .isAnonymous(request.isAnonymous())
                 .view(view)
                 .isDeleted(isDeleted)
