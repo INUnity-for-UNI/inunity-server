@@ -57,8 +57,10 @@ public class ArticleService {
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.CONTRACT_NOT_FOUND));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
-        String editorJSText = convertHtmlToJson(requestCreateArticle.content());
-        Article article = Article.of(requestCreateArticle, editorJSText, 0, false, foundCategory, user);
+        // 크롤링할때만 editorJS가 요구하는 형태로 변환 필요. 정상적으로 글을 작성할 때는 필요 없음.
+        // 스웨거 테스트용 컨트롤러를 따로 만드는건 동의합니당 근데.. content에 HTML을 넣어도 500 에러가 나던데.. 확인필요할덧
+//        String editorJSText = convertHtmlToJson(requestCreateArticle.content());
+        Article article = Article.of(requestCreateArticle, requestCreateArticle.content(), 0, false, foundCategory, user);
 
         articleRepository.save(article);
         return article.getId();
