@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 
-/// TODO: 2025-01-05 정보 가져올때 본인인지 표기가 필요한지 프론트에 문의 후 개발
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -76,11 +75,6 @@ public class ProfileService {
     public void deleteCareer(Long careerId, Long userId, UserDetails userDetails){
         checkOwner(userId, userDetails);
         careerService.deleteCareer(careerId);
-    }
-
-    public List<ResponseContract> getContracts(Long userId) {
-        User user = userService.findUserById(userId);
-        return contractService.getContracts(user);
     }
 
     public void createPortfolio(RequestCreatePortfolio requestCreatePortfolio, Long userId, UserDetails userDetails) {
