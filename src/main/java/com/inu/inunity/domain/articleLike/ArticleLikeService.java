@@ -4,6 +4,8 @@ import com.inu.inunity.domain.article.Article;
 import com.inu.inunity.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,5 +40,9 @@ public class ArticleLikeService {
     @Transactional(readOnly = true)
     public Boolean isLike(Long articleId, Long userId){
         return articleLikeRepository.existsArticleLikeByArticleIdAndUserId(articleId, userId);
+    }
+
+    public Page<ArticleLike> getUserLikePost(Long userId, Pageable pageable){
+        return articleLikeRepository.findAllByUserIdAndArticleIsDeletedIsFalse(userId, pageable);
     }
 }

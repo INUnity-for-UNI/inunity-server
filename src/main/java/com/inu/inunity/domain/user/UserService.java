@@ -8,6 +8,8 @@ import com.inu.inunity.domain.comment.dto.ResponseMyPageComment;
 import com.inu.inunity.domain.user.dto.RequestSetUser;
 import com.inu.inunity.security.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,16 +35,14 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
     }
 
-    public List<ResponseArticleThumbnail> getUserWroteArticle(UserDetails userDetails){
+    public Page<ResponseArticleThumbnail> getUserWroteArticle(UserDetails userDetails, Pageable pageable){
         Long userId = ((CustomUserDetails) userDetails).getId();
-        User user = findUserById(userId);
-        return articleService.getUserWroteArticles(user);
+        return articleService.getUserWroteArticles(userId, pageable);
     }
 
-    public List<ResponseArticleThumbnail> getUserLikedArticle(UserDetails userDetails){
+    public Page<ResponseArticleThumbnail> getUserLikedArticle(UserDetails userDetails, Pageable pageable){
         Long userId = ((CustomUserDetails) userDetails).getId();
-        User user = findUserById(userId);
-        return articleService.getUserLikedArticles(user);
+        return articleService.getUserLikedArticles(userId, pageable);
     }
 
     public List<ResponseMyPageComment> getUserComments(UserDetails userDetails){

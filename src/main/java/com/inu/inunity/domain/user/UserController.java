@@ -3,6 +3,7 @@ package com.inu.inunity.domain.user;
 import com.inu.inunity.common.CommonResponse;
 import com.inu.inunity.domain.user.dto.RequestSetUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,17 +26,20 @@ public class UserController {
     }
 
     @GetMapping("/v1/users/articles/like")
-    public CommonResponse<?> getUserLikedArticle(@AuthenticationPrincipal UserDetails userDetails) {
-        return CommonResponse.success("유저가 좋아요누른 아티클 조회 성공", userService.getUserLikedArticle(userDetails));
+    public CommonResponse<?> getUserLikedArticle(@AuthenticationPrincipal UserDetails userDetails,
+                                                 Pageable pageable) {
+        return CommonResponse.success("유저가 좋아요누른 아티클 조회 성공", userService.getUserLikedArticle(userDetails, pageable));
     }
 
     @GetMapping("/v1/users/articles/wrote")
-    public CommonResponse<?> getUserWroteArticle(@AuthenticationPrincipal UserDetails userDetails) {
-        return CommonResponse.success("유저가 작성한 아티클 조회 성공", userService.getUserWroteArticle(userDetails));
+    public CommonResponse<?> getUserWroteArticle(@AuthenticationPrincipal UserDetails userDetails,
+                                                 Pageable pageable) {
+        return CommonResponse.success("유저가 작성한 아티클 조회 성공", userService.getUserWroteArticle(userDetails, pageable));
     }
 
     @GetMapping("/v1/users/comments")
-    public CommonResponse<?> getUserComments(@AuthenticationPrincipal UserDetails userDetails) {
+    public CommonResponse<?> getUserComments(@AuthenticationPrincipal UserDetails userDetails,
+                                             Pageable pageable) {
         return CommonResponse.success("유저가 단 댓글목록 조회 성공", userService.getUserComments(userDetails));
     }
 }
