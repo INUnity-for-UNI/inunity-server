@@ -68,10 +68,10 @@ public class CategoryService {
      * @return Long 수정된 Category ID
      */
     @Transactional
-    public Long editCategoryName(Long categoryId, String category_name) {
+    public Long updateCategory(Long categoryId, String category_name, String description, String icon, Boolean isActive) {
         Category foundCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.CATEGORY_NOT_FOUND));
-        foundCategory.editName(category_name);
+        foundCategory.updateCategory(category_name, description, icon, isActive);
         Category savedCategory = categoryRepository.save(foundCategory);
         return savedCategory.getId();
     }

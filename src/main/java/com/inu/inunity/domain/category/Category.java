@@ -23,20 +23,26 @@ public class Category {
 
     private String description;
 
+    private String icon;
+
     private Boolean isActive;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private List<Article> articles = new ArrayList<>();
 
     @Builder
-    public Category(String name, String description, Boolean isActive) {
+    public Category(String name, String description, String icon,Boolean isActive) {
         this.name = name;
         this.description = description;
+        this.icon = icon;
         this.isActive = isActive;
     }
 
-    public void editName(String name) {
+    public void updateCategory(String name, String description, String icon, Boolean isActive) {
         this.name = name;
+        this.description = description;
+        this.icon = icon;
+        this.isActive = isActive;
     }
 
     public void changeStatus(Boolean status) {
