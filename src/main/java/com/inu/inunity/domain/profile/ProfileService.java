@@ -7,8 +7,6 @@ import com.inu.inunity.domain.profile.career.dto.RequestCreateCareer;
 import com.inu.inunity.domain.profile.career.dto.RequestUpdateCareer;
 import com.inu.inunity.domain.profile.career.dto.ResponseCareer;
 import com.inu.inunity.domain.profile.contract.ContractService;
-import com.inu.inunity.domain.profile.contract.dto.RequestCreateContract;
-import com.inu.inunity.domain.profile.contract.dto.RequestUpdateContract;
 import com.inu.inunity.domain.profile.contract.dto.ResponseContract;
 import com.inu.inunity.domain.profile.portfolio.PortfolioService;
 import com.inu.inunity.domain.profile.portfolio.dto.RequestCreatePortfolio;
@@ -25,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -41,10 +40,26 @@ public class ProfileService {
     private final PortfolioService portfolioService;
     private final SkillService skillService;
 
+    public ResponseProfile getProfile(Long userId, UserDetails userDetails){
+        User user = userService.findUserById(userId);
+        Boolean isOwner =isOwner(userId, userDetails);
+        List<ResponseContract> contracts = contractService.getContracts(user);
+        return ResponseProfile.of(user, contracts, isOwner);
+    }
+
+    @Transactional
+    public void updateProfile(RequestUpdateProfile requestUpdateProfile, UserDetails userDetails){
+        Long userId = ((CustomUserDetails) userDetails).getId();
+        User user = userService.findUserById(userId);
+
+        user.updateUserProfile(requestUpdateProfile.nickname(), requestUpdateProfile.graduateDate(), requestUpdateProfile.isGraduation(),
+                requestUpdateProfile.isAnonymous(), requestUpdateProfile.organization(), requestUpdateProfile.job());
+        contractService.updateContracts(requestUpdateProfile.contracts(), user);
+    }
+
     public void createCareer(RequestCreateCareer requestCreateCareer, Long userId, UserDetails userDetails){
-        Long userTokenId = ((CustomUserDetails) userDetails).getId();
-        checkOwner(userId, userTokenId);
-        User user = userService.findUserById(userTokenId);
+        checkOwner(userId, userDetails);
+        User user = userService.findUserById(userId);
         careerService.createCareer(requestCreateCareer, user);
     }
 
@@ -54,22 +69,13 @@ public class ProfileService {
     }
 
     public void updateCareer(RequestUpdateCareer requestUpdateCareer, Long userId, UserDetails userDetails){
-        Long userTokenId = ((CustomUserDetails) userDetails).getId();
-        checkOwner(userId, userTokenId);
+        checkOwner(userId, userDetails);
         careerService.updateCareer(requestUpdateCareer);
     }
 
     public void deleteCareer(Long careerId, Long userId, UserDetails userDetails){
-        Long userTokenId = ((CustomUserDetails) userDetails).getId();
-        checkOwner(userId, userTokenId);
+        checkOwner(userId, userDetails);
         careerService.deleteCareer(careerId);
-    }
-
-    public void createContract(RequestCreateContract requestCreateContract, Long userId, UserDetails userDetails) {
-        Long userTokenId = ((CustomUserDetails) userDetails).getId();
-        checkOwner(userId, userTokenId);
-        User user = userService.findUserById(userTokenId);
-        contractService.createContract(requestCreateContract, user);
     }
 
     public List<ResponseContract> getContracts(Long userId) {
@@ -77,22 +83,9 @@ public class ProfileService {
         return contractService.getContracts(user);
     }
 
-    public void updateContract(RequestUpdateContract requestUpdateContract, Long userId, UserDetails userDetails) {
-        Long userTokenId = ((CustomUserDetails) userDetails).getId();
-        checkOwner(userId, userTokenId);
-        contractService.updateContract(requestUpdateContract);
-    }
-
-    public void deleteContract(Long contractId, Long userId, UserDetails userDetails) {
-        Long userTokenId = ((CustomUserDetails) userDetails).getId();
-        checkOwner(userId, userTokenId);
-        contractService.deleteContract(contractId);
-    }
-
     public void createPortfolio(RequestCreatePortfolio requestCreatePortfolio, Long userId, UserDetails userDetails) {
-        Long userTokenId = ((CustomUserDetails) userDetails).getId();
-        checkOwner(userId, userTokenId);
-        User user = userService.findUserById(userTokenId);
+        checkOwner(userId, userDetails);
+        User user = userService.findUserById(userId);
         portfolioService.createPortfolio(requestCreatePortfolio, user);
     }
 
@@ -102,21 +95,18 @@ public class ProfileService {
     }
 
     public void updatePortfolio(RequestUpdatePortfolio requestUpdatePortfolio, Long userId, UserDetails userDetails) {
-        Long userTokenId = ((CustomUserDetails) userDetails).getId();
-        checkOwner(userId, userTokenId);
+        checkOwner(userId, userDetails);
         portfolioService.updatePortfolio(requestUpdatePortfolio);
     }
 
     public void deletePortfolio(Long portfolioId, Long userId, UserDetails userDetails) {
-        Long userTokenId = ((CustomUserDetails) userDetails).getId();
-        checkOwner(userId, userTokenId);
+        checkOwner(userId, userDetails);
         portfolioService.deletePortfolio(portfolioId);
     }
 
     public void createSkill(RequestCreateSkill requestCreateSkill, Long userId, UserDetails userDetails) {
-        Long userTokenId = ((CustomUserDetails) userDetails).getId();
-        checkOwner(userId, userTokenId);
-        User user = userService.findUserById(userTokenId);
+        checkOwner(userId, userDetails);
+        User user = userService.findUserById(userId);
         skillService.createSkill(requestCreateSkill, user);
     }
 
@@ -126,25 +116,27 @@ public class ProfileService {
     }
 
     public void updateSkill(RequestUpdateSkill requestUpdateSkill, Long userId, UserDetails userDetails) {
-        Long userTokenId = ((CustomUserDetails) userDetails).getId();
-        checkOwner(userId, userTokenId);
+        checkOwner(userId, userDetails);
         skillService.updateSkill(requestUpdateSkill);
     }
 
     public void deleteSkill(Long skillId, Long userId, UserDetails userDetails) {
         Long userTokenId = ((CustomUserDetails) userDetails).getId();
-        checkOwner(userId, userTokenId);
+        checkOwner(userId, userDetails);
         skillService.deleteSkill(skillId);
     }
 
-    public void checkOwner(Long userId, Long userTokenId) {
-        log.info(isOwner(userId, userTokenId).toString());
-        if(!isOwner(userId, userTokenId)){
+    public void checkOwner(Long userId, UserDetails userDetails) {
+        if(!isOwner(userId, userDetails)){
             throw new NotOwnerException(ExceptionMessage.NOT_AUTHORIZATION_ACCESS);
         }
     }
 
-    public Boolean isOwner(Long userId, Long userTokenId) {
-        return Objects.equals(userTokenId, userId);
+    public Boolean isOwner(Long userId, UserDetails userDetails) {
+        if(userDetails != null){
+            Long userTokenId = ((CustomUserDetails) userDetails).getId();
+            return Objects.equals(userTokenId, userId);
+        }
+        return false;
     }
 }

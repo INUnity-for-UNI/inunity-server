@@ -2,15 +2,17 @@ package com.inu.inunity.domain.profile.contract;
 
 import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
-import com.inu.inunity.domain.profile.contract.dto.RequestCreateContract;
-import com.inu.inunity.domain.profile.contract.dto.RequestUpdateContract;
+import com.inu.inunity.domain.profile.contract.dto.RequestCreateUpdateContract;
 import com.inu.inunity.domain.profile.contract.dto.ResponseContract;
 import com.inu.inunity.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,21 +27,42 @@ public class ContractService {
                 .toList();
     }
 
-    @Transactional
-    public void createContract(RequestCreateContract requestCreateContract, User user){
-        Contract contract = Contract.of(requestCreateContract.name(),requestCreateContract.url(), requestCreateContract.type(), user);
-        contractRepository.save(contract);
+    public void updateContracts(List<RequestCreateUpdateContract> requestCreateUpdateContracts, User user){
+        List<Contract> existingContracts = user.getContracts();
+        List<RequestCreateUpdateContract> contractsToCreate = new ArrayList<>();
+        List<RequestCreateUpdateContract> contractsToModify = new ArrayList<>();
+        Map<Long, Contract> skillMap = existingContracts.stream()
+                .collect(Collectors.toMap(Contract::getId, Contract -> Contract));
+        requestCreateUpdateContracts.forEach(requestUpdateCareer -> {
+            if (requestUpdateCareer.contractId() == null) {
+                contractsToCreate.add(requestUpdateCareer);
+            } else {
+                contractsToModify.add(requestUpdateCareer);
+                skillMap.remove(requestUpdateCareer.contractId());
+            }
+        });
+        createContracts(contractsToCreate, user);
+        modifyContracts(contractsToModify);
+        deleteContracts(skillMap.keySet().stream().toList());
+
     }
 
-    @Transactional
-    public void updateContract(RequestUpdateContract requestModifyContract){
-        Contract contract = contractRepository.findById(requestModifyContract.contractId())
-                .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.CONTRACT_NOT_FOUND));
-        contract.edit(requestModifyContract.name(), requestModifyContract.url(), requestModifyContract.type());
+    private void createContracts(List<RequestCreateUpdateContract> requestCreateContracts, User user){
+        List<Contract> contracts = requestCreateContracts.stream()
+                .map(createContract -> Contract.of(createContract.name(),createContract.url(), createContract.type(), user))
+                .toList();
+        contractRepository.saveAll(contracts);
     }
 
-    @Transactional
-    public void deleteContract(Long requestDeleteContract){
-        contractRepository.deleteById(requestDeleteContract);
+    private void modifyContracts(List<RequestCreateUpdateContract> requestModifyContracts) {
+        requestModifyContracts.forEach(modifyContract -> {
+            Contract contract = contractRepository.findById(modifyContract.contractId())
+                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.CONTRACT_NOT_FOUND));
+            contract.edit(modifyContract.name(), modifyContract.url(), modifyContract.type());
+        });
+    }
+
+    private void deleteContracts(List<Long> requestDeleteContracts) {
+        contractRepository.deleteAllById(requestDeleteContracts);
     }
 }

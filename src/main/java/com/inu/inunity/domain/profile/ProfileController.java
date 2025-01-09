@@ -3,8 +3,6 @@ package com.inu.inunity.domain.profile;
 import com.inu.inunity.common.CommonResponse;
 import com.inu.inunity.domain.profile.career.dto.RequestCreateCareer;
 import com.inu.inunity.domain.profile.career.dto.RequestUpdateCareer;
-import com.inu.inunity.domain.profile.contract.dto.RequestCreateContract;
-import com.inu.inunity.domain.profile.contract.dto.RequestUpdateContract;
 import com.inu.inunity.domain.profile.portfolio.dto.RequestCreatePortfolio;
 import com.inu.inunity.domain.profile.portfolio.dto.RequestUpdatePortfolio;
 import com.inu.inunity.domain.profile.skill.dto.RequestCreateSkill;
@@ -47,30 +45,16 @@ public class ProfileController {
         return CommonResponse.success("career 삭제 성공", null);
     }
 
-    @PostMapping("/users/{userid}/profile/contract")
-    public ResponseEntity<CommonResponse<?>> createUserContract(@RequestBody RequestCreateContract request, @PathVariable Long userid,
-                                                                @AuthenticationPrincipal UserDetails userDetails) {
-        profileService.createContract(request, userid, userDetails);
-        return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("contract 생성 성공", null));
+    @GetMapping("/users/{userid}/profile")
+    public CommonResponse<?> getUserContracts(@PathVariable Long userid, @AuthenticationPrincipal UserDetails userDetails) {
+        return CommonResponse.success("유저의 profile 가져오기 성공", profileService.getProfile(userid, userDetails));
     }
 
-    @GetMapping("/users/{userid}/profile/contract")
-    public CommonResponse<?> getUserContracts(@PathVariable Long userid) {
-        return CommonResponse.success("유저의 contract 가져오기 성공", profileService.getContracts(userid));
-    }
-
-    @PutMapping("/users/{userid}/profile/contract")
-    public CommonResponse<?> updateUserContract(@RequestBody RequestUpdateContract request, @PathVariable Long userid,
+    @PutMapping("/users/{userid}/profile")
+    public CommonResponse<?> updateUserContract(@RequestBody RequestUpdateProfile request, @PathVariable Long userid,
                                                 @AuthenticationPrincipal UserDetails userDetails) {
-        profileService.updateContract(request, userid, userDetails);
-        return CommonResponse.success("contract 수정 성공", null);
-    }
-
-    @DeleteMapping("/users/{userid}/profile/contract/{contractid}")
-    public CommonResponse<?> deleteUserContract(@PathVariable Long contractid, @PathVariable Long userid,
-                                               @AuthenticationPrincipal UserDetails userDetails) {
-        profileService.deleteContract(contractid, userid, userDetails);
-        return CommonResponse.success("contract 삭제 성공", null);
+        profileService.updateProfile(request, userDetails);
+        return CommonResponse.success("profile 수정 성공", null);
     }
 
     @PostMapping("/users/{userid}/profile/portfolio")
