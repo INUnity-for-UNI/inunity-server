@@ -1,5 +1,8 @@
 package com.inu.inunity.domain.article;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.inu.inunity.common.editorJS.EditorJSConverter;
+import com.inu.inunity.common.editorJS.EditorJSOutput;
 import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
 import com.inu.inunity.domain.article.dto.RequestCreateArticle;
@@ -38,6 +41,7 @@ public class ArticleService {
     private final UserRepository userRepository;
     private final ArticleLikeService articleLikeService;
     private final CommentService commentService;
+    private final EditorJSConverter editorJSConverter;
 
     /**
      * 아티클을 생성하는 메서드
@@ -48,15 +52,21 @@ public class ArticleService {
      * @return Long 생성된 아티클의 게시글 번호
      */
     @Transactional
-    public Long createArticle(RequestCreateArticle requestCreateArticle, Long categoryId, Long userId) {
+    public Long createArticle(RequestCreateArticle requestCreateArticle, Long categoryId, Long userId) throws JsonProcessingException {
         Category foundCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.CONTRACT_NOT_FOUND));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
-        Article article = Article.of(requestCreateArticle, 0, false, foundCategory, user);
+        String editorJSText = convertHtmlToJson(requestCreateArticle.content());
+        Article article = Article.of(requestCreateArticle, editorJSText, 0, false, foundCategory, user);
 
         articleRepository.save(article);
         return article.getId();
+    }
+
+    public String convertHtmlToJson(String htmlContent) {
+        EditorJSOutput editorJSOutput = editorJSConverter.convertHtmlToEditorJS(htmlContent);
+        return editorJSConverter.toJson(editorJSOutput);
     }
 
     /**

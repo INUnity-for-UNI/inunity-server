@@ -31,7 +31,8 @@ public enum ExceptionMessage {
     IMAGE_UPLOAD_FAILED("이미지서버 업로드에 실패했습니다.", 0, HttpStatus.BAD_REQUEST),
     IMAGE_UPLOAD_FAILED_UNDEFINED("이미지서버가 불안정합니다.", 0, HttpStatus.BAD_REQUEST),
     NOT_AUTHORIZATION_ACCESS("허가되지 않은 접근입니다.", 0, HttpStatus.UNAUTHORIZED),
-    PORTFOLIO_NOT_FOUND("포트폴리오를 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND)
+    PORTFOLIO_NOT_FOUND("포트폴리오를 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
+    EDITOR_JS_CONVERT_FAILED("변환하다가 오류났지요~ 서버에 문의하세요~", 0, HttpStatus.BAD_REQUEST)
     ;
 
     private final String message;

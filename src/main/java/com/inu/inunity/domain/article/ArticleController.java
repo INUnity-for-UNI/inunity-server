@@ -1,5 +1,6 @@
 package com.inu.inunity.domain.article;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.inu.inunity.common.CommonResponse;
 import com.inu.inunity.domain.article.dto.RequestCreateArticle;
 import com.inu.inunity.domain.article.dto.RequestModifyArticle;
@@ -28,7 +29,7 @@ public class ArticleController {
             @RequestBody RequestCreateArticle requestCreateArticle,
             @PathVariable Long category_id,
             @AuthenticationPrincipal UserDetails userDetails
-            ) {
+            ) throws JsonProcessingException {
         CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
         Long userId = customUserDetails.getId();
         Long result = articleService.createArticle(requestCreateArticle, category_id, userId);
