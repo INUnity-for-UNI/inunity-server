@@ -1,9 +1,9 @@
-package com.inu.inunity.domain.replyComment;
+package com.inu.inunity.domain.comment.replyComment;
 
 import com.inu.inunity.common.BaseEntity;
 import com.inu.inunity.domain.comment.Comment;
-import com.inu.inunity.domain.replyComment.dto.RequestCreateReplyComment;
-import com.inu.inunity.domain.replyComment.dto.RequestUpdateReplyComment;
+import com.inu.inunity.domain.comment.dto.RequestCreateReplyComment;
+import com.inu.inunity.domain.comment.dto.RequestUpdateReplyComment;
 import com.inu.inunity.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

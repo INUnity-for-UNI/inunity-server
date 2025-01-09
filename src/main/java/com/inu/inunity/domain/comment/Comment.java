@@ -4,7 +4,7 @@ import com.inu.inunity.common.BaseEntity;
 import com.inu.inunity.domain.article.Article;
 import com.inu.inunity.domain.comment.dto.RequestCreateComment;
 import com.inu.inunity.domain.comment.dto.RequestUpdateComment;
-import com.inu.inunity.domain.replyComment.ReplyComment;
+import com.inu.inunity.domain.comment.replyComment.ReplyComment;
 import com.inu.inunity.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

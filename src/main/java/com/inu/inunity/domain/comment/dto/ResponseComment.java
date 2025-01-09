@@ -1,7 +1,6 @@
 package com.inu.inunity.domain.comment.dto;
 
 import com.inu.inunity.domain.comment.Comment;
-import com.inu.inunity.domain.replyComment.dto.ResponseReplyComment;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
