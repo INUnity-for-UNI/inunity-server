@@ -6,6 +6,8 @@ public record ResponseCategory(
         Long id,
         String name,
         String description,
-        Boolean isActive
+        Boolean isActive,
+
+        String icon
 ) {
 }
