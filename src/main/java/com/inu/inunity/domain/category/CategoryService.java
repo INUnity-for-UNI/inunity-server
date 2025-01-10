@@ -41,7 +41,8 @@ public class CategoryService {
                 .name(requestCreateCategory.name())
                 .description(requestCreateCategory.description())
                 .icon(requestCreateCategory.icon())
-                .isActive(true)
+                .isActive(requestCreateCategory.isActivity())
+                .isNotice(requestCreateCategory.isNotice())
                 .build();
         Category savedCategory = categoryRepository.save(newCategory);
         return savedCategory.getId();
@@ -62,6 +63,7 @@ public class CategoryService {
                 .description(category.getDescription())
                 .icon(category.getIcon())
                 .isActive(category.getIsActive())
+                .isNotice(category.getIsNotice())
                 .build()).toList();
     }
 
