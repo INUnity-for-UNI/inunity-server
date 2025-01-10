@@ -30,6 +30,8 @@ public class Comment extends BaseEntity {
 
     private Boolean isDeleted;
 
+    private Boolean isInadequate;
+
     @ManyToOne
     private User user;
 
@@ -40,10 +42,11 @@ public class Comment extends BaseEntity {
     private List<ReplyComment> replyComments = new ArrayList<>();
 
     @Builder
-    Comment(String content, Boolean isAnonymous, User user, Article article) {
+    Comment(String content, Boolean isAnonymous, Boolean isDeleted, Boolean isInadequate, User user, Article article) {
         this.content = content;
         this.isAnonymous = isAnonymous;
-        this.isDeleted = false;
+        this.isDeleted = isDeleted;
+        this.isInadequate = isInadequate;
         this.user = user;
         this.article = article;
     }
@@ -52,6 +55,7 @@ public class Comment extends BaseEntity {
         return Comment.builder()
                 .content(request.content())
                 .isAnonymous(request.isAnonymous())
+                .isInadequate(false)
                 .user(user)
                 .article(article)
                 .build();

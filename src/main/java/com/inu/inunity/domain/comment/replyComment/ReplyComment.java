@@ -7,6 +7,7 @@ import com.inu.inunity.domain.comment.dto.RequestUpdateReplyComment;
 import com.inu.inunity.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,22 +26,33 @@ public class ReplyComment extends BaseEntity {
 
     private Boolean isDeleted;
 
+    private Boolean isInadequate;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Comment comment;
 
-    public ReplyComment(String content, Boolean isAnonymous, Boolean isDeleted, User user, Comment comment) {
+    @Builder
+    public ReplyComment(String content, Boolean isAnonymous, Boolean isDeleted, Boolean isInadequate, User user, Comment comment) {
         this.content = content;
         this.isAnonymous = isAnonymous;
         this.isDeleted = isDeleted;
+        this.isInadequate = isInadequate;
         this.user = user;
         this.comment = comment;
     }
 
     public static ReplyComment of(RequestCreateReplyComment requestCreateReplyComment, User user, Comment comment) {
-        return new ReplyComment(requestCreateReplyComment.content(), requestCreateReplyComment.isAnonymous(), false, user, comment);
+        return ReplyComment.builder()
+                .content(requestCreateReplyComment.content())
+                .isAnonymous(requestCreateReplyComment.isAnonymous())
+                .isDeleted(false)
+                .isInadequate(false)
+                .user(user)
+                .comment(comment)
+                .build();
     }
 
     public void updateReplyComment(RequestUpdateReplyComment requestUpdateReplyComment) {

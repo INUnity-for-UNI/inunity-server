@@ -40,7 +40,7 @@ public class Article extends BaseEntity {
 
     private Boolean isNotice;
 
-    @Embedded
+    @OneToOne(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private Notice notice;
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
