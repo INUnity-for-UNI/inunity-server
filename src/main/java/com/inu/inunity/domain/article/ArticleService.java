@@ -10,6 +10,7 @@ import com.inu.inunity.domain.article.dto.ResponseArticle;
 import com.inu.inunity.domain.category.Category;
 import com.inu.inunity.domain.category.CategoryRepository;
 import com.inu.inunity.domain.comment.dto.ResponseComment;
+import com.inu.inunity.util.communicate.CommunicateUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ public class ArticleService {
     private final ArticleRepository articleRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final CommunicateUtil communicateUtil;
 
     /**
      * 아티클을 생성하는 메서드
@@ -36,9 +38,18 @@ public class ArticleService {
     public Long createArticle(RequestCreateArticle requestCreateArticle, Long categoryId, Long userId) {
         Category foundCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.CONTRACT_NOT_FOUND));
-        User user = userRepository.findById(userId)
+        User foundUser = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
-        Article article = Article.of(requestCreateArticle, 0, false, foundCategory, user);
+
+        Article article = Article.builder()
+                .title(communicateUtil.requestToCleanBot(requestCreateArticle.title()))
+                .content(communicateUtil.requestToCleanBot(requestCreateArticle.content()))
+                .isAnonymous(requestCreateArticle.isAnonymous())
+                .view(0)
+                .isDeleted(false)
+                .category(foundCategory)
+                .user(foundUser)
+                .build();
 
         articleRepository.save(article);
         return article.getId();

@@ -28,7 +28,7 @@ public class ArticleController {
             @RequestBody RequestCreateArticle requestCreateArticle,
             @PathVariable Long category_id,
             @AuthenticationPrincipal UserDetails userDetails
-            ) {
+    ) {
         CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
         Long userId = customUserDetails.getId();
         Long result = articleService.createArticle(requestCreateArticle, category_id, userId);
