@@ -1,7 +1,5 @@
 package com.inu.inunity.domain.article;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.inu.inunity.common.editorJS.EditorJSConverter;
 import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
 import com.inu.inunity.domain.article.dto.RequestCreateArticle;
@@ -40,7 +38,6 @@ public class ArticleService {
     private final UserRepository userRepository;
     private final ArticleLikeService articleLikeService;
     private final CommentService commentService;
-    private final EditorJSConverter editorJSConverter;
 
     /**
      * 아티클을 생성하는 메서드
@@ -51,7 +48,7 @@ public class ArticleService {
      * @return Long 생성된 아티클의 게시글 번호
      */
     @Transactional
-    public Long createArticle(RequestCreateArticle requestCreateArticle, Long categoryId, Long userId) throws JsonProcessingException {
+    public Long createArticle(RequestCreateArticle requestCreateArticle, Long categoryId, Long userId) {
         Category foundCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.CONTRACT_NOT_FOUND));
         User user = userRepository.findById(userId)
@@ -72,6 +69,7 @@ public class ArticleService {
     public ResponseArticle getArticle(Long articleId, UserDetails userDetails) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ARTICLE_NOT_FOUND));
+
         if(article.getIsDeleted()){
             throw new NotFoundElementException(ExceptionMessage.ARTICLE_IS_DELETED);
         }
@@ -81,10 +79,15 @@ public class ArticleService {
         Integer likeNum = articleLikeService.getLikeNum(article);
         Boolean isLike = articleLikeService.isLike(articleId, userId);
         Integer commentNum = commentService.getCommentNum(articleId);
-        Boolean isOwner = Objects.equals(article.getUser().getId(), userId);
         List<ResponseComment> comments = commentService.getComments(article, userId);
 
-        return ResponseArticle.of(article, likeNum, isLike, isOwner, commentNum, comments);
+        if(article.getCategory().getIsNotice()) {
+            return ResponseArticle.ofNotice(article, article.getNotice(), likeNum, isLike, commentNum, comments);
+        }
+        else {
+            Boolean isOwner = Objects.equals(article.getUser().getId(), userId);
+            return ResponseArticle.ofNormal(article, likeNum, isLike, isOwner, commentNum, comments);
+        }
     }
 
     /**
@@ -138,7 +141,7 @@ public class ArticleService {
 
         return articleLikes.map(articleLike -> {
                     Article article = articleLike.getArticle();
-                    return ResponseArticleThumbnail.of(article, articleLikeService.getLikeNum(article),
+                    return ResponseArticleThumbnail.ofNormal(article, articleLikeService.getLikeNum(article),
                             articleLikeService.isLike(article.getId(), userId), commentService.getCommentNum(article.getId()));
                 });
     }
@@ -147,7 +150,7 @@ public class ArticleService {
     public Page<ResponseArticleThumbnail> getUserWroteArticles(Long userId, Pageable pageable){
         Page<Article> articles = articleRepository.findAllByUserIdAndIsDeletedIsFalse(userId, pageable);
 
-        return articles.map(article -> ResponseArticleThumbnail.of(article, articleLikeService.getLikeNum(article),
+        return articles.map(article -> ResponseArticleThumbnail.ofNormal(article, articleLikeService.getLikeNum(article),
                                 articleLikeService.isLike(article.getId(), userId), commentService.getCommentNum(article.getId())));
     }
 

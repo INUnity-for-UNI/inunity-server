@@ -1,9 +1,11 @@
 package com.inu.inunity.domain.article.dto;
 
 import com.inu.inunity.domain.article.Article;
+import com.inu.inunity.domain.notice.Notice;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Builder
 public record ResponseArticleThumbnail(
@@ -23,7 +25,7 @@ public record ResponseArticleThumbnail(
         Boolean isLiked
 ) {
 
-    public static ResponseArticleThumbnail of(Article article, Integer likeNum, Boolean isLiked, Integer commentNum){
+    public static ResponseArticleThumbnail ofNormal(Article article, Integer likeNum, Boolean isLiked, Integer commentNum){
         return ResponseArticleThumbnail.builder()
                 .userId(article.getUser().getId())
                 .department(article.getUser().getDepartment())
@@ -36,6 +38,24 @@ public record ResponseArticleThumbnail(
                 .commentNum(commentNum)
                 .createAt(article.getCreateAt())
                 .updatedAt(article.getUpdateAt())
+                .viewNum(article.getView())
+                .likeNum(likeNum)
+                .isLiked(isLiked)
+                .build();
+    }
+
+    public static ResponseArticleThumbnail ofNotice(Article article, Notice notice, Integer likeNum, Boolean isLiked, Integer commentNum){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        return ResponseArticleThumbnail.builder()
+                .department(notice.getDepartment().getName())
+                .nickname(notice.getDetail().getAuthor())
+                .isAnonymous(article.getIsAnonymous())
+                .articleId(article.getId())
+                .title(notice.getTitle())
+                .content(notice.getDetail().getContent())
+                .commentNum(commentNum)
+                .createAt(LocalDateTime.parse(notice.getDetail().getDate(), formatter))
+                .updatedAt(LocalDateTime.parse(notice.getDetail().getDate(), formatter))
                 .viewNum(article.getView())
                 .likeNum(likeNum)
                 .isLiked(isLiked)
