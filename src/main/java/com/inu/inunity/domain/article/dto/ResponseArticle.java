@@ -21,6 +21,7 @@ public record ResponseArticle(
         String content,
         Integer viewNum,
         Boolean isOwner,
+        Boolean isNotice,
         Integer likeNum,
         Boolean isLiked,
         LocalDateTime createAt,
@@ -44,6 +45,7 @@ public record ResponseArticle(
                 .isOwner(isOwner)
                 .likeNum(likeNum)
                 .isLiked(isLiked)
+                .isNotice(false)
                 .createAt(article.getCreateAt())
                 .updatedAt(article.getUpdateAt())
                 .commentNum(commentNum)
@@ -65,6 +67,7 @@ public record ResponseArticle(
                 .isOwner(false)
                 .likeNum(likeNum)
                 .isLiked(isLiked)
+                .isNotice(true)
                 .createAt(LocalDateTime.parse(notice.getDetail().getDate(), formatter))
                 .updatedAt(LocalDateTime.parse(notice.getDetail().getDate(), formatter))
                 .commentNum(commentNum)

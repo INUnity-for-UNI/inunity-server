@@ -22,7 +22,8 @@ public record ResponseArticleThumbnail(
         Integer viewNum,
         Integer commentNum,
         Integer likeNum,
-        Boolean isLiked
+        Boolean isLiked,
+        Boolean isNotice
 ) {
 
     public static ResponseArticleThumbnail ofNormal(Article article, Integer likeNum, Boolean isLiked, Integer commentNum){
@@ -41,6 +42,7 @@ public record ResponseArticleThumbnail(
                 .viewNum(article.getView())
                 .likeNum(likeNum)
                 .isLiked(isLiked)
+                .isNotice(false)
                 .build();
     }
 
@@ -59,6 +61,7 @@ public record ResponseArticleThumbnail(
                 .viewNum(article.getView())
                 .likeNum(likeNum)
                 .isLiked(isLiked)
+                .isNotice(true)
                 .build();
     }
 }
