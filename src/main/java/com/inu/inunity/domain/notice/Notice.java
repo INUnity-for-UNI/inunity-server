@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @Table(name = "notices")
+@Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Notice {
     @Id

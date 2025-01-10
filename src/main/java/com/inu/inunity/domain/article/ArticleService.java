@@ -56,7 +56,7 @@ public class ArticleService {
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.CONTRACT_NOT_FOUND));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
-        Article article = Article.of(requestCreateArticle, 0, false, foundCategory, user);
+        Article article = Article.ofUser(requestCreateArticle, 0, false, foundCategory, user);
 
         articleRepository.save(article);
         return article.getId();

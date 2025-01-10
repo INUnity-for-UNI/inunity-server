@@ -7,6 +7,7 @@ import com.inu.inunity.domain.articleLike.ArticleLike;
 import com.inu.inunity.domain.articleReport.ArticleReport;
 import com.inu.inunity.domain.category.Category;
 import com.inu.inunity.domain.comment.Comment;
+import com.inu.inunity.domain.notice.Notice;
 import com.inu.inunity.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -35,6 +36,13 @@ public class Article extends BaseEntity {
 
     private Boolean isAnonymous;
 
+    private Boolean isInadequate;
+
+    private Boolean isNotice;
+
+    @Embedded
+    private Notice notice;
+
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
@@ -51,27 +59,45 @@ public class Article extends BaseEntity {
     private Category category;
 
     @Builder
-    public Article(String title, String content, Boolean isAnonymous, Integer view, Boolean isDeleted, Category category,
+    public Article(String title, String content, Boolean isAnonymous, Integer view, Boolean isDeleted, Boolean isInadequate,
+                   Boolean isNotice, Notice notice, Category category,
                    User user) {
         this.title = title;
         this.content = content;
         this.isAnonymous = isAnonymous;
         this.view = view;
         this.isDeleted = isDeleted;
+        this.isInadequate = isInadequate;
+        this.isNotice = isNotice;
+        this.notice = notice;
         this.category = category;
         this.user = user;
     }
 
-    public static Article of(RequestCreateArticle request, Integer view, Boolean isDeleted, Category category,
-                   User user) {
+    public static Article ofUser(RequestCreateArticle request, Integer view, Boolean isDeleted, Category category,
+                                 User user) {
         return Article.builder()
                 .title(request.title())
                 .content(request.content())
                 .isAnonymous(request.isAnonymous())
                 .view(view)
                 .isDeleted(isDeleted)
+                //todo: fastApi 연결 성공하면 이걸로 상태변경시키기
+                .isInadequate(false)
+                .isNotice(false)
                 .category(category)
                 .user(user)
+                .build();
+    }
+
+    public static Article ofNotice(Boolean isDeleted, Notice notice, Category category) {
+        return Article.builder()
+                .view(0)
+                .isDeleted(isDeleted)
+                .isInadequate(false)
+                .isNotice(true)
+                .notice(notice)
+                .category(category)
                 .build();
     }
 

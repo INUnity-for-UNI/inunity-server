@@ -55,9 +55,10 @@ public class CategoryController {
             @RequestParam("categoryName") String category_name,
             @RequestParam String icon,
             @RequestParam Boolean isActive,
+            @RequestParam Boolean isNotice,
             @RequestParam String description
     ) {
-        Long result = categoryService.updateCategory(category_id, category_name, description, icon, isActive);
+        Long result = categoryService.updateCategory(category_id, category_name, description, icon, isActive, isNotice);
         return CommonResponse.success("카테고리 이름 수정 완료", result);
     }
 

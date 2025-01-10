@@ -74,10 +74,10 @@ public class CategoryService {
      * @author 김원정
      */
     @Transactional
-    public Long updateCategory(Long categoryId, String category_name, String description, String icon, Boolean isActive) {
+    public Long updateCategory(Long categoryId, String category_name, String description, String icon, Boolean isActive, Boolean isNotice) {
         Category foundCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.CATEGORY_NOT_FOUND));
-        foundCategory.updateCategory(category_name, description, icon, isActive);
+        foundCategory.updateCategory(category_name, description, icon, isActive, isNotice);
         Category savedCategory = categoryRepository.save(foundCategory);
         return savedCategory.getId();
     }
