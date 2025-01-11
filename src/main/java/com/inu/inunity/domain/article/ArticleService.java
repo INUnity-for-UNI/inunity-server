@@ -86,8 +86,7 @@ public class ArticleService {
         List<ResponseComment> comments = commentService.getComments(article, userId);
 
         if(article.getCategory().getIsNotice()) {
-            String content = getObject(article.getNotice().getDetail().getContent());
-            return ResponseArticle.ofNotice(article, article.getNotice(), content, likeNum, isLike, commentNum, comments);
+            return ResponseArticle.ofNotice(article, article.getNotice(), likeNum, isLike, commentNum, comments);
         }
         else {
             Boolean isOwner = Objects.equals(article.getUser().getId(), userId);

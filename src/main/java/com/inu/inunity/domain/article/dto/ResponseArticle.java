@@ -55,7 +55,7 @@ public record ResponseArticle(
                 .build();
     }
 
-    public static ResponseArticle ofNotice(Article article, Notice notice, String content, Integer likeNum, Boolean isLiked,Integer commentNum,
+    public static ResponseArticle ofNotice(Article article, Notice notice, Integer likeNum, Boolean isLiked,Integer commentNum,
                                            List<ResponseComment> comments) {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate localDate = LocalDate.parse(notice.getDetail().getDate(), dateFormatter);
@@ -65,7 +65,7 @@ public record ResponseArticle(
                 .isAnonymous(article.getIsAnonymous())
                 .articleId(article.getId())
                 .title(notice.getTitle())
-                .content(content)
+                .content(notice.getDetail().getContent())
                 .viewNum(article.getView())
                 .isOwner(false)
                 .likeNum(likeNum)
