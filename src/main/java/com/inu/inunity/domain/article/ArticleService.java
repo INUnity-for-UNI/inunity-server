@@ -3,7 +3,6 @@ package com.inu.inunity.domain.article;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inu.inunity.common.editorJS.EditorJSConverter;
-import com.inu.inunity.common.editorJS.EditorJSOutput;
 import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
 import com.inu.inunity.domain.article.dto.RequestCreateArticle;
@@ -193,9 +192,8 @@ public class ArticleService {
 
     public String getObject(String json) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        EditorJSOutput output = objectMapper.readValue(json, EditorJSOutput.class);
-
         EditorJSConverter converter = new EditorJSConverter(objectMapper);
-        return converter.extractTextFromEditorJS(output);
+
+        return converter.extractTextFromEditorJS(json);
     }
 }
