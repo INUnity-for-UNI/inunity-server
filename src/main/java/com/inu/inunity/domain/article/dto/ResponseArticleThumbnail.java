@@ -49,7 +49,7 @@ public record ResponseArticleThumbnail(
                 .build();
     }
 
-    public static ResponseArticleThumbnail ofNotice(Article article, Notice notice, Integer likeNum, Boolean isLiked, Integer commentNum){
+    public static ResponseArticleThumbnail ofNotice(Article article, Notice notice, String content, Integer likeNum, Boolean isLiked, Integer commentNum){
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate localDate = LocalDate.parse(notice.getDetail().getDate(), dateFormatter);
         return ResponseArticleThumbnail.builder()
@@ -59,7 +59,7 @@ public record ResponseArticleThumbnail(
                 .isAnonymous(article.getIsAnonymous())
                 .articleId(article.getId())
                 .title(notice.getTitle())
-                .content(notice.getDetail().getContent())
+                .content(content)
                 .commentNum(commentNum)
                 .createAt(localDate.atStartOfDay())
                 .updatedAt(localDate.atStartOfDay())

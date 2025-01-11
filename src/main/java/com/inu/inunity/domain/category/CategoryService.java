@@ -1,5 +1,6 @@
 package com.inu.inunity.domain.category;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
 import com.inu.inunity.domain.article.Article;
@@ -176,7 +177,12 @@ public class CategoryService {
             Boolean isLiked = articleLikeService.isLike(article.getId(), articleService.getUserIdAtUserDetails(userDetails));
             Integer likeNum = articleLikeService.getLikeNum(article);
             Integer commentNum = commentService.getCommentNum(article.getId());
-            return ResponseArticleThumbnail.ofNotice(article, article.getNotice(), likeNum, isLiked, commentNum);
+            try {
+                String content = articleService.getObject(article.getNotice().getDetail().getContent());
+                return ResponseArticleThumbnail.ofNotice(article, article.getNotice(), content, likeNum, isLiked, commentNum);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 
@@ -197,7 +203,12 @@ public class CategoryService {
             Integer likeNum = articleLikeService.getLikeNum(article);
             Integer commentNum = commentService.getCommentNum(article.getId());
             if(article.getIsNotice()){
-                return ResponseArticleThumbnail.ofNotice(article, article.getNotice(), likeNum, isLiked, commentNum);
+                try {
+                    String content = articleService.getObject(article.getNotice().getDetail().getContent());
+                    return ResponseArticleThumbnail.ofNotice(article, article.getNotice(), content, likeNum, isLiked, commentNum);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
             }
             else{
                 return ResponseArticleThumbnail.ofNormal(article, likeNum, isLiked, commentNum);

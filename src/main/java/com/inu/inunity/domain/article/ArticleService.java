@@ -1,5 +1,9 @@
 package com.inu.inunity.domain.article;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.inu.inunity.common.editorJS.EditorJSConverter;
+import com.inu.inunity.common.editorJS.EditorJSOutput;
 import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
 import com.inu.inunity.domain.article.dto.RequestCreateArticle;
@@ -38,6 +42,7 @@ public class ArticleService {
     private final UserRepository userRepository;
     private final ArticleLikeService articleLikeService;
     private final CommentService commentService;
+    private final EditorJSConverter editorJSConverter;
 
     /**
      * 아티클을 생성하는 메서드
@@ -66,7 +71,7 @@ public class ArticleService {
      * @return responseArticle Record
      */
     @Transactional(readOnly = true)
-    public ResponseArticle getArticle(Long articleId, UserDetails userDetails) {
+    public ResponseArticle getArticle(Long articleId, UserDetails userDetails) throws JsonProcessingException {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ARTICLE_NOT_FOUND));
 
@@ -82,7 +87,8 @@ public class ArticleService {
         List<ResponseComment> comments = commentService.getComments(article, userId);
 
         if(article.getCategory().getIsNotice()) {
-            return ResponseArticle.ofNotice(article, article.getNotice(), likeNum, isLike, commentNum, comments);
+            String content = getObject(article.getNotice().getDetail().getContent());
+            return ResponseArticle.ofNotice(article, article.getNotice(), content, likeNum, isLike, commentNum, comments);
         }
         else {
             Boolean isOwner = Objects.equals(article.getUser().getId(), userId);
@@ -183,5 +189,13 @@ public class ArticleService {
                                 })
                 ).sorted(Comparator.comparing(ResponseMyPageComment::createAt).reversed())
                 .toList();
+    }
+
+    public String getObject(String json) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        EditorJSOutput output = objectMapper.readValue(json, EditorJSOutput.class);
+
+        EditorJSConverter converter = new EditorJSConverter(objectMapper);
+        return converter.extractTextFromEditorJS(output);
     }
 }

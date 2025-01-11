@@ -51,7 +51,7 @@ public class ArticleController {
      * @return CommonResponse에 감싸진 ResponseArticle 클래스
      */
     @GetMapping("/v1/articles/{article_id}")
-    CommonResponse<ResponseArticle> getArticle(@PathVariable Long article_id, @AuthenticationPrincipal UserDetails userDetails) {
+    CommonResponse<ResponseArticle> getArticle(@PathVariable Long article_id, @AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
         ResponseArticle result = articleService.getArticle(article_id, userDetails);
         return CommonResponse.success("아티클 조회 완료", result);
     }
