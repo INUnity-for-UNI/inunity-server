@@ -130,6 +130,42 @@ public class CategoryService {
         return getNormalArticles(pagingArticle, userDetails);
     }
 
+    @Transactional(readOnly = true)
+    public Page<ResponseArticleThumbnail> getSearchArticles(Long categoryId, String keyword, String searchType,
+                                                            UserDetails userDetails, Pageable pageable) {
+        Page<Article> articles = judgementQuery(categoryId, keyword, searchType, pageable);
+        return getNormalArticles(articles, userDetails);
+    }
+
+    public Page<Article> judgementQuery(Long categoryId, String keyword, String searchType, Pageable pageable){
+        if(categoryId != null){
+            return queryCategoryNotNull(categoryId, keyword, searchType, pageable);
+        }
+        else{
+            return queryCategoryNull(keyword, searchType, pageable);
+        }
+    }
+
+    public Page<Article> queryCategoryNull(String keyword, String searchType, Pageable pageable){
+        if(searchType.equals("content")){
+            return articleRepository.searchArticlesCategoryIsNoticeIsFalseAndKeywordForContent(keyword, pageable);
+        }
+        else if(searchType.equals("title")){
+            return  articleRepository.searchArticlesCategoryIsNoticeIsFalseAndKeywordForTitle(keyword, pageable);
+        }
+        return articleRepository.searchArticlesCategoryIsNoticeIsFalseAndKeywordForContentOrTitle(keyword, pageable);
+    }
+
+    public Page<Article> queryCategoryNotNull(Long category_id, String keyword, String searchType, Pageable pageable){
+        if(searchType.equals("content")){
+            return articleRepository.searchArticlesCategoryAndKeywordForContent(category_id, keyword, pageable);
+        }
+        else if(searchType.equals("title")){
+            return  articleRepository.searchArticlesCategoryAndKeywordForTitle(category_id, keyword, pageable);
+        }
+        return articleRepository.searchArticlesCategoryAndKeywordForContentOrTitle(category_id, keyword, pageable);
+    }
+
     public Category findCategoryByCategoryId(Long categoryId){
         return categoryRepository.findById(categoryId)
                 .orElseThrow( ()-> new NotFoundElementException(ExceptionMessage.CATEGORY_NOT_FOUND));

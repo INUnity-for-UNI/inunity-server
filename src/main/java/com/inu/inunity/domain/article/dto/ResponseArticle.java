@@ -25,6 +25,7 @@ public record ResponseArticle(
         Boolean isNotice,
         Integer likeNum,
         Boolean isLiked,
+        String url,
         LocalDateTime createAt,
         LocalDateTime updatedAt,
         Integer commentNum,
@@ -54,7 +55,7 @@ public record ResponseArticle(
                 .build();
     }
 
-    public static ResponseArticle ofNotice(Article article, Notice notice, Integer likeNum, Boolean isLiked, Integer commentNum,
+    public static ResponseArticle ofNotice(Article article, Notice notice, Integer likeNum, Boolean isLiked,Integer commentNum,
                                            List<ResponseComment> comments) {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate localDate = LocalDate.parse(notice.getDetail().getDate(), dateFormatter);
@@ -70,6 +71,7 @@ public record ResponseArticle(
                 .likeNum(likeNum)
                 .isLiked(isLiked)
                 .isNotice(true)
+                .url(notice.getUrl())
                 .createAt(localDate.atStartOfDay())
                 .updatedAt(localDate.atStartOfDay())
                 .commentNum(commentNum)

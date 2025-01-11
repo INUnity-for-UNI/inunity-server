@@ -15,6 +15,7 @@ public record ResponseArticleThumbnail(
         String nickname,
         String department,
         Boolean isAnonymous,
+        Long categoryId,
         Long articleId,
         String title,
         String content,
@@ -34,6 +35,7 @@ public record ResponseArticleThumbnail(
                 .nickname(article.getUser().getNickname())
                 .userImageUrl(article.getUser().getProfileImageUrl())
                 .isAnonymous(article.getIsAnonymous())
+                .categoryId(article.getCategory().getId())
                 .articleId(article.getId())
                 .title(article.getTitle())
                 .content(article.getContent())
@@ -51,6 +53,7 @@ public record ResponseArticleThumbnail(
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate localDate = LocalDate.parse(notice.getDetail().getDate(), dateFormatter);
         return ResponseArticleThumbnail.builder()
+                .categoryId(article.getCategory().getId())
                 .department(notice.getDepartment().getName())
                 .nickname(notice.getDetail().getAuthor())
                 .isAnonymous(article.getIsAnonymous())
