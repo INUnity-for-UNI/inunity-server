@@ -53,10 +53,20 @@ public class CommentService {
 
     public List<ResponseComment> getCommentsForUnLoginUser(Article article) {
         return article.getComments().stream()
-                .map(comment -> ResponseComment.of(comment, false,
-                        comment.getReplyComments().stream()
-                                .map(replyComment -> ResponseReplyComment.of(replyComment, false))
-                                .toList()))
+                .map(comment -> {
+                    if(comment.getIsDeleted()){
+                        return ResponseComment.ofDeleted(comment.getId(),
+                                comment.getReplyComments().stream()
+                                        .map(replyComment -> ResponseReplyComment.of(replyComment, false))
+                                        .toList());
+                    }
+                    else{
+                        return ResponseComment.of(comment, false,
+                                comment.getReplyComments().stream()
+                                        .map(replyComment -> ResponseReplyComment.of(replyComment, false))
+                                        .toList());
+                    }
+                })
                 .toList();
     }
 

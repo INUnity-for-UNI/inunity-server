@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inu.inunity.common.editorJS.EditorJSConverter;
 import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
+import com.inu.inunity.common.exception.NotOwnerException;
 import com.inu.inunity.domain.article.dto.RequestCreateArticle;
 import com.inu.inunity.domain.article.dto.RequestModifyArticle;
 import com.inu.inunity.domain.article.dto.ResponseArticle;
@@ -102,9 +103,13 @@ public class ArticleService {
      * @return Long 수정된 아티클의 게시글 번호
      */
     @Transactional
-    public Long modifyArticle(Long articleId, RequestModifyArticle requestModifyArticle) {
+    public Long modifyArticle(Long articleId, RequestModifyArticle requestModifyArticle, UserDetails userDetails) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ARTICLE_NOT_FOUND));
+        Long userId = ((CustomUserDetails) userDetails).getId();
+        if(!Objects.equals(article.getUser().getId(), userId)) {
+            throw new NotOwnerException(ExceptionMessage.NOT_AUTHORIZATION_ACCESS);
+        }
         article.modifyArticle(requestModifyArticle);
         return articleId;
     }
