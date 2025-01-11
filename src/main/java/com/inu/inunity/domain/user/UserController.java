@@ -42,4 +42,9 @@ public class UserController {
                                              Pageable pageable) {
         return CommonResponse.success("유저가 단 댓글목록 조회 성공", userService.getUserComments(userDetails));
     }
+
+    @GetMapping("/v1/users/information")
+    public CommonResponse<?> getUserId(@AuthenticationPrincipal UserDetails userDetails) {
+        return CommonResponse.success("유저의 아이디 조회 성공", userService.getUserIdAtUserDetails(userDetails));
+    }
 }

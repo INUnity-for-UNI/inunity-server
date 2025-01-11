@@ -50,4 +50,8 @@ public class UserService {
         User user = findUserById(userId);
         return articleService.getUserWroteComments(user);
     }
+
+    public Long getUserIdAtUserDetails(UserDetails userDetails){
+        return ((CustomUserDetails) userDetails).getId();
+    }
 }
