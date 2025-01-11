@@ -55,6 +55,7 @@ public class Comment extends BaseEntity {
         return Comment.builder()
                 .content(request.content())
                 .isAnonymous(request.isAnonymous())
+                .isDeleted(false)
                 .isInadequate(false)
                 .user(user)
                 .article(article)
