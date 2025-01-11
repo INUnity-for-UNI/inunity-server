@@ -2,6 +2,7 @@ package com.inu.inunity.domain.category;
 
 import com.inu.inunity.common.CommonResponse;
 import com.inu.inunity.domain.article.dto.ResponseArticleThumbnail;
+import com.inu.inunity.domain.articleReport.SearchType;
 import com.inu.inunity.domain.category.dto.RequestCreateCategory;
 import com.inu.inunity.domain.category.dto.ResponseCategory;
 import lombok.RequiredArgsConstructor;
@@ -55,9 +56,10 @@ public class CategoryController {
             @RequestParam("categoryName") String category_name,
             @RequestParam String icon,
             @RequestParam Boolean isActive,
+            @RequestParam Boolean isNotice,
             @RequestParam String description
     ) {
-        Long result = categoryService.updateCategory(category_id, category_name, description, icon, isActive);
+        Long result = categoryService.updateCategory(category_id, category_name, description, icon, isActive, isNotice);
         return CommonResponse.success("카테고리 이름 수정 완료", result);
     }
 
@@ -103,5 +105,22 @@ public class CategoryController {
     ) {
         Page<ResponseArticleThumbnail> result = categoryService.getArticles(category_id, userDetails, pageable);
         return CommonResponse.success("카테고리 내 아티클 목록 조회 완료", result);
+    }
+
+    @GetMapping("/v1/articles/search")
+    CommonResponse<Page<ResponseArticleThumbnail>> searchArticles(
+            @RequestParam(required = false) Long category_id,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "all") SearchType searchType,
+            @AuthenticationPrincipal UserDetails userDetails,
+            Pageable pageable
+    ) {
+        Page<ResponseArticleThumbnail> result = categoryService.getSearchArticles(category_id, keyword, searchType.name(), userDetails, pageable);
+        return CommonResponse.success("카테고리 내 아티클 목록 검색 완료", result);
+    }
+
+    @GetMapping("/v1/popular/articles")
+    CommonResponse<Page<ResponseArticleThumbnail>> getPopularArticles(@AuthenticationPrincipal UserDetails userDetails, Pageable pageable) {
+        return CommonResponse.success("게시글 인기 목록 검색 완료", categoryService.getPopularArticles(userDetails, pageable));
     }
 }

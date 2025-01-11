@@ -1,5 +1,6 @@
 package com.inu.inunity.domain.category;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
 import com.inu.inunity.domain.article.Article;
@@ -41,7 +42,8 @@ public class CategoryService {
                 .name(requestCreateCategory.name())
                 .description(requestCreateCategory.description())
                 .icon(requestCreateCategory.icon())
-                .isActive(true)
+                .isActive(requestCreateCategory.isActivity())
+                .isNotice(requestCreateCategory.isNotice())
                 .build();
         Category savedCategory = categoryRepository.save(newCategory);
         return savedCategory.getId();
@@ -62,6 +64,7 @@ public class CategoryService {
                 .description(category.getDescription())
                 .icon(category.getIcon())
                 .isActive(category.getIsActive())
+                .isNotice(category.getIsNotice())
                 .build()).toList();
     }
 
@@ -74,10 +77,10 @@ public class CategoryService {
      * @author 김원정
      */
     @Transactional
-    public Long updateCategory(Long categoryId, String category_name, String description, String icon, Boolean isActive) {
+    public Long updateCategory(Long categoryId, String category_name, String description, String icon, Boolean isActive, Boolean isNotice) {
         Category foundCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.CATEGORY_NOT_FOUND));
-        foundCategory.updateCategory(category_name, description, icon, isActive);
+        foundCategory.updateCategory(category_name, description, icon, isActive, isNotice);
         Category savedCategory = categoryRepository.save(foundCategory);
         return savedCategory.getId();
     }
@@ -110,7 +113,6 @@ public class CategoryService {
         categoryRepository.deleteById(category_id);
     }
 
-
     /**
      * 카테고리가 가지고 있는 아티클을 모두 보여주는 메서드
      *
@@ -120,13 +122,97 @@ public class CategoryService {
      */
     @Transactional(readOnly = true)
     public Page<ResponseArticleThumbnail> getArticles(Long category_id, UserDetails userDetails, Pageable pageable) {
-        Page<Article> pagingArticle = articleRepository.findAllByCategoryId(category_id, pageable);
+        Page<Article> pagingArticle = articleRepository.findAllByCategoryIdAndIsDeletedIsFalseOrderByUpdateAtDesc(category_id, pageable);
+        Category category = findCategoryByCategoryId(category_id);
 
+        if(category.getIsNotice()){
+            return getNoticeArticles(pagingArticle, userDetails);
+        }
+        return getNormalArticles(pagingArticle, userDetails);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ResponseArticleThumbnail> getSearchArticles(Long categoryId, String keyword, String searchType,
+                                                            UserDetails userDetails, Pageable pageable) {
+        Page<Article> articles = judgementQuery(categoryId, keyword, searchType, pageable);
+        return getNormalArticles(articles, userDetails);
+    }
+
+    public Page<Article> judgementQuery(Long categoryId, String keyword, String searchType, Pageable pageable){
+        if(categoryId != null){
+            return queryCategoryNotNull(categoryId, keyword, searchType, pageable);
+        }
+        else{
+            return queryCategoryNull(keyword, searchType, pageable);
+        }
+    }
+
+    public Page<Article> queryCategoryNull(String keyword, String searchType, Pageable pageable){
+        if(searchType.equals("content")){
+            return articleRepository.searchArticlesCategoryIsNoticeIsFalseAndKeywordForContent(keyword, pageable);
+        }
+        else if(searchType.equals("title")){
+            return  articleRepository.searchArticlesCategoryIsNoticeIsFalseAndKeywordForTitle(keyword, pageable);
+        }
+        return articleRepository.searchArticlesCategoryIsNoticeIsFalseAndKeywordForContentOrTitle(keyword, pageable);
+    }
+
+    public Page<Article> queryCategoryNotNull(Long category_id, String keyword, String searchType, Pageable pageable){
+        if(searchType.equals("content")){
+            return articleRepository.searchArticlesCategoryAndKeywordForContent(category_id, keyword, pageable);
+        }
+        else if(searchType.equals("title")){
+            return  articleRepository.searchArticlesCategoryAndKeywordForTitle(category_id, keyword, pageable);
+        }
+        return articleRepository.searchArticlesCategoryAndKeywordForContentOrTitle(category_id, keyword, pageable);
+    }
+
+    public Category findCategoryByCategoryId(Long categoryId){
+        return categoryRepository.findById(categoryId)
+                .orElseThrow( ()-> new NotFoundElementException(ExceptionMessage.CATEGORY_NOT_FOUND));
+    }
+
+    public Page<ResponseArticleThumbnail> getNoticeArticles(Page<Article> pagingArticle, UserDetails userDetails) {
         return pagingArticle.map(article -> {
             Boolean isLiked = articleLikeService.isLike(article.getId(), articleService.getUserIdAtUserDetails(userDetails));
             Integer likeNum = articleLikeService.getLikeNum(article);
             Integer commentNum = commentService.getCommentNum(article.getId());
-            return ResponseArticleThumbnail.of(article, likeNum, isLiked, commentNum);
+            try {
+                String content = articleService.getObject(article.getNotice().getDetail().getContent());
+                return ResponseArticleThumbnail.ofNotice(article, article.getNotice(), content, likeNum, isLiked, commentNum);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public Page<ResponseArticleThumbnail> getNormalArticles(Page<Article> pagingArticle, UserDetails userDetails) {
+        return pagingArticle.map(article -> {
+            Boolean isLiked = articleLikeService.isLike(article.getId(), articleService.getUserIdAtUserDetails(userDetails));
+            Integer likeNum = articleLikeService.getLikeNum(article);
+            Integer commentNum = commentService.getCommentNum(article.getId());
+            return ResponseArticleThumbnail.ofNormal(article, likeNum, isLiked, commentNum);
+        });
+    }
+
+    public Page<ResponseArticleThumbnail> getPopularArticles(UserDetails userDetails, Pageable pageable) {
+        Page<Article> articles = articleRepository.getPopularArticles(pageable);
+
+        return articles.map(article -> {
+            Boolean isLiked = articleLikeService.isLike(article.getId(), articleService.getUserIdAtUserDetails(userDetails));
+            Integer likeNum = articleLikeService.getLikeNum(article);
+            Integer commentNum = commentService.getCommentNum(article.getId());
+            if(article.getIsNotice()){
+                try {
+                    String content = articleService.getObject(article.getNotice().getDetail().getContent());
+                    return ResponseArticleThumbnail.ofNotice(article, article.getNotice(), content, likeNum, isLiked, commentNum);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            else{
+                return ResponseArticleThumbnail.ofNormal(article, likeNum, isLiked, commentNum);
+            }
         });
     }
 }

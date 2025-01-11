@@ -1,9 +1,12 @@
 package com.inu.inunity.domain.article.dto;
 
 import com.inu.inunity.domain.article.Article;
+import com.inu.inunity.domain.notice.Notice;
 import lombok.Builder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Builder
 public record ResponseArticleThumbnail(
@@ -12,6 +15,7 @@ public record ResponseArticleThumbnail(
         String nickname,
         String department,
         Boolean isAnonymous,
+        Long categoryId,
         Long articleId,
         String title,
         String content,
@@ -20,16 +24,18 @@ public record ResponseArticleThumbnail(
         Integer viewNum,
         Integer commentNum,
         Integer likeNum,
-        Boolean isLiked
+        Boolean isLiked,
+        Boolean isNotice
 ) {
 
-    public static ResponseArticleThumbnail of(Article article, Integer likeNum, Boolean isLiked, Integer commentNum){
+    public static ResponseArticleThumbnail ofNormal(Article article, Integer likeNum, Boolean isLiked, Integer commentNum){
         return ResponseArticleThumbnail.builder()
                 .userId(article.getUser().getId())
                 .department(article.getUser().getDepartment())
                 .nickname(article.getUser().getNickname())
                 .userImageUrl(article.getUser().getProfileImageUrl())
                 .isAnonymous(article.getIsAnonymous())
+                .categoryId(article.getCategory().getId())
                 .articleId(article.getId())
                 .title(article.getTitle())
                 .content(article.getContent())
@@ -39,6 +45,28 @@ public record ResponseArticleThumbnail(
                 .viewNum(article.getView())
                 .likeNum(likeNum)
                 .isLiked(isLiked)
+                .isNotice(false)
+                .build();
+    }
+
+    public static ResponseArticleThumbnail ofNotice(Article article, Notice notice, String content, Integer likeNum, Boolean isLiked, Integer commentNum){
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(notice.getDetail().getDate(), dateFormatter);
+        return ResponseArticleThumbnail.builder()
+                .categoryId(article.getCategory().getId())
+                .department(notice.getDepartment().getName())
+                .nickname(notice.getDetail().getAuthor())
+                .isAnonymous(article.getIsAnonymous())
+                .articleId(article.getId())
+                .title(notice.getTitle())
+                .content(content)
+                .commentNum(commentNum)
+                .createAt(localDate.atStartOfDay())
+                .updatedAt(localDate.atStartOfDay())
+                .viewNum(article.getView())
+                .likeNum(likeNum)
+                .isLiked(isLiked)
+                .isNotice(true)
                 .build();
     }
 }

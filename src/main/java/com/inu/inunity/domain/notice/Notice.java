@@ -1,5 +1,6 @@
 package com.inu.inunity.domain.notice;
 
+import com.inu.inunity.domain.article.Article;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -27,6 +28,10 @@ public class Notice {
 
     @Column(name = "url", nullable = false)
     private String url;
+
+    @OneToOne
+    @JoinColumn(name = "article_id", nullable = false)
+    private Article article;
 
     // 관계 설정: NoticeDetail과 1:1 구성 허용
     @OneToOne(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)

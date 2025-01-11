@@ -1,9 +1,11 @@
 package com.inu.inunity.domain.article;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inu.inunity.common.editorJS.EditorJSConverter;
 import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
+import com.inu.inunity.common.exception.NotOwnerException;
 import com.inu.inunity.domain.article.dto.RequestCreateArticle;
 import com.inu.inunity.domain.article.dto.RequestModifyArticle;
 import com.inu.inunity.domain.article.dto.ResponseArticle;
@@ -51,12 +53,17 @@ public class ArticleService {
      * @return Long 생성된 아티클의 게시글 번호
      */
     @Transactional
-    public Long createArticle(RequestCreateArticle requestCreateArticle, Long categoryId, Long userId) throws JsonProcessingException {
+    public Long createArticle(RequestCreateArticle requestCreateArticle, Long categoryId, Long userId) {
         Category foundCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.CONTRACT_NOT_FOUND));
+
+        if(foundCategory.getIsNotice()){
+            throw new NotOwnerException(ExceptionMessage.NOTICE_CATEGORY_CANNOT_WRITE);
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
-        Article article = Article.of(requestCreateArticle, 0, false, foundCategory, user);
+        Article article = Article.ofUser(requestCreateArticle, 0, false, foundCategory, user);
 
         articleRepository.save(article);
         return article.getId();
@@ -69,9 +76,10 @@ public class ArticleService {
      * @return responseArticle Record
      */
     @Transactional(readOnly = true)
-    public ResponseArticle getArticle(Long articleId, UserDetails userDetails) {
+    public ResponseArticle getArticle(Long articleId, UserDetails userDetails) throws JsonProcessingException {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ARTICLE_NOT_FOUND));
+
         if(article.getIsDeleted()){
             throw new NotFoundElementException(ExceptionMessage.ARTICLE_IS_DELETED);
         }
@@ -81,10 +89,15 @@ public class ArticleService {
         Integer likeNum = articleLikeService.getLikeNum(article);
         Boolean isLike = articleLikeService.isLike(articleId, userId);
         Integer commentNum = commentService.getCommentNum(articleId);
-        Boolean isOwner = Objects.equals(article.getUser().getId(), userId);
         List<ResponseComment> comments = commentService.getComments(article, userId);
 
-        return ResponseArticle.of(article, likeNum, isLike, isOwner, commentNum, comments);
+        if(article.getCategory().getIsNotice()) {
+            return ResponseArticle.ofNotice(article, article.getNotice(), likeNum, isLike, commentNum, comments);
+        }
+        else {
+            Boolean isOwner = Objects.equals(article.getUser().getId(), userId);
+            return ResponseArticle.ofNormal(article, likeNum, isLike, isOwner, commentNum, comments);
+        }
     }
 
     /**
@@ -95,9 +108,18 @@ public class ArticleService {
      * @return Long 수정된 아티클의 게시글 번호
      */
     @Transactional
-    public Long modifyArticle(Long articleId, RequestModifyArticle requestModifyArticle) {
+    public Long modifyArticle(Long articleId, RequestModifyArticle requestModifyArticle, UserDetails userDetails) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ARTICLE_NOT_FOUND));
+        Long userId = ((CustomUserDetails) userDetails).getId();
+
+        if(!Objects.equals(article.getUser().getId(), userId)) {
+            throw new NotOwnerException(ExceptionMessage.NOT_AUTHORIZATION_ACCESS);
+        }
+        if(article.getIsNotice()){
+            throw new NotOwnerException(ExceptionMessage.NOTICE_CANNOT_EDIT);
+        }
+
         article.modifyArticle(requestModifyArticle);
         return articleId;
     }
@@ -138,16 +160,16 @@ public class ArticleService {
 
         return articleLikes.map(articleLike -> {
                     Article article = articleLike.getArticle();
-                    return ResponseArticleThumbnail.of(article, articleLikeService.getLikeNum(article),
+                    return ResponseArticleThumbnail.ofNormal(article, articleLikeService.getLikeNum(article),
                             articleLikeService.isLike(article.getId(), userId), commentService.getCommentNum(article.getId()));
                 });
     }
 
     @Transactional(readOnly = true)
     public Page<ResponseArticleThumbnail> getUserWroteArticles(Long userId, Pageable pageable){
-        Page<Article> articles = articleRepository.findAllByUserIdAndIsDeletedIsFalse(userId, pageable);
+        Page<Article> articles = articleRepository.findAllByUserIdAndIsDeletedIsFalseOrderByUpdateAtDesc(userId, pageable);
 
-        return articles.map(article -> ResponseArticleThumbnail.of(article, articleLikeService.getLikeNum(article),
+        return articles.map(article -> ResponseArticleThumbnail.ofNormal(article, articleLikeService.getLikeNum(article),
                                 articleLikeService.isLike(article.getId(), userId), commentService.getCommentNum(article.getId())));
     }
 
@@ -180,5 +202,12 @@ public class ArticleService {
                                 })
                 ).sorted(Comparator.comparing(ResponseMyPageComment::createAt).reversed())
                 .toList();
+    }
+
+    public String getObject(String json) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        EditorJSConverter converter = new EditorJSConverter(objectMapper);
+
+        return converter.extractTextFromEditorJS(json);
     }
 }
