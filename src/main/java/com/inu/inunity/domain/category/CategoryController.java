@@ -118,4 +118,9 @@ public class CategoryController {
         Page<ResponseArticleThumbnail> result = categoryService.getSearchArticles(category_id, keyword, searchType.name(), userDetails, pageable);
         return CommonResponse.success("카테고리 내 아티클 목록 검색 완료", result);
     }
+
+    @GetMapping("/v1/popular/articles")
+    CommonResponse<Page<ResponseArticleThumbnail>> getPopularArticles(@AuthenticationPrincipal UserDetails userDetails, Pageable pageable) {
+        return CommonResponse.success("카테고리 내 아티클 목록 검색 완료", categoryService.getPopularArticles(userDetails, pageable));
+    }
 }

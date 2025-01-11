@@ -188,4 +188,20 @@ public class CategoryService {
             return ResponseArticleThumbnail.ofNormal(article, likeNum, isLiked, commentNum);
         });
     }
+
+    public Page<ResponseArticleThumbnail> getPopularArticles(UserDetails userDetails, Pageable pageable) {
+        Page<Article> articles = articleRepository.getPopularArticles(pageable);
+
+        return articles.map(article -> {
+            Boolean isLiked = articleLikeService.isLike(article.getId(), articleService.getUserIdAtUserDetails(userDetails));
+            Integer likeNum = articleLikeService.getLikeNum(article);
+            Integer commentNum = commentService.getCommentNum(article.getId());
+            if(article.getIsNotice()){
+                return ResponseArticleThumbnail.ofNotice(article, article.getNotice(), likeNum, isLiked, commentNum);
+            }
+            else{
+                return ResponseArticleThumbnail.ofNormal(article, likeNum, isLiked, commentNum);
+            }
+        });
+    }
 }
