@@ -4,6 +4,7 @@ import com.inu.inunity.domain.article.Article;
 import com.inu.inunity.domain.notice.Notice;
 import lombok.Builder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -47,7 +48,8 @@ public record ResponseArticleThumbnail(
     }
 
     public static ResponseArticleThumbnail ofNotice(Article article, Notice notice, Integer likeNum, Boolean isLiked, Integer commentNum){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(notice.getDetail().getDate(), dateFormatter);
         return ResponseArticleThumbnail.builder()
                 .department(notice.getDepartment().getName())
                 .nickname(notice.getDetail().getAuthor())
@@ -56,8 +58,8 @@ public record ResponseArticleThumbnail(
                 .title(notice.getTitle())
                 .content(notice.getDetail().getContent())
                 .commentNum(commentNum)
-                .createAt(LocalDateTime.parse(notice.getDetail().getDate(), formatter))
-                .updatedAt(LocalDateTime.parse(notice.getDetail().getDate(), formatter))
+                .createAt(localDate.atStartOfDay())
+                .updatedAt(localDate.atStartOfDay())
                 .viewNum(article.getView())
                 .likeNum(likeNum)
                 .isLiked(isLiked)
