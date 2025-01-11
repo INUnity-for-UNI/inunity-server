@@ -56,6 +56,11 @@ public class ArticleService {
     public Long createArticle(RequestCreateArticle requestCreateArticle, Long categoryId, Long userId) {
         Category foundCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.CONTRACT_NOT_FOUND));
+
+        if(foundCategory.getIsNotice()){
+            throw new NotOwnerException(ExceptionMessage.NOTICE_CATEGORY_CANNOT_WRITE);
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
         Article article = Article.ofUser(requestCreateArticle, 0, false, foundCategory, user);
@@ -107,9 +112,14 @@ public class ArticleService {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ARTICLE_NOT_FOUND));
         Long userId = ((CustomUserDetails) userDetails).getId();
+
         if(!Objects.equals(article.getUser().getId(), userId)) {
             throw new NotOwnerException(ExceptionMessage.NOT_AUTHORIZATION_ACCESS);
         }
+        if(article.getIsNotice()){
+            throw new NotOwnerException(ExceptionMessage.NOTICE_CANNOT_EDIT);
+        }
+
         article.modifyArticle(requestModifyArticle);
         return articleId;
     }
