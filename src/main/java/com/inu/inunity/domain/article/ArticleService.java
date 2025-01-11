@@ -157,7 +157,7 @@ public class ArticleService {
 
     @Transactional(readOnly = true)
     public Page<ResponseArticleThumbnail> getUserWroteArticles(Long userId, Pageable pageable){
-        Page<Article> articles = articleRepository.findAllByUserIdAndIsDeletedIsFalse(userId, pageable);
+        Page<Article> articles = articleRepository.findAllByUserIdAndIsDeletedIsFalseOrderByUpdateAtDesc(userId, pageable);
 
         return articles.map(article -> ResponseArticleThumbnail.ofNormal(article, articleLikeService.getLikeNum(article),
                                 articleLikeService.isLike(article.getId(), userId), commentService.getCommentNum(article.getId())));

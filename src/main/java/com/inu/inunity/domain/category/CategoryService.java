@@ -122,7 +122,7 @@ public class CategoryService {
      */
     @Transactional(readOnly = true)
     public Page<ResponseArticleThumbnail> getArticles(Long category_id, UserDetails userDetails, Pageable pageable) {
-        Page<Article> pagingArticle = articleRepository.findAllByCategoryIdAndIsDeletedIsFalse(category_id, pageable);
+        Page<Article> pagingArticle = articleRepository.findAllByCategoryIdAndIsDeletedIsFalseOrderByUpdateAtDesc(category_id, pageable);
         Category category = findCategoryByCategoryId(category_id);
 
         if(category.getIsNotice()){

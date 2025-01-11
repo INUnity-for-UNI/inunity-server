@@ -7,35 +7,41 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ArticleRepository extends JpaRepository<Article, Long> {
-    Page<Article> findAllByCategoryIdAndIsDeletedIsFalse(Long categoryId, Pageable pageable);
-    Page<Article> findAllByUserIdAndIsDeletedIsFalse(Long userId, Pageable pageable);
+    Page<Article> findAllByCategoryIdAndIsDeletedIsFalseOrderByUpdateAtDesc(Long categoryId, Pageable pageable);
+    Page<Article> findAllByUserIdAndIsDeletedIsFalseOrderByUpdateAtDesc(Long userId, Pageable pageable);
     @Query("SELECT a FROM Article a " +
             "WHERE a.category.id = :categoryId " +
             "AND (a.content LIKE %:keyword% OR a.title LIKE %:keyword%) " +
-            "AND a.isDeleted = false")
+            "AND a.isDeleted = false " +
+            "ORDER BY a.updateAt DESC")
     Page<Article> searchArticlesCategoryAndKeywordForContentOrTitle(@Param("categoryId") Long categoryId, @Param("keyword") String keyword, Pageable pageable);
     @Query("SELECT a FROM Article a " +
             "WHERE a.category.id = :categoryId " +
-            "AND (a.content LIKE %:keyword%) AND a.isDeleted = false")
+            "AND (a.content LIKE %:keyword%) AND a.isDeleted = false " +
+            "ORDER BY a.updateAt DESC")
     Page<Article> searchArticlesCategoryAndKeywordForContent(@Param("categoryId") Long categoryId, @Param("keyword") String keyword, Pageable pageable);
     @Query("SELECT a FROM Article a " +
             "WHERE a.category.id = :categoryId " +
-            "AND (a.title LIKE %:keyword%) AND a.isDeleted = false")
+            "AND (a.title LIKE %:keyword%) AND a.isDeleted = false " +
+            "ORDER BY a.updateAt DESC")
     Page<Article> searchArticlesCategoryAndKeywordForTitle(@Param("categoryId") Long categoryId, @Param("keyword") String keyword, Pageable pageable);
     @Query("SELECT a FROM Article a " +
             "WHERE a.category.isNotice = false " +
             "AND (a.content LIKE %:keyword% OR a.title LIKE %:keyword%) " +
-            "AND a.isDeleted = false")
+            "AND a.isDeleted = false " +
+            "ORDER BY a.updateAt DESC")
     Page<Article> searchArticlesCategoryIsNoticeIsFalseAndKeywordForContentOrTitle(@Param("keyword") String keyword, Pageable pageable);
     @Query("SELECT a FROM Article a " +
             "WHERE a.category.isNotice = false " +
             "AND (a.content LIKE %:keyword%) " +
-            "AND a.isDeleted = false")
+            "AND a.isDeleted = false " +
+            "ORDER BY a.updateAt DESC")
     Page<Article> searchArticlesCategoryIsNoticeIsFalseAndKeywordForContent(@Param("keyword") String keyword, Pageable pageable);
     @Query("SELECT a FROM Article a " +
             "WHERE a.category.isNotice = false " +
             "AND (a.title LIKE %:keyword%) " +
-            "AND a.isDeleted = false")
+            "AND a.isDeleted = false " +
+            "ORDER BY a.updateAt DESC")
     Page<Article> searchArticlesCategoryIsNoticeIsFalseAndKeywordForTitle(@Param("keyword") String keyword, Pageable pageable);
 
     @Query("SELECT a FROM Article a " +
