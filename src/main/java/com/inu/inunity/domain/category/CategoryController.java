@@ -121,6 +121,6 @@ public class CategoryController {
 
     @GetMapping("/v1/popular/articles")
     CommonResponse<Page<ResponseArticleThumbnail>> getPopularArticles(@AuthenticationPrincipal UserDetails userDetails, Pageable pageable) {
-        return CommonResponse.success("카테고리 내 아티클 목록 검색 완료", categoryService.getPopularArticles(userDetails, pageable));
+        return CommonResponse.success("게시글 인기 목록 검색 완료", categoryService.getPopularArticles(userDetails, pageable));
     }
 }
