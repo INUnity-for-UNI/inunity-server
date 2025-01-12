@@ -1,6 +1,6 @@
 package com.inu.inunity.domain.profile.skill;
 
-import com.inu.inunity.domain.User.User;
+import com.inu.inunity.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

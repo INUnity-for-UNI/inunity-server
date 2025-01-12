@@ -1,30 +1,48 @@
 package com.inu.inunity.domain.article;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.inu.inunity.common.editorJS.EditorJSConverter;
 import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
-import com.inu.inunity.domain.User.User;
-import com.inu.inunity.domain.User.UserRepository;
+import com.inu.inunity.common.exception.NotOwnerException;
 import com.inu.inunity.domain.article.dto.RequestCreateArticle;
 import com.inu.inunity.domain.article.dto.RequestModifyArticle;
 import com.inu.inunity.domain.article.dto.ResponseArticle;
+import com.inu.inunity.domain.article.dto.ResponseArticleThumbnail;
+import com.inu.inunity.domain.articleLike.ArticleLike;
+import com.inu.inunity.domain.articleLike.ArticleLikeService;
 import com.inu.inunity.domain.category.Category;
 import com.inu.inunity.domain.category.CategoryRepository;
+import com.inu.inunity.domain.comment.CommentService;
 import com.inu.inunity.domain.comment.dto.ResponseComment;
-import com.inu.inunity.util.communicate.CommunicateUtil;
+import com.inu.inunity.domain.comment.dto.ResponseMyPageComment;
+import com.inu.inunity.domain.user.User;
+import com.inu.inunity.domain.user.UserRepository;
+import com.inu.inunity.security.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ArticleService {
     private final ArticleRepository articleRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
-    private final CommunicateUtil communicateUtil;
+    private final ArticleLikeService articleLikeService;
+    private final CommentService commentService;
+    private final EditorJSConverter editorJSConverter;
 
     /**
      * 아티클을 생성하는 메서드
@@ -38,18 +56,14 @@ public class ArticleService {
     public Long createArticle(RequestCreateArticle requestCreateArticle, Long categoryId, Long userId) {
         Category foundCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.CONTRACT_NOT_FOUND));
-        User foundUser = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
 
-        Article article = Article.builder()
-                .title(communicateUtil.requestToCleanBot(requestCreateArticle.title()))
-                .content(communicateUtil.requestToCleanBot(requestCreateArticle.content()))
-                .isAnonymous(requestCreateArticle.isAnonymous())
-                .view(0)
-                .isDeleted(false)
-                .category(foundCategory)
-                .user(foundUser)
-                .build();
+        if(foundCategory.getIsNotice()){
+            throw new NotOwnerException(ExceptionMessage.NOTICE_CATEGORY_CANNOT_WRITE);
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
+        Article article = Article.ofUser(requestCreateArticle, 0, false, foundCategory, user);
 
         articleRepository.save(article);
         return article.getId();
@@ -58,24 +72,32 @@ public class ArticleService {
     /**
      * 아티클 단 건 조회 메서드
      * @author 김원정
-     * @param article_id 아티클 ID
+     * @param articleId 아티클 ID
      * @return responseArticle Record
      */
     @Transactional(readOnly = true)
-    public ResponseArticle getArticle(Long article_id) {
-        Article foundArticle = articleRepository.findById(article_id)
+    public ResponseArticle getArticle(Long articleId, UserDetails userDetails) throws JsonProcessingException {
+        Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ARTICLE_NOT_FOUND));
-        foundArticle.increaseView();
-        Article savedArticle = articleRepository.save(foundArticle);
 
-        //todo: 새 이슈에서 해당 기능 구현. 프론트와의 빠른 협업을 위해 mock 삽입 후 배포.
-        Integer likeNum = 0;
-        Boolean isLike = false;
-        Integer commentNum = 0;
-        Boolean isOwner = false;
-        List<ResponseComment> comments = new ArrayList<>();
+        if(article.getIsDeleted()){
+            throw new NotFoundElementException(ExceptionMessage.ARTICLE_IS_DELETED);
+        }
 
-        return ResponseArticle.of(savedArticle, likeNum, isLike, isOwner, commentNum, comments);
+        article.increaseView();
+        Long userId = getUserIdAtUserDetails(userDetails);
+        Integer likeNum = articleLikeService.getLikeNum(article);
+        Boolean isLike = articleLikeService.isLike(articleId, userId);
+        Integer commentNum = commentService.getCommentNum(articleId);
+        List<ResponseComment> comments = commentService.getComments(article, userId);
+
+        if(article.getCategory().getIsNotice()) {
+            return ResponseArticle.ofNotice(article, article.getNotice(), likeNum, isLike, commentNum, comments);
+        }
+        else {
+            Boolean isOwner = Objects.equals(article.getUser().getId(), userId);
+            return ResponseArticle.ofNormal(article, likeNum, isLike, isOwner, commentNum, comments);
+        }
     }
 
     /**
@@ -86,9 +108,18 @@ public class ArticleService {
      * @return Long 수정된 아티클의 게시글 번호
      */
     @Transactional
-    public Long modifyArticle(Long articleId, RequestModifyArticle requestModifyArticle) {
+    public Long modifyArticle(Long articleId, RequestModifyArticle requestModifyArticle, UserDetails userDetails) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ARTICLE_NOT_FOUND));
+        Long userId = ((CustomUserDetails) userDetails).getId();
+
+        if(!Objects.equals(article.getUser().getId(), userId)) {
+            throw new NotOwnerException(ExceptionMessage.NOT_AUTHORIZATION_ACCESS);
+        }
+        if(article.getIsNotice()){
+            throw new NotOwnerException(ExceptionMessage.NOTICE_CANNOT_EDIT);
+        }
+
         article.modifyArticle(requestModifyArticle);
         return articleId;
     }
@@ -100,7 +131,83 @@ public class ArticleService {
      */
     @Transactional
     public void deleteArticle(Long articleId) {
-        articleRepository.deleteById(articleId);
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ARTICLE_NOT_FOUND));
+        article.deleteArticle();
     }
 
+    public Long getUserIdAtUserDetails(UserDetails userDetails){
+        if(userDetails == null){
+            return null;
+        }else{
+            return ((CustomUserDetails) userDetails).getId();
+        }
+    }
+
+    public Integer pushArticleLike(Long articleId, UserDetails userDetails){
+        Long userId = ((CustomUserDetails) userDetails).getId();
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ARTICLE_NOT_FOUND));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
+
+        return articleLikeService.toggleLike(article, user);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ResponseArticleThumbnail> getUserLikedArticles(Long userId, Pageable pageable){
+        Page<ArticleLike> articleLikes = articleLikeService.getUserLikePost(userId, pageable);
+
+        return articleLikes.map(articleLike -> {
+                    Article article = articleLike.getArticle();
+                    return ResponseArticleThumbnail.ofNormal(article, articleLikeService.getLikeNum(article),
+                            articleLikeService.isLike(article.getId(), userId), commentService.getCommentNum(article.getId()));
+                });
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ResponseArticleThumbnail> getUserWroteArticles(Long userId, Pageable pageable){
+        Page<Article> articles = articleRepository.findAllByUserIdAndIsDeletedIsFalseOrderByUpdateAtDesc(userId, pageable);
+
+        return articles.map(article -> ResponseArticleThumbnail.ofNormal(article, articleLikeService.getLikeNum(article),
+                                articleLikeService.isLike(article.getId(), userId), commentService.getCommentNum(article.getId())));
+    }
+
+    @Transactional(readOnly = true)
+    public List<ResponseMyPageComment> getUserWroteComments(User user){
+        return Stream.concat(
+                        user.getComments().stream()
+                                .filter(comment -> !comment.getIsDeleted())
+                                .map(comment -> {
+                                    Article article = comment.getArticle();
+                                    return ResponseMyPageComment.of(
+                                            article.getId(),
+                                            article.getTitle(),
+                                            comment.getId(),
+                                            comment.getContent(),
+                                            comment.getCreateAt()
+                                    );
+                                }),
+                        user.getReplyComments().stream()
+                                .filter(replyComment -> !replyComment.getIsDeleted())
+                                .map(replyComment -> {
+                                    Article article = replyComment.getComment().getArticle();
+                                    return ResponseMyPageComment.of(
+                                            article.getId(),
+                                            article.getTitle(),
+                                            replyComment.getId(),
+                                            replyComment.getContent(),
+                                            replyComment.getCreateAt()
+                                    );
+                                })
+                ).sorted(Comparator.comparing(ResponseMyPageComment::createAt).reversed())
+                .toList();
+    }
+
+    public String getObject(String json) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        EditorJSConverter converter = new EditorJSConverter(objectMapper);
+
+        return converter.extractTextFromEditorJS(json);
+    }
 }

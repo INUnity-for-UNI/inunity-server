@@ -5,6 +5,9 @@ import lombok.Builder;
 @Builder
 public record RequestCreateCategory(
     String name,
-    String description
+    String description,
+    String icon,
+    Boolean isActivity,
+    Boolean isNotice
 ) {
 }

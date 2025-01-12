@@ -26,8 +26,16 @@ public enum ExceptionMessage {
     CATEGORY_NOT_FOUND("카테고리를 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
     ARTICLE_NOT_FOUND("아티클을 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
     COMMENT_NOT_FOUND("댓글을 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
+    ARTICLE_LIKE_NOT_FOUND("유저가 좋아요를 누른 기록을 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
+    ARTICLE_IS_DELETED("삭제된 게시글입니다.", 0, HttpStatus.NOT_FOUND),
+    IMAGE_UPLOAD_FAILED("이미지서버 업로드에 실패했습니다.", 0, HttpStatus.BAD_REQUEST),
+    IMAGE_UPLOAD_FAILED_UNDEFINED("이미지서버가 불안정합니다.", 0, HttpStatus.BAD_REQUEST),
+    NOT_AUTHORIZATION_ACCESS("허가되지 않은 접근입니다.", 0, HttpStatus.UNAUTHORIZED),
+    PORTFOLIO_NOT_FOUND("포트폴리오를 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
+    EDITOR_JS_CONVERT_FAILED("변환하다가 오류났지요~ 서버에 문의하세요~", 0, HttpStatus.BAD_REQUEST),
+    NOTICE_CANNOT_EDIT("공지는 수정/생성 할수없어요", 0, HttpStatus.BAD_REQUEST),
+    NOTICE_CATEGORY_CANNOT_WRITE("공지 카테고리에는 일반인이 글을 쓸 수 없어요", 0, HttpStatus.BAD_REQUEST)
     ;
-
 
     private final String message;
 

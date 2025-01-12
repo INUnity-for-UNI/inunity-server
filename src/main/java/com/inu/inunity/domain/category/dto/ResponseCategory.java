@@ -5,7 +5,9 @@ import lombok.Builder;
 public record ResponseCategory(
         Long id,
         String name,
+        String icon,
         String description,
-        Boolean isActive
+        Boolean isActive,
+        Boolean isNotice
 ) {
 }

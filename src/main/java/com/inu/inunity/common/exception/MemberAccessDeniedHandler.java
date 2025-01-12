@@ -20,7 +20,7 @@ public class MemberAccessDeniedHandler implements AccessDeniedHandler {
         ObjectMapper objectMapper = new ObjectMapper();
         log.info("[ClientAccessDeniedException] 접근 권한이 없습니다.");
 
-        CommonResponse commonResponse = new CommonResponse(0, null, null);
+        CommonResponse commonResponse = new CommonResponse(0, exception.getMessage(), null);
 
 
         response.setStatus(403);

@@ -45,4 +45,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("[handlePortalLoginException] {}", ex.getMessage());
         return ResponseEntity.status(status).body(CommonResponse.error(status, ex.getMessage(), null));
     }
+
+    @ExceptionHandler(value = ImageServerException.class)
+    public ResponseEntity<CommonResponse> handleImageServerException(ImageServerException ex) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        log.error("[handleImageServerException] {}", ex.getMessage());
+        return ResponseEntity.status(status).body(CommonResponse.error(status, ex.getMessage(), null));
+    }
+
+    @ExceptionHandler(value = EditorJSConvertException.class)
+    public ResponseEntity<CommonResponse> handleEditorJSConvertException(EditorJSConvertException ex) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        log.error("[handleEditorJSConvertException] {}", ex.getMessage());
+        return ResponseEntity.status(status).body(CommonResponse.error(status, ex.getMessage(), null));
+    }
 }

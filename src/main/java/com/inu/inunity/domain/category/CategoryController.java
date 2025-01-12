@@ -2,11 +2,14 @@ package com.inu.inunity.domain.category;
 
 import com.inu.inunity.common.CommonResponse;
 import com.inu.inunity.domain.article.dto.ResponseArticleThumbnail;
+import com.inu.inunity.domain.articleReport.SearchType;
 import com.inu.inunity.domain.category.dto.RequestCreateCategory;
 import com.inu.inunity.domain.category.dto.ResponseCategory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,12 +50,16 @@ public class CategoryController {
      * @param category_name @RequestParam 바뀔 Category 이름
      * @return CommonResponse에 감싸진 Long Category ID
      */
-    @PutMapping("/v1/categories/{category-id}/name")
+    @PutMapping("/v1/categories/{category-id}")
     CommonResponse<Long> updateCategoryName(
             @PathVariable("category-id") Long category_id,
-            @RequestParam("categoryName") String category_name
+            @RequestParam("categoryName") String category_name,
+            @RequestParam String icon,
+            @RequestParam Boolean isActive,
+            @RequestParam Boolean isNotice,
+            @RequestParam String description
     ) {
-        Long result = categoryService.editCategoryName(category_id, category_name);
+        Long result = categoryService.updateCategory(category_id, category_name, description, icon, isActive, isNotice);
         return CommonResponse.success("카테고리 이름 수정 완료", result);
     }
 
@@ -93,9 +100,27 @@ public class CategoryController {
     @GetMapping("/v1/categories/{category_id}/articles")
     CommonResponse<Page<ResponseArticleThumbnail>> getArticlesByCategory(
             @PathVariable("category_id") Long category_id,
+            @AuthenticationPrincipal UserDetails userDetails,
             Pageable pageable
     ) {
-        Page<ResponseArticleThumbnail> result = categoryService.getArticles(category_id, pageable);
+        Page<ResponseArticleThumbnail> result = categoryService.getArticles(category_id, userDetails, pageable);
         return CommonResponse.success("카테고리 내 아티클 목록 조회 완료", result);
+    }
+
+    @GetMapping("/v1/articles/search")
+    CommonResponse<Page<ResponseArticleThumbnail>> searchArticles(
+            @RequestParam(required = false) Long category_id,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "all") SearchType searchType,
+            @AuthenticationPrincipal UserDetails userDetails,
+            Pageable pageable
+    ) {
+        Page<ResponseArticleThumbnail> result = categoryService.getSearchArticles(category_id, keyword, searchType.name(), userDetails, pageable);
+        return CommonResponse.success("카테고리 내 아티클 목록 검색 완료", result);
+    }
+
+    @GetMapping("/v1/popular/articles")
+    CommonResponse<Page<ResponseArticleThumbnail>> getPopularArticles(@AuthenticationPrincipal UserDetails userDetails, Pageable pageable) {
+        return CommonResponse.success("게시글 인기 목록 검색 완료", categoryService.getPopularArticles(userDetails, pageable));
     }
 }
