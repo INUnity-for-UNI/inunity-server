@@ -46,8 +46,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             requestAttributeSecurityContextRepository.saveContext(SecurityContextHolder.getContext(), servletRequest, servletResponse);
             log.info("[doFilterInternal] 토큰 값 검증 완료.git");
         }
-
         filterChain.doFilter(servletRequest, servletResponse);
     }
-
 }

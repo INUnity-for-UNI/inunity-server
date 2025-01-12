@@ -161,7 +161,7 @@ public class JwtProvider {
                 .secure(true)
                 .path("/")
                 .sameSite("None")
-                .maxAge(3600)
+                .maxAge(accessTokenValidTime)
                 .build();
 
         // Refresh Token 쿠키
@@ -170,7 +170,7 @@ public class JwtProvider {
                 .secure(true)
                 .path("/")
                 .sameSite("None")
-                .maxAge(86400)
+                .maxAge(refreshTokenValidTime)
                 .build();
 
         // 응답에 쿠키 추가

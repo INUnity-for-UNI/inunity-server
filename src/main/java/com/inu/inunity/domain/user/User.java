@@ -105,6 +105,10 @@ public class User extends BaseEntity {
         return this;
     }
 
+    public void updateAuthenticationForAdmin(List<Role> roles){
+        this.roles = roles;
+    }
+
     public void setUser(String name, String nickname, LocalDate graduateDate, Boolean isGraduation){
         this.name = name;
         this.nickname = nickname;
