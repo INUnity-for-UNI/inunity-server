@@ -1,5 +1,6 @@
 package com.inu.inunity.security.config;
 
+import com.inu.inunity.common.exception.JwtExceptionHandlerFilter;
 import com.inu.inunity.security.jwt.JwtAuthFilter;
 import com.inu.inunity.security.jwt.JwtProvider;
 import com.inu.inunity.security.oauth.CustomAuthorizationRequestResolver;
@@ -9,6 +10,7 @@ import com.inu.inunity.security.oauth.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
@@ -60,8 +62,14 @@ public class SecurityConfig {
                         sessionManagement
                                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("**/**").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers(PERMIT_ALL).permitAll()
+                        .requestMatchers(HttpMethod.GET, PERMIT_GET).permitAll()
+                        .requestMatchers(PERMIT_TEST_USER).hasAnyRole("TEST", "USER")
+                        .requestMatchers(HttpMethod.GET, PERMIT_USER_GET).hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, PERMIT_USER_POST).hasRole("USER")
+                        .requestMatchers(HttpMethod.PUT, PERMIT_USER_PUT).hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, PERMIT_USER_DELETE).hasRole("USER")
+                        .anyRequest().hasRole("ADMIN")
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(endpoint -> endpoint
@@ -72,6 +80,8 @@ public class SecurityConfig {
                         )
                         .failureHandler(oauth2FailHandler)
                         .successHandler(oAuth2SuccessHandler))
+                .addFilterBefore(new JwtExceptionHandlerFilter(),
+                        UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtAuthFilter(jwtProvider),
                         UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer
@@ -95,4 +105,75 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration); // 모든 경로에 대해 설정 적용
         return source;
     }
+
+    String[] PERMIT_ALL = {
+            "/oauth2/**", //oauth2 로그인 서비스 접근
+            "/login/**", //oauth2 로그인창
+            "/swagger-ui/**", //스웨거 명세
+            "/v3/api-docs/**", //스웨거 명세
+            "/v1/auth/register",
+            "/v1/auth/login",
+            "/v1/users/admin"
+    };
+
+    String[] PERMIT_GET = {
+            "/v1/categories",
+            "/v1/popular/articles",
+            "/v1/categories/{category_id}/articles",
+            "/v1/articles/search",
+            "/v1/articles/{article_id}",
+            "/v1/users/{userid}/profile",
+            "/v1/users/{userid}/profile/skill",
+            "/v1/users/{userid}/profile/portfolio",
+            "/v1/users/{userid}/profile/career"
+    };
+
+    String[] PERMIT_TEST_USER = {
+            "/v1/user",
+            "/v1/auth/test",
+            "/v1/minio/upload"
+    };
+
+    String[] PERMIT_USER_GET = {
+            "/v1/users/information",
+            "/v1/users/comments",
+            "/v1/users/articles/wrote",
+            "/v1/users/articles/like"
+    };
+
+    String[] PERMIT_USER_POST = {
+            "/v1/replycomment",
+            "/v1/articles/{articleid}/comment",
+            "/v1/users/{userid}/profile/skill",
+            "/v1/users/{userid}/profile/portfolio",
+            "/users/{userid}/profile/career"
+    };
+
+    String[] PERMIT_USER_PUT = {
+            "/v1/replycomment",
+            "/v1/articles/comment",
+            "/v1/articles/{articleid}",
+            "/v1/users/{userid}/profile",
+            "/v1/users/{userid}/profile/skill",
+            "/v1/users/{userid}/profile/portfolio",
+            "/v1/users/{userid}/profile/career"
+    };
+
+    String[] PERMIT_USER_PATCH = {
+    };
+
+    String[] PERMIT_USER_DELETE = {
+            "/v1/replyment/{replymentid}",
+            "/v1/comment/{commentid}",
+            "/v1/articles/{article_id}/like",
+            "/v1/users/{userid}/profile/skill/{skillId}",
+            "/v1/users/{userid}/profile/portfolio/{portfolioId}",
+            "/v1/users/{userid}/profile/career/{careerId}"
+    };
+
+    String[] PERMIT_ADMIN = {
+            "/v1/categories/{category-id}",
+            "/v1/categories/status",
+            "/v1/categories/{category_id}"
+    };
 }

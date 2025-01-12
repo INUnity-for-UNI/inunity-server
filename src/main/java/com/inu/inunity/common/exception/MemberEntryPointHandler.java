@@ -23,7 +23,6 @@ public class MemberEntryPointHandler implements AuthenticationEntryPoint {
 
         CommonResponse commonResponse = new CommonResponse(0, ex.getMessage(), null);
 
-        response.setStatus(401);
         response.setContentType("application/json");
         response.setCharacterEncoding("utf-8");
 

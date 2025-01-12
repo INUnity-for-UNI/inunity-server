@@ -28,6 +28,7 @@ public class Article extends BaseEntity {
 
     private String title;
 
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     private Integer view;
@@ -82,7 +83,7 @@ public class Article extends BaseEntity {
                 .isAnonymous(request.isAnonymous())
                 .view(view)
                 .isDeleted(isDeleted)
-                //todo: fastApi 연결 성공하면 이걸로 상태변경시키기
+                //todo: fastApi 연결 성공하면 상태변경시키기
                 .isInadequate(false)
                 .isNotice(false)
                 .category(category)
