@@ -51,6 +51,6 @@ public class UserController {
 
     @GetMapping("/v1/users/information")
     public CommonResponse<?> getUserId(@AuthenticationPrincipal UserDetails userDetails) {
-        return CommonResponse.success("유저의 아이디 조회 성공", userService.getUserIdAtUserDetails(userDetails));
+        return CommonResponse.success("유저의 아이디 조회 성공", userService.getUserAtUserDetails(userDetails));
     }
 }
