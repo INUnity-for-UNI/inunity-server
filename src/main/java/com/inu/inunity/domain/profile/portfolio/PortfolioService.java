@@ -23,13 +23,13 @@ public class PortfolioService {
     public List<ResponsePortfolio> getPortfolios(User user){
         return user.getPortfolios().stream()
                 .sorted(Comparator.comparing(Portfolio::getStartDate))
-                .map(portfolio-> ResponsePortfolio.of(portfolio.getId(), portfolio.getUrl(), portfolio.getStartDate(), portfolio.getEndDate()))
+                .map(portfolio-> ResponsePortfolio.of(portfolio.getId(), portfolio.getTitle(), portfolio.getUrl(), portfolio.getStartDate(), portfolio.getEndDate()))
                 .toList();
     }
 
     @Transactional
     public void createPortfolio(RequestCreatePortfolio requestCreatePortfolio, User user){
-        Portfolio portfolio = Portfolio.of(requestCreatePortfolio.url(), requestCreatePortfolio.startDate(),
+        Portfolio portfolio = Portfolio.of(requestCreatePortfolio.title(), requestCreatePortfolio.url(), requestCreatePortfolio.startDate(),
                 requestCreatePortfolio.endDate(), user);
 
         portfolioRepository.save(portfolio);
@@ -40,7 +40,7 @@ public class PortfolioService {
         Portfolio portfolio = portfolioRepository.findById(requestUpdatePortfolio.portfolioId())
                 .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.PORTFOLIO_NOT_FOUND));
 
-        portfolio.update(requestUpdatePortfolio.url(), requestUpdatePortfolio.startDate(), requestUpdatePortfolio.endDate());
+        portfolio.update(requestUpdatePortfolio.title(), requestUpdatePortfolio.url(), requestUpdatePortfolio.startDate(), requestUpdatePortfolio.endDate());
     }
 
     @Transactional
