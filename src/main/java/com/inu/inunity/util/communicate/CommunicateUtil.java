@@ -1,6 +1,7 @@
 package com.inu.inunity.util.communicate;
 
 import com.inu.inunity.util.communicate.dto.ResponseCleanBot;
+import com.inu.inunity.util.communicate.dto.ResponseSummaryNotice;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -29,4 +30,16 @@ public class CommunicateUtil {
                 .body(ResponseCleanBot.class);
         return Objects.requireNonNull(result).isBinary_class();
     }
+
+    public String requestToSummaryBot(String text) {
+        Map<String, String> requestBody = Map.of("text", text);
+        ResponseSummaryNotice result = restClientForAI.post()
+                .uri("/summaryBot")
+                .body(requestBody)
+                .retrieve()
+                .body(ResponseSummaryNotice.class);
+        return result.getSummary();
+    }
+
+
 }

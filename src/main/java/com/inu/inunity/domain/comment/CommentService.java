@@ -11,6 +11,7 @@ import com.inu.inunity.domain.comment.dto.ResponseReplyComment;
 import com.inu.inunity.domain.comment.replyComment.ReplyCommentService;
 import com.inu.inunity.domain.user.User;
 import com.inu.inunity.domain.user.UserRepository;
+import com.inu.inunity.util.communicate.CommunicateUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ public class CommentService {
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
     private final ReplyCommentService replyCommentService;
+    private final CommunicateUtil communicateUtil;
 
     @Transactional(readOnly = true)
     public List<ResponseComment> getComments(Article article, Long userId){
@@ -88,7 +90,8 @@ public class CommentService {
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ARTICLE_NOT_FOUND));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
-        Comment comment = Comment.of(requestCreateComment, user, article);
+        Boolean isInadequate = communicateUtil.requestToCleanBot(requestCreateComment.content());
+        Comment comment = Comment.of(requestCreateComment, user, article, isInadequate);
 
         commentRepository.save(comment);
         return articleId;
@@ -104,7 +107,8 @@ public class CommentService {
     public Long updateComment(RequestUpdateComment requestUpdateComment) {
         Comment comment = commentRepository.findById(requestUpdateComment.commentId())
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.COMMENT_NOT_FOUND));
-        comment.modifyComment(requestUpdateComment);
+        Boolean isInadequate = communicateUtil.requestToCleanBot(requestUpdateComment.content());
+        comment.modifyComment(requestUpdateComment, isInadequate);
         return comment.getId();
     }
 
