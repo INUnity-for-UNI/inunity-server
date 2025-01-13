@@ -7,6 +7,7 @@ import java.util.List;
 
 public record RequestUpdateProfile(
         String nickname,
+        String description,
         LocalDate graduateDate,
         Boolean isGraduation,
         Boolean isAnonymous,
