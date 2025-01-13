@@ -10,6 +10,7 @@ import java.util.List;
 @Builder
 public record ResponseProfile(
         String nickname,
+        String description,
         LocalDate graduateDate,
         Boolean isGraduation,
         Boolean isAnonymous,
@@ -22,6 +23,7 @@ public record ResponseProfile(
     public static ResponseProfile of(User user, List<ResponseContract> contracts, Boolean isOwner) {
         return ResponseProfile.builder()
                 .nickname(user.getNickname())
+                .description(user.getDescription())
                 .graduateDate(user.getGraduateDate())
                 .isGraduation(user.getIsGraduation())
                 .isAnonymous(user.getIsAnonymous())
