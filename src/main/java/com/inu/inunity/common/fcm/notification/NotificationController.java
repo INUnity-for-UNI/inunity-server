@@ -21,7 +21,7 @@ public class NotificationController {
     }
 
     @PutMapping("/v1/notification/{notificationid}")
-    public void markNotificationAsRead(@PathVariable Long notificationid, UserDetails userDetails) {
+    public void markNotificationAsRead(@PathVariable Long notificationid, @AuthenticationPrincipal UserDetails userDetails) {
         notificationService.updateRead(notificationid, userDetails);
     }
 }
