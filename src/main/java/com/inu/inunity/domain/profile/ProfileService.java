@@ -39,6 +39,7 @@ public class ProfileService {
     private final PortfolioService portfolioService;
     private final SkillService skillService;
 
+    @Transactional
     public ResponseProfile getProfile(Long userId, UserDetails userDetails){
         User user = userService.findUserById(userId);
         Boolean isOwner =isOwner(userId, userDetails);
@@ -51,69 +52,81 @@ public class ProfileService {
         Long userId = ((CustomUserDetails) userDetails).getId();
         User user = userService.findUserById(userId);
 
-        user.updateUserProfile(requestUpdateProfile.nickname(), requestUpdateProfile.graduateDate(), requestUpdateProfile.isGraduation(),
+        user.updateUserProfile(requestUpdateProfile.nickname(), requestUpdateProfile.description(), requestUpdateProfile.graduateDate(), requestUpdateProfile.isGraduation(), requestUpdateProfile.profileImageUrl(),
                 requestUpdateProfile.isAnonymous(), requestUpdateProfile.organization(), requestUpdateProfile.job());
         contractService.updateContracts(requestUpdateProfile.contracts(), user);
     }
 
+    @Transactional
     public void createCareer(RequestCreateCareer requestCreateCareer, Long userId, UserDetails userDetails){
         checkOwner(userId, userDetails);
         User user = userService.findUserById(userId);
         careerService.createCareer(requestCreateCareer, user);
     }
 
+    @Transactional
     public List<ResponseCareer> getCareers(Long userId){
         User user = userService.findUserById(userId);
         return careerService.getCareers(user);
     }
 
+    @Transactional
     public void updateCareer(RequestUpdateCareer requestUpdateCareer, Long userId, UserDetails userDetails){
         checkOwner(userId, userDetails);
         careerService.updateCareer(requestUpdateCareer);
     }
 
+    @Transactional
     public void deleteCareer(Long careerId, Long userId, UserDetails userDetails){
         checkOwner(userId, userDetails);
         careerService.deleteCareer(careerId);
     }
 
+    @Transactional
     public void createPortfolio(RequestCreatePortfolio requestCreatePortfolio, Long userId, UserDetails userDetails) {
         checkOwner(userId, userDetails);
         User user = userService.findUserById(userId);
         portfolioService.createPortfolio(requestCreatePortfolio, user);
     }
 
+    @Transactional
     public List<ResponsePortfolio> getPortfolios(Long userId) {
         User user = userService.findUserById(userId);
         return portfolioService.getPortfolios(user);
     }
 
+    @Transactional
     public void updatePortfolio(RequestUpdatePortfolio requestUpdatePortfolio, Long userId, UserDetails userDetails) {
         checkOwner(userId, userDetails);
         portfolioService.updatePortfolio(requestUpdatePortfolio);
     }
 
+    @Transactional
     public void deletePortfolio(Long portfolioId, Long userId, UserDetails userDetails) {
         checkOwner(userId, userDetails);
         portfolioService.deletePortfolio(portfolioId);
     }
 
+    @Transactional
     public void createSkill(RequestCreateSkill requestCreateSkill, Long userId, UserDetails userDetails) {
         checkOwner(userId, userDetails);
         User user = userService.findUserById(userId);
         skillService.createSkill(requestCreateSkill, user);
     }
 
+    @Transactional
     public List<ResponseSkill> getSkills(Long userId) {
         User user = userService.findUserById(userId);
         return skillService.getSkills(user);
     }
 
+    @Transactional
     public void updateSkill(RequestUpdateSkill requestUpdateSkill, Long userId, UserDetails userDetails) {
         checkOwner(userId, userDetails);
         skillService.updateSkill(requestUpdateSkill);
     }
 
+    @Transactional
     public void deleteSkill(Long skillId, Long userId, UserDetails userDetails) {
         Long userTokenId = ((CustomUserDetails) userDetails).getId();
         checkOwner(userId, userDetails);

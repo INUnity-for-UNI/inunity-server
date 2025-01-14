@@ -129,9 +129,11 @@ public class User extends BaseEntity {
         this.isAnonymous = true;
     }
 
-    public void updateUserProfile(String nickname, LocalDate graduateDate, Boolean isGraduation,
+    public void updateUserProfile(String nickname, String description, LocalDate graduateDate, Boolean isGraduation, String profileImageUrl,
                            Boolean isAnonymous, String organization, String job){
         this.nickname = nickname;
+        this.description = description;
+        this.profileImageUrl = profileImageUrl;
         this.graduateDate = graduateDate;
         this.isGraduation = isGraduation;
         this.isAnonymous = isAnonymous;
