@@ -13,6 +13,12 @@ java {
     }
 }
 
+processResources {
+    from("src/main/resources") {
+        include "fcm-service.json"
+    }
+}
+
 repositories {
     mavenCentral()
 }
