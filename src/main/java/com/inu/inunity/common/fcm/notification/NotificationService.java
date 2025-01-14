@@ -29,10 +29,7 @@ public class NotificationService {
     public void createNotification(User user, NotificationType type, Long categoryId, Long articleId, String title, String content, boolean push, List<FcmToken> token) {
         Notification notification = Notification.of(type, categoryId, articleId, title, content, push, false, user);
         notificationRepository.save(notification);
-
-        if (push && !token.isEmpty()) {
-            fcmTokenService.sendMessage(notification);
-        }
+        fcmTokenService.sendMessage(notification);
     }
 
     @Transactional
