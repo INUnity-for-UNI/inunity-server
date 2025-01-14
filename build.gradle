@@ -16,7 +16,7 @@ java {
 processResources {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from("src/main/resources") {
-        include "fcm-service.json"
+        include "**/*"
     }
 }
 
