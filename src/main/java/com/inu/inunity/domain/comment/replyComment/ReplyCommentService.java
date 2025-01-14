@@ -2,6 +2,7 @@ package com.inu.inunity.domain.comment.replyComment;
 
 import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
+import com.inu.inunity.domain.articleUser.ArticleUserService;
 import com.inu.inunity.domain.comment.Comment;
 import com.inu.inunity.domain.comment.CommentRepository;
 import com.inu.inunity.domain.comment.dto.RequestCreateReplyComment;
@@ -22,6 +23,7 @@ public class ReplyCommentService {
     private final ReplyCommentRepository replyCommentRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final ArticleUserService articleUserService;
 
     public List<ResponseReplyComment> getReplyComment(Comment comment, Long userId){
         return comment.getReplyComments().stream().map(replyComment -> {
@@ -48,7 +50,8 @@ public class ReplyCommentService {
 
         ReplyComment replyComment = ReplyComment.of(requestCreateReplyComment, user, comment);
         replyCommentRepository.save(replyComment);
-
+        articleUserService.sendNotification(comment.getArticle());
+        articleUserService.createArticleUser(replyComment.getComment().getArticle(), user);
         return comment.getArticle().getId();
     }
 

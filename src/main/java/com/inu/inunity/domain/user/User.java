@@ -1,9 +1,12 @@
 package com.inu.inunity.domain.user;
 
 import com.inu.inunity.common.BaseEntity;
+import com.inu.inunity.common.fcm.FcmToken;
+import com.inu.inunity.common.fcm.notification.Notification;
 import com.inu.inunity.domain.article.Article;
 import com.inu.inunity.domain.articleLike.ArticleLike;
 import com.inu.inunity.domain.articleReport.ArticleReport;
+import com.inu.inunity.domain.articleUser.ArticleUser;
 import com.inu.inunity.domain.comment.Comment;
 import com.inu.inunity.domain.comment.replyComment.ReplyComment;
 import com.inu.inunity.domain.profile.career.Career;
@@ -82,6 +85,15 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private final List<Portfolio> portfolios = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<Notification> notifications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<FcmToken> fcmTokens = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<ArticleUser> articleUsers = new ArrayList<>();
 
     @Builder
     public User(Long studentId, String name , String nickname, String profileImageUrl, String description, Boolean isGraduation,

@@ -146,7 +146,8 @@ public class SecurityConfig {
             "/v1/articles/{articleid}/comment",
             "/v1/users/{userid}/profile/skill",
             "/v1/users/{userid}/profile/portfolio",
-            "/users/{userid}/profile/career"
+            "/v1/users/{userid}/profile/career",
+            "/v1/articles/{category_id}"
     };
 
     String[] PERMIT_USER_PUT = {
