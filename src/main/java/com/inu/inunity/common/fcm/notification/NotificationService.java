@@ -40,7 +40,6 @@ public class NotificationService {
                 .map(notification -> ResponseNotification.of(notification.getId(), notification.getType(), notification.getCategoryId(), notification.getArticleId(), notification.getTitle(), notification.getContent(), notification.isPushed(), notification.isRead()));
     }
 
-
     @Transactional
     public void updateRead(Long notificationId, UserDetails userDetails){
         Long userId = ((CustomUserDetails) userDetails).getId();
@@ -54,5 +53,4 @@ public class NotificationService {
 
         notification.updateRead();
     }
-
 }

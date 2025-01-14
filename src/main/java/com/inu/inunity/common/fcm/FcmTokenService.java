@@ -5,7 +5,6 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
-import com.inu.inunity.common.fcm.notification.dto.ResponseNotification;
 import com.inu.inunity.domain.user.User;
 import com.inu.inunity.domain.user.UserRepository;
 import com.inu.inunity.security.jwt.CustomUserDetails;
@@ -24,15 +23,13 @@ public class FcmTokenService {
 
     public void sendMessage(com.inu.inunity.common.fcm.notification.Notification notification) {
             List<FcmToken> tokens = notification.getUser().getFcmTokens();
-            ResponseNotification responseNotification = ResponseNotification.of(notification.getId(), notification.getType(), notification.getCategoryId(), notification.getArticleId(), notification.getTitle(),
-                    notification.getContent(), notification.isPushed(), notification.isRead());
             tokens.forEach(token -> {
                         try {
                             Message message = Message.builder()
                                     .setToken(token.getToken())
                                     .setNotification(Notification.builder()
-                                            .setTitle(responseNotification.title())
-                                            .setBody(responseNotification.toString())
+                                            .setTitle(notification.getTitle())
+                                            .setBody(notification.getContent())
                                             .build())
                                     .build();
                             String response = FirebaseMessaging.getInstance().send(message);

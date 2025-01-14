@@ -5,6 +5,7 @@ import com.inu.inunity.domain.article.dto.ResponseArticleThumbnail;
 import com.inu.inunity.domain.articleReport.SearchType;
 import com.inu.inunity.domain.category.dto.RequestCreateCategory;
 import com.inu.inunity.domain.category.dto.ResponseCategory;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -119,8 +120,15 @@ public class CategoryController {
         return CommonResponse.success("카테고리 내 아티클 목록 검색 완료", result);
     }
 
-    @GetMapping("/v1/popular/articles")
-    CommonResponse<Page<ResponseArticleThumbnail>> getPopularArticles(@AuthenticationPrincipal UserDetails userDetails, Pageable pageable) {
-        return CommonResponse.success("게시글 인기 목록 검색 완료", categoryService.getPopularArticles(userDetails, pageable));
+    @PostMapping("/v1/notification/categories/{categoryid}")
+    @Operation(summary = "카테고리 알림 설정 변경", description = "카테고리 알림을 토글합니다")
+    CommonResponse<?> toggleUserCategory(@PathVariable Long categoryid, @AuthenticationPrincipal UserDetails userDetails) {
+        return CommonResponse.success("카테고리 알림 설정 변경 완료", categoryService.toggleUserArticle(categoryid, userDetails));
+    }
+
+    @GetMapping("/v1/notification/categories")
+    @Operation(summary = "유저의 카테고리 알림 목록", description = "모든 카테고리와 카테고리 알림 설정 유무를 반환합니다.")
+    CommonResponse<?> getPopularArticles(@AuthenticationPrincipal UserDetails userDetails) {
+        return CommonResponse.success("카테고리와 카테고리 알림 여부 반환", categoryService.getUserCategories(userDetails));
     }
 }
