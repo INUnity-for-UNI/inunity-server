@@ -41,7 +41,14 @@ public class CommentService {
     public List<ResponseComment> getCommentsForLoginUser(Article article, Long userId) {
         return article.getComments().stream().map(comment -> {
             boolean commentIsOwner = Objects.equals(comment.getUser().getId(), userId);
-            String nickname = comment.getIsAnonymous() ? "익명" + getUserAnonymousNum(comment.getUser().getId(), article.getId()) : comment.getUser().getNickname();
+            boolean commentIsArticleOwner = Objects.equals(comment.getUser().getId(), article.getUser().getId());
+            String nickname;
+            if(commentIsArticleOwner){
+                nickname = comment.getIsAnonymous() ? "익명" + "(글쓴이)" : comment.getUser().getNickname();
+            }
+            else{
+                nickname = comment.getIsAnonymous() ? "익명" + getUserAnonymousNum(comment.getUser().getId(), article.getId()) : comment.getUser().getNickname();
+            }
             String profileImage = comment.getIsAnonymous() ? "https://image-server.squidjiny.com/pictures/다운로드 (1).jpeg" : comment.getUser().getProfileImageUrl();
             if (comment.getIsDeleted()) {
                 return ResponseComment.ofDeleted(comment.getId(), replyCommentService.getReplyComment(comment, userId));
@@ -71,7 +78,14 @@ public class CommentService {
                                         .toList());
                     }
                     else{
-                        String nickname = comment.getIsAnonymous() ? "익명" + getUserAnonymousNum(comment.getUser().getId(), article.getId()) : comment.getUser().getNickname();
+                        boolean commentIsArticleOwner = Objects.equals(comment.getUser().getId(), article.getUser().getId());ㅅ
+                        String nickname;
+                        if(commentIsArticleOwner){
+                            nickname = comment.getIsAnonymous() ? "익명" + "(글쓴이)" : comment.getUser().getNickname();
+                        }
+                        else{
+                            nickname = comment.getIsAnonymous() ? "익명" + getUserAnonymousNum(comment.getUser().getId(), article.getId()) : comment.getUser().getNickname();
+                        }
                         String profileImage = comment.getIsAnonymous() ? "https://image-server.squidjiny.com/pictures/다운로드 (1).jpeg" : comment.getUser().getProfileImageUrl();
                         return ResponseComment.of(comment, nickname, profileImage, false,
                                 comment.getReplyComments().stream()
