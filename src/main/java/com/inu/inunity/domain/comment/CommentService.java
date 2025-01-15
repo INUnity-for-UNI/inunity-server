@@ -12,7 +12,6 @@ import com.inu.inunity.domain.comment.dto.ResponseReplyComment;
 import com.inu.inunity.domain.comment.replyComment.ReplyCommentService;
 import com.inu.inunity.domain.user.User;
 import com.inu.inunity.domain.user.UserRepository;
-import com.inu.inunity.util.communicate.CommunicateUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +26,6 @@ public class CommentService {
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
     private final ReplyCommentService replyCommentService;
-    private final CommunicateUtil communicateUtil;
     private final ArticleUserService articleUserService;
 
     @Transactional(readOnly = true)
@@ -92,11 +90,9 @@ public class CommentService {
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ARTICLE_NOT_FOUND));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
-        Boolean isInadequate = communicateUtil.requestToCleanBot(requestCreateComment.content());
-        Comment comment = Comment.of(requestCreateComment, user, article, isInadequate);
+        Comment comment = Comment.of(requestCreateComment, user, article);
         articleUserService.sendNotification(article);
         articleUserService.createArticleUser(article, user);
-
         commentRepository.save(comment);
         return articleId;
     }
@@ -111,8 +107,7 @@ public class CommentService {
     public Long updateComment(RequestUpdateComment requestUpdateComment) {
         Comment comment = commentRepository.findById(requestUpdateComment.commentId())
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.COMMENT_NOT_FOUND));
-        Boolean isInadequate = communicateUtil.requestToCleanBot(requestUpdateComment.content());
-        comment.modifyComment(requestUpdateComment, isInadequate);
+        comment.modifyComment(requestUpdateComment);
         return comment.getId();
     }
 

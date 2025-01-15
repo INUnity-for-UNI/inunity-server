@@ -14,11 +14,4 @@ public class RestClientConfig {
                 .defaultHeader("User-Agent", "UNI PORTAL LOGIN")
                 .build();
     }
-
-    @Bean
-    public RestClient restClientForAI() {
-        return RestClient.builder()
-                .baseUrl("http://localhost:8000")
-                .build();
-    }
 }
