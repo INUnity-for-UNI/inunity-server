@@ -19,13 +19,13 @@ public record ResponseComment(
         LocalDateTime createAt,
         List<ResponseReplyComment> replyComments
 ) {
-    public static ResponseComment of(Comment comment, Boolean isOwner, List<ResponseReplyComment> replyComments){
+    public static ResponseComment of(Comment comment, String nickname, Boolean isOwner, List<ResponseReplyComment> replyComments){
         return ResponseComment.builder()
                 .commentId(comment.getId())
                 .userId(comment.getUser().getId())
                 .isAnonymous(comment.getIsAnonymous())
                 .department(comment.getUser().getDepartment())
-                .nickname(comment.getUser().getNickname())
+                .nickname(nickname)
                 .userImageUrl(comment.getUser().getProfileImageUrl())
                 .content(comment.getContent())
                 .isOwner(isOwner)
@@ -37,6 +37,7 @@ public record ResponseComment(
     public static ResponseComment ofDeleted(Long commentId, List<ResponseReplyComment> replyComments) {
         return ResponseComment.builder()
                 .commentId(commentId)
+                .nickname("(알수없음)")
                 .isOwner(false)
                 .content("[삭제된 댓글입니다.]")
                 .replyComments(replyComments)

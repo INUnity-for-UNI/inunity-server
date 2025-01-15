@@ -48,4 +48,11 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
             "WHERE a.isDeleted = false " +
             "ORDER BY SIZE(a.articleLikes) DESC, a.view DESC, a.updateAt DESC")
     Page<Article> getPopularArticles(Pageable pageable);
+
+    @Query("SELECT al.id FROM Article a JOIN a.anonymousLists al WHERE a.id = :articleId AND al.userId = :userId")
+    Integer findAnonymousIdByArticleIdAndUserId(@Param("articleId") Long articleId, @Param("userId") Long userId);
+
+    @Query("SELECT CASE WHEN COUNT(al) > 0 THEN true ELSE false END FROM Article a JOIN a.anonymousLists al WHERE a.id = :articleId AND al.userId = :userId")
+    boolean existsByAnonymousUserIdAndArticleId(@Param("articleId") Long articleId, @Param("userId") Long userId);
+
 }

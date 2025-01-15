@@ -41,16 +41,22 @@ public class CommentService {
     public List<ResponseComment> getCommentsForLoginUser(Article article, Long userId) {
         return article.getComments().stream().map(comment -> {
             boolean commentIsOwner = Objects.equals(comment.getUser().getId(), userId);
+            String nickname = comment.getIsAnonymous() ? "익명" + getUserAnonymousNum(comment.getUser().getId(), article.getId()) : comment.getUser().getNickname();
             if (comment.getIsDeleted()) {
                 return ResponseComment.ofDeleted(comment.getId(), replyCommentService.getReplyComment(comment, userId));
             } else {
             return ResponseComment.of(
                     comment,
+                    nickname,
                     commentIsOwner,
                     replyCommentService.getReplyComment(comment, userId)
             );
         }
     }).toList();
+    }
+
+    public Integer getUserAnonymousNum(Long userId, Long articleId){
+        return articleRepository.findAnonymousIdByArticleIdAndUserId(articleId, userId);
     }
 
     public List<ResponseComment> getCommentsForUnLoginUser(Article article) {
@@ -63,7 +69,8 @@ public class CommentService {
                                         .toList());
                     }
                     else{
-                        return ResponseComment.of(comment, false,
+                        String nickname = comment.getIsAnonymous() ? "익명" + getUserAnonymousNum(comment.getUser().getId(), article.getId()) : comment.getUser().getNickname();
+                        return ResponseComment.of(comment, nickname, false,
                                 comment.getReplyComments().stream()
                                         .map(replyComment -> ResponseReplyComment.of(replyComment, false))
                                         .toList());
@@ -93,9 +100,13 @@ public class CommentService {
         Comment comment = Comment.of(requestCreateComment, user, article);
         articleUserService.sendNotification(article);
         articleUserService.createArticleUser(article, user);
+        if(!articleRepository.existsByAnonymousUserIdAndArticleId(article.getId(), userId)){
+            article.addAnonymousUser(userId);
+        }
         commentRepository.save(comment);
         return articleId;
     }
+
 
     /**
      * 댓글을 수정하는 메서드
