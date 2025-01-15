@@ -128,7 +128,13 @@ public class CategoryController {
 
     @GetMapping("/v1/notification/categories")
     @Operation(summary = "유저의 카테고리 알림 목록", description = "모든 카테고리와 카테고리 알림 설정 유무를 반환합니다.")
-    CommonResponse<?> getPopularArticles(@AuthenticationPrincipal UserDetails userDetails) {
+    CommonResponse<?> getCategoryArticles(@AuthenticationPrincipal UserDetails userDetails) {
         return CommonResponse.success("카테고리와 카테고리 알림 여부 반환", categoryService.getUserCategories(userDetails));
+    }
+
+    @GetMapping("/v1/popular/articles")
+    @Operation(summary = "인기게시글", description = "인기게시글")
+    CommonResponse<?> getPopularArticles(@AuthenticationPrincipal UserDetails userDetails, Pageable pageable) {
+        return CommonResponse.success("인기게시글 반환", categoryService.getPopularArticles(userDetails, pageable));
     }
 }
