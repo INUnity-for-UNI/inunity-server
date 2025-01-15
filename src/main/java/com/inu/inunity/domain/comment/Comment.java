@@ -51,21 +51,20 @@ public class Comment extends BaseEntity {
         this.article = article;
     }
 
-    public static Comment of(RequestCreateComment request, User user, Article article, Boolean isInadequate){
+    public static Comment of(RequestCreateComment request, User user, Article article){
         return Comment.builder()
                 .content(request.content())
                 .isAnonymous(request.isAnonymous())
                 .isDeleted(false)
-                .isInadequate(isInadequate)
+                .isInadequate(false)
                 .user(user)
                 .article(article)
                 .build();
     }
 
-    public void modifyComment(RequestUpdateComment requestUpdateComment, Boolean isInadequate) {
+    public void modifyComment(RequestUpdateComment requestUpdateComment) {
         this.content = requestUpdateComment.content();
         this.isAnonymous = requestUpdateComment.isAnonymous();
-        this.isInadequate = isInadequate;
     }
 
     public void deleteComment(){
