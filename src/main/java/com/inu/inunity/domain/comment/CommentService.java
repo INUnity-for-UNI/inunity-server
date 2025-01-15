@@ -78,7 +78,7 @@ public class CommentService {
                                         .toList());
                     }
                     else{
-                        boolean commentIsArticleOwner = Objects.equals(comment.getUser().getId(), article.getUser().getId());ㅅ
+                        boolean commentIsArticleOwner = Objects.equals(comment.getUser().getId(), article.getUser().getId());
                         String nickname;
                         if(commentIsArticleOwner){
                             nickname = comment.getIsAnonymous() ? "익명" + "(글쓴이)" : comment.getUser().getNickname();
