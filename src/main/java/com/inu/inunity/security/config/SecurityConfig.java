@@ -125,7 +125,9 @@ public class SecurityConfig {
             "/v1/users/{userid}/profile",
             "/v1/users/{userid}/profile/skill",
             "/v1/users/{userid}/profile/portfolio",
-            "/v1/users/{userid}/profile/career"
+            "/v1/users/{userid}/profile/career",
+            "/v1/advertises",
+            "/v1/advertises/{advertiseid}"
     };
 
     String[] PERMIT_TEST_USER = {
@@ -138,7 +140,9 @@ public class SecurityConfig {
             "/v1/users/information",
             "/v1/users/comments",
             "/v1/users/articles/wrote",
-            "/v1/users/articles/like"
+            "/v1/users/articles/like",
+            "/v1/notification",
+            "/v1/notification/categories"
     };
 
     String[] PERMIT_USER_POST = {
@@ -146,7 +150,11 @@ public class SecurityConfig {
             "/v1/articles/{articleid}/comment",
             "/v1/users/{userid}/profile/skill",
             "/v1/users/{userid}/profile/portfolio",
-            "/users/{userid}/profile/career"
+            "/v1/users/{userid}/profile/career",
+            "/v1/articles/{category_id}",
+            "/v1/articles/{article_id}/like",
+            "/v1/fcm/token",
+            "/v1/notification/categories/{categoryid}"
     };
 
     String[] PERMIT_USER_PUT = {
@@ -156,7 +164,8 @@ public class SecurityConfig {
             "/v1/users/{userid}/profile",
             "/v1/users/{userid}/profile/skill",
             "/v1/users/{userid}/profile/portfolio",
-            "/v1/users/{userid}/profile/career"
+            "/v1/users/{userid}/profile/career",
+            "/v1/notification/{notificationid}"
     };
 
     String[] PERMIT_USER_PATCH = {
@@ -165,7 +174,6 @@ public class SecurityConfig {
     String[] PERMIT_USER_DELETE = {
             "/v1/replyment/{replymentid}",
             "/v1/comment/{commentid}",
-            "/v1/articles/{article_id}/like",
             "/v1/users/{userid}/profile/skill/{skillId}",
             "/v1/users/{userid}/profile/portfolio/{portfolioId}",
             "/v1/users/{userid}/profile/career/{careerId}"

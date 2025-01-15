@@ -13,6 +13,13 @@ java {
     }
 }
 
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from("src/main/resources") {
+        include "**/*"
+    }
+}
+
 repositories {
     mavenCentral()
 }
@@ -47,8 +54,15 @@ dependencies {
 
     //직렬화
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+
+    //fcm
+    implementation 'com.google.firebase:firebase-admin:9.4.3'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+bootRun {
+    classpath = sourceSets.main.runtimeClasspath
 }

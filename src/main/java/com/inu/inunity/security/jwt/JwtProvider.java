@@ -161,7 +161,7 @@ public class JwtProvider {
                 .secure(true)
                 .path("/")
                 .sameSite("None")
-                .maxAge(accessTokenValidTime)
+                .maxAge(convertMilliSecondsToSeconds(accessTokenValidTime))
                 .build();
 
         // Refresh Token 쿠키
@@ -170,11 +170,15 @@ public class JwtProvider {
                 .secure(true)
                 .path("/")
                 .sameSite("None")
-                .maxAge(refreshTokenValidTime)
+                .maxAge(convertMilliSecondsToSeconds(refreshTokenValidTime))
                 .build();
 
         // 응답에 쿠키 추가
         response.addHeader("Set-Cookie", accessTokenCookie.toString());
         response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+    }
+
+    public Long convertMilliSecondsToSeconds(Long time){
+        return time / 1000;
     }
 }

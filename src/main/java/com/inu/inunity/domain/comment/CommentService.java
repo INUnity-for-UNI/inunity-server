@@ -4,6 +4,7 @@ import com.inu.inunity.common.exception.ExceptionMessage;
 import com.inu.inunity.common.exception.NotFoundElementException;
 import com.inu.inunity.domain.article.Article;
 import com.inu.inunity.domain.article.ArticleRepository;
+import com.inu.inunity.domain.articleUser.ArticleUserService;
 import com.inu.inunity.domain.comment.dto.RequestCreateComment;
 import com.inu.inunity.domain.comment.dto.RequestUpdateComment;
 import com.inu.inunity.domain.comment.dto.ResponseComment;
@@ -25,6 +26,7 @@ public class CommentService {
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
     private final ReplyCommentService replyCommentService;
+    private final ArticleUserService articleUserService;
 
     @Transactional(readOnly = true)
     public List<ResponseComment> getComments(Article article, Long userId){
@@ -89,7 +91,8 @@ public class CommentService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
         Comment comment = Comment.of(requestCreateComment, user, article);
-
+        articleUserService.sendNotification(article);
+        articleUserService.createArticleUser(article, user);
         commentRepository.save(comment);
         return articleId;
     }
