@@ -29,10 +29,11 @@ public record ResponseArticleThumbnail(
 ) {
 
     public static ResponseArticleThumbnail ofNormal(Article article, String content, Integer likeNum, Boolean isLiked, Integer commentNum){
+        String nickname = article.getIsAnonymous() ? "익명" : article.getUser().getNickname();
         return ResponseArticleThumbnail.builder()
                 .userId(article.getUser().getId())
                 .department(article.getUser().getDepartment())
-                .nickname(article.getUser().getNickname())
+                .nickname(nickname)
                 .userImageUrl(article.getUser().getProfileImageUrl())
                 .isAnonymous(article.getIsAnonymous())
                 .categoryId(article.getCategory().getId())
