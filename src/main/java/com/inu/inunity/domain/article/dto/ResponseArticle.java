@@ -35,7 +35,7 @@ public record ResponseArticle(
     public static ResponseArticle ofNormal(Article article, Integer likeNum, Boolean isLiked, Boolean isOwner, Integer commentNum,
                                            List<ResponseComment> comments) {
         String nickname = article.getIsAnonymous() ? "익명" : article.getUser().getNickname();
-        String profileUrl = article.getUser().getIsAnonymous() ? "https://image-server.squidjiny.com/pictures/다운로드 (1).jpeg" : article.getUser().getProfileImageUrl();
+        String profileUrl = article.getIsAnonymous() ? "https://image-server.squidjiny.com/pictures/다운로드 (1).jpeg" : article.getUser().getProfileImageUrl();
         return ResponseArticle.builder()
                 .userId(article.getUser().getId())
                 .department(article.getUser().getDepartment())
