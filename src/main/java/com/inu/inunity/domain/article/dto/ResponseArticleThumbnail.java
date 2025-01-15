@@ -30,11 +30,12 @@ public record ResponseArticleThumbnail(
 
     public static ResponseArticleThumbnail ofNormal(Article article, String content, Integer likeNum, Boolean isLiked, Integer commentNum){
         String nickname = article.getIsAnonymous() ? "익명" : article.getUser().getNickname();
+        String profileUrl = article.getUser().getIsAnonymous() ? "https://image-server.squidjiny.com/pictures/다운로드 (1).jpeg" : article.getUser().getProfileImageUrl();
         return ResponseArticleThumbnail.builder()
                 .userId(article.getUser().getId())
                 .department(article.getUser().getDepartment())
                 .nickname(nickname)
-                .userImageUrl(article.getUser().getProfileImageUrl())
+                .userImageUrl(profileUrl)
                 .isAnonymous(article.getIsAnonymous())
                 .categoryId(article.getCategory().getId())
                 .articleId(article.getId())
