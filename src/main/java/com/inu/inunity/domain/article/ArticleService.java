@@ -21,6 +21,7 @@ import com.inu.inunity.domain.comment.dto.ResponseMyPageComment;
 import com.inu.inunity.domain.user.User;
 import com.inu.inunity.domain.user.UserRepository;
 import com.inu.inunity.security.jwt.CustomUserDetails;
+import com.inu.inunity.util.communicate.CommunicateUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -43,6 +44,8 @@ public class ArticleService {
     private final UserRepository userRepository;
     private final ArticleLikeService articleLikeService;
     private final CommentService commentService;
+    private final EditorJSConverter editorJSConverter;
+    private final CommunicateUtil communicateUtil;
     private final ArticleUserService articleUserService;
 
     /**
@@ -64,7 +67,8 @@ public class ArticleService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
-        Article article = Article.ofUser(requestCreateArticle, 0, false, foundCategory, user);
+        Boolean isInadequate = communicateUtil.requestToCleanBot(requestCreateArticle.content());
+        Article article = Article.ofUser(requestCreateArticle, 0, false, foundCategory, isInadequate, user);
 
         articleRepository.save(article);
         articleUserService.createArticleUser(article, user);
@@ -122,7 +126,9 @@ public class ArticleService {
             throw new NotOwnerException(ExceptionMessage.NOTICE_CANNOT_EDIT);
         }
 
-        article.modifyArticle(requestModifyArticle);
+        Boolean isInadequate = communicateUtil.requestToCleanBot(requestModifyArticle.content());
+
+        article.modifyArticle(requestModifyArticle, isInadequate);
         return articleId;
     }
 

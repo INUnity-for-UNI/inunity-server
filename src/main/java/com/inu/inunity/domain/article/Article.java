@@ -81,15 +81,14 @@ public class Article extends BaseEntity {
     }
 
     public static Article ofUser(RequestCreateArticle request, Integer view, Boolean isDeleted, Category category,
-                                 User user) {
+                                 Boolean isInadequate, User user) {
         return Article.builder()
                 .title(request.title())
                 .content(request.content())
                 .isAnonymous(request.isAnonymous())
                 .view(view)
                 .isDeleted(isDeleted)
-                //todo: fastApi 연결 성공하면 상태변경시키기
-                .isInadequate(false)
+                .isInadequate(isInadequate)
                 .isNotice(false)
                 .category(category)
                 .user(user)
@@ -111,10 +110,11 @@ public class Article extends BaseEntity {
         this.view++;
     }
 
-    public void modifyArticle(RequestModifyArticle requestModifyArticle) {
+    public void modifyArticle(RequestModifyArticle requestModifyArticle, Boolean isInadequate) {
         this.title = requestModifyArticle.title();
         this.content = requestModifyArticle.content();
         this.isAnonymous = requestModifyArticle.isAnonymous();
+        this.isInadequate = isInadequate;
     }
 
     public void deleteArticle(){
