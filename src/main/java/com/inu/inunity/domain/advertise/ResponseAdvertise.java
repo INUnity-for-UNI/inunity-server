@@ -15,6 +15,13 @@ public record ResponseAdvertise(
 ) {
 
     public static ResponseAdvertise of(Long advertiseId, String title, String content, String url, LocalDateTime createAt, LocalDateTime updateAt){
-        return ResponseAdvertise.of(advertiseId, title, content, url, createAt, updateAt);
+        return ResponseAdvertise.builder()
+                .advertiseId(advertiseId)
+                .title(title)
+                .content(content)
+                .url(url)
+                .createAt(createAt)
+                .updateAt(updateAt)
+                .build();
     }
 }
