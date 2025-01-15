@@ -28,7 +28,7 @@ public record ResponseArticleThumbnail(
         Boolean isNotice
 ) {
 
-    public static ResponseArticleThumbnail ofNormal(Article article, Integer likeNum, Boolean isLiked, Integer commentNum){
+    public static ResponseArticleThumbnail ofNormal(Article article, String content, Integer likeNum, Boolean isLiked, Integer commentNum){
         return ResponseArticleThumbnail.builder()
                 .userId(article.getUser().getId())
                 .department(article.getUser().getDepartment())
@@ -38,7 +38,7 @@ public record ResponseArticleThumbnail(
                 .categoryId(article.getCategory().getId())
                 .articleId(article.getId())
                 .title(article.getTitle())
-                .content(article.getContent())
+                .content(content)
                 .commentNum(commentNum)
                 .createAt(article.getCreateAt())
                 .updatedAt(article.getUpdateAt())

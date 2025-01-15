@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean;
 @OpenAPIDefinition
         (
         info = @io.swagger.v3.oas.annotations.info.Info(title = "InUnity API", version = "1.0", description = "API Documentation"),
-        servers = {
+        servers = {@Server(url = "https://server.inunity.club", description = "최경민 개멍청이"),
                 @Server(url = "https://inunity-server.squidjiny.com", description = "Production Server"),
                 @Server(url = "http://localhost:8082", description = "local Server")
         }

@@ -11,6 +11,11 @@ import com.inu.inunity.domain.articleLike.ArticleLikeService;
 import com.inu.inunity.domain.category.dto.RequestCreateCategory;
 import com.inu.inunity.domain.category.dto.ResponseCategory;
 import com.inu.inunity.domain.comment.CommentService;
+import com.inu.inunity.domain.user.User;
+import com.inu.inunity.domain.user.UserService;
+import com.inu.inunity.domain.userCategory.UserCategoryService;
+import com.inu.inunity.domain.userCategory.dto.ResponseUserCategory;
+import com.inu.inunity.security.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +33,8 @@ public class CategoryService {
     private final ArticleService articleService;
     private final ArticleLikeService articleLikeService;
     private final CommentService commentService;
+    private final UserCategoryService userCategoryService;
+    private final UserService userService;
 
     /**
      * 카테고리 생성 메서드
@@ -191,7 +198,12 @@ public class CategoryService {
             Boolean isLiked = articleLikeService.isLike(article.getId(), articleService.getUserIdAtUserDetails(userDetails));
             Integer likeNum = articleLikeService.getLikeNum(article);
             Integer commentNum = commentService.getCommentNum(article.getId());
-            return ResponseArticleThumbnail.ofNormal(article, likeNum, isLiked, commentNum);
+            try {
+                String content = articleService.getObject(article.getContent());
+                return ResponseArticleThumbnail.ofNormal(article, content, likeNum, isLiked, commentNum);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 
@@ -211,8 +223,30 @@ public class CategoryService {
                 }
             }
             else{
-                return ResponseArticleThumbnail.ofNormal(article, likeNum, isLiked, commentNum);
+                try {
+                    String content = articleService.getObject(article.getContent());
+                    return ResponseArticleThumbnail.ofNormal(article, content, likeNum, isLiked, commentNum);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
+    }
+
+    @Transactional
+    public boolean toggleUserArticle(Long categoryId, UserDetails userDetails){
+        Category category = categoryRepository.findById(categoryId)
+                        .orElseThrow(()->new NotFoundElementException(ExceptionMessage.CATEGORY_NOT_FOUND));
+        Long userId = ((CustomUserDetails) userDetails).getId();
+        User user = userService.findUserById(userId);
+
+        return userCategoryService.toggleUserCategory(category, user);
+    }
+
+    public List<ResponseUserCategory> getUserCategories(UserDetails userDetails){
+        Long userId = ((CustomUserDetails) userDetails).getId();
+        User user = userService.findUserById(userId);
+
+        return userCategoryService.getUserCategories(user);
     }
 }

@@ -5,6 +5,7 @@ import com.inu.inunity.domain.article.dto.RequestCreateArticle;
 import com.inu.inunity.domain.article.dto.RequestModifyArticle;
 import com.inu.inunity.domain.articleLike.ArticleLike;
 import com.inu.inunity.domain.articleReport.ArticleReport;
+import com.inu.inunity.domain.articleUser.ArticleUser;
 import com.inu.inunity.domain.category.Category;
 import com.inu.inunity.domain.comment.Comment;
 import com.inu.inunity.domain.notice.Notice;
@@ -15,6 +16,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -28,6 +30,7 @@ public class Article extends BaseEntity {
 
     private String title;
 
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     private Integer view;
@@ -51,6 +54,9 @@ public class Article extends BaseEntity {
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ArticleReport> articleReports;
+
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<ArticleUser> articleUsers = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;

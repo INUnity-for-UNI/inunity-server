@@ -12,6 +12,7 @@ import com.inu.inunity.domain.article.dto.ResponseArticle;
 import com.inu.inunity.domain.article.dto.ResponseArticleThumbnail;
 import com.inu.inunity.domain.articleLike.ArticleLike;
 import com.inu.inunity.domain.articleLike.ArticleLikeService;
+import com.inu.inunity.domain.articleUser.ArticleUserService;
 import com.inu.inunity.domain.category.Category;
 import com.inu.inunity.domain.category.CategoryRepository;
 import com.inu.inunity.domain.comment.CommentService;
@@ -45,6 +46,7 @@ public class ArticleService {
     private final CommentService commentService;
     private final EditorJSConverter editorJSConverter;
     private final CommunicateUtil communicateUtil;
+    private final ArticleUserService articleUserService;
 
     /**
      * 아티클을 생성하는 메서드
@@ -69,6 +71,7 @@ public class ArticleService {
         Article article = Article.ofUser(requestCreateArticle, 0, false, foundCategory, isInadequate, user);
 
         articleRepository.save(article);
+        articleUserService.createArticleUser(article, user);
         return article.getId();
     }
 
@@ -165,17 +168,30 @@ public class ArticleService {
 
         return articleLikes.map(articleLike -> {
                     Article article = articleLike.getArticle();
-                    return ResponseArticleThumbnail.ofNormal(article, articleLikeService.getLikeNum(article),
-                            articleLikeService.isLike(article.getId(), userId), commentService.getCommentNum(article.getId()));
-                });
+            String content = null;
+            try {
+                content = getObject(article.getContent());
+                return ResponseArticleThumbnail.ofNormal(article, content, articleLikeService.getLikeNum(article),
+                        articleLikeService.isLike(article.getId(), userId), commentService.getCommentNum(article.getId()));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     @Transactional(readOnly = true)
     public Page<ResponseArticleThumbnail> getUserWroteArticles(Long userId, Pageable pageable){
         Page<Article> articles = articleRepository.findAllByUserIdAndIsDeletedIsFalseOrderByUpdateAtDesc(userId, pageable);
 
-        return articles.map(article -> ResponseArticleThumbnail.ofNormal(article, articleLikeService.getLikeNum(article),
-                                articleLikeService.isLike(article.getId(), userId), commentService.getCommentNum(article.getId())));
+        return articles.map(article -> {
+            try {
+                String content = getObject(article.getContent());
+                return  ResponseArticleThumbnail.ofNormal(article, content, articleLikeService.getLikeNum(article),
+                        articleLikeService.isLike(article.getId(), userId), commentService.getCommentNum(article.getId()));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     @Transactional(readOnly = true)

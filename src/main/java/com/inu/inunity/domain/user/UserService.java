@@ -6,6 +6,8 @@ import com.inu.inunity.domain.article.ArticleService;
 import com.inu.inunity.domain.article.dto.ResponseArticleThumbnail;
 import com.inu.inunity.domain.comment.dto.ResponseMyPageComment;
 import com.inu.inunity.domain.user.dto.RequestSetUser;
+import com.inu.inunity.domain.user.dto.ResponseUser;
+import com.inu.inunity.security.Role;
 import com.inu.inunity.security.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -51,7 +53,16 @@ public class UserService {
         return articleService.getUserWroteComments(user);
     }
 
-    public Long getUserIdAtUserDetails(UserDetails userDetails){
-        return ((CustomUserDetails) userDetails).getId();
+    public ResponseUser getUserAtUserDetails(UserDetails userDetails){
+        User user = findUserById(((CustomUserDetails) userDetails).getId());
+
+        return ResponseUser.of(user);
+    }
+
+    @Transactional
+    public void editRole(Role role, UserDetails userDetails){
+        Long userId = ((CustomUserDetails) userDetails).getId();
+        User user = findUserById(userId);
+        user.updateAuthenticationForAdmin(List.of(role));
     }
 }
