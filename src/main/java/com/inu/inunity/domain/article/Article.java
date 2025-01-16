@@ -43,6 +43,9 @@ public class Article extends BaseEntity {
 
     private Boolean isNotice;
 
+    @ElementCollection
+    private List<AnonymousList> anonymousLists = new ArrayList<>();
+
     @OneToOne(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private Notice notice;
 
@@ -119,5 +122,11 @@ public class Article extends BaseEntity {
 
     public void deleteArticle(){
         this.isDeleted = true;
+    }
+
+    public void addAnonymousUser(Long userId) {
+        Long newId = (long) (anonymousLists.size() + 1); // 리스트 크기 +1
+        AnonymousList newAnonymous = new AnonymousList(newId, userId);
+        anonymousLists.add(newAnonymous);
     }
 }
