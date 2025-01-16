@@ -176,7 +176,8 @@ public class SecurityConfig {
             "/v1/comment/{commentid}",
             "/v1/users/{userid}/profile/skill/{skillId}",
             "/v1/users/{userid}/profile/portfolio/{portfolioId}",
-            "/v1/users/{userid}/profile/career/{careerId}"
+            "/v1/users/{userid}/profile/career/{careerId}",
+            "/v1/articles/{article_id}"
     };
 
     String[] PERMIT_ADMIN = {
